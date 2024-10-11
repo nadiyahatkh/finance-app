@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/Card";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ValueIcon } from "@radix-ui/react-icons";
 
 export default function Dashboard(){
@@ -46,16 +47,28 @@ export default function Dashboard(){
             <div className="flex justify-between items-center mb-8">
                 <p className="font-bold">Pengeluaran</p>
                 <div className="flex items-center space-x-4">
+                <Select>
+                  <SelectTrigger className="w-[150px] font-semibold">
+                    <SelectValue placeholder="Bulan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
+                  </SelectContent>
+                </Select>
+                </div>
+
+            </div>
+            {/* <BarChart data={chartData} /> */}
+            <div className="flex justify-center items-center space-x-4">
                     <p className="flex items-center font-semibold text-sm">
                         <ValueIcon className="h-4 w-4 mr-2" style={{ color: "#28A745" }} /> Reimburesent
                     </p>
                     <p className="flex items-center font-semibold text-sm">
                         <ValueIcon className="h-4 w-4 mr-2" style={{ color: "#28A745" }} /> Payment Procces
                     </p>
-                </div>
-
             </div>
-            {/* <BarChart data={chartData} /> */}
           </CardContent>
           {/* <CardContent className="lg:col-span-2 flex flex-col gap-4">
             <section>
