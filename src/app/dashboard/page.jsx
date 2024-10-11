@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/Card";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ValueIcon } from "@radix-ui/react-icons";
+import { Circle } from "lucide-react";
 
 export default function Dashboard(){
     const cardData = [
@@ -63,10 +64,10 @@ export default function Dashboard(){
             {/* <BarChart data={chartData} /> */}
             <div className="flex justify-center items-center space-x-4">
                     <p className="flex items-center font-semibold text-sm">
-                        <ValueIcon className="h-4 w-4 mr-2" style={{ color: "#28A745" }} /> Reimburesent
+                        <Circle className="h-4 w-4 mr-2 fill-green-600" style={{ color: "#28A745" }} /> Reimburesent
                     </p>
                     <p className="flex items-center font-semibold text-sm">
-                        <ValueIcon className="h-4 w-4 mr-2" style={{ color: "#28A745" }} /> Payment Procces
+                        <Circle className="h-4 w-4 mr-2 fill-blue-600" style={{ color: "#2563EB" }} /> Payment Procces
                     </p>
             </div>
           </CardContent>

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight } from "lucide-react";
+import { Check, ChevronRight, CircleUserRound, Receipt } from "lucide-react";
 
 export default function DetailSubmission() {
   return (
@@ -13,7 +13,7 @@ export default function DetailSubmission() {
         <div className="mt-4">
           <Card className="lg:w-5/6 p-4">
             <CardContent className="w-full">
-              <div className="grid gap-x-8 gap-y-4 grid-cols-3"> {/* Ubah menjadi 2 kolom */}
+              <div className="grid gap-x-8 gap-y-4 grid-cols-3 mb-4"> {/* Ubah menjadi 2 kolom */}
                 {/* Kolom pertama */}
                 <div className="w-full">
                   <div className="flex text-sm mb-2">
@@ -62,6 +62,27 @@ export default function DetailSubmission() {
                 <Button className="mr-2">Tolak</Button>
                 <Button>Terima</Button> {/* Ubah tombol untuk perbedaan aksi */}
               </div>
+              </div>
+              <div className="flex justify-center items-center mb-4">
+                    <div className="rounded-full flex justify-center items-center border border-green-400 w-[45px] h-[45px]">
+                        <Receipt className="h-5 w-5 text-green-400" />
+                    </div>
+                    <div className="border border-green-400 w-[100px]"></div>
+                    <div className="rounded-full flex justify-center items-center border border-green-400 w-[45px] h-[45px]">
+                        <CircleUserRound className="h-5 w-5 text-green-400" />
+                    </div>  
+                    <div className="border border-green-400 w-[100px]"></div>
+                    <div className="rounded-full flex justify-center items-center border border-green-400 w-[45px] h-[45px]">
+                        <CircleUserRound className="h-5 w-5 text-green-400" />
+                    </div>
+                    <div className="border w-[100px]"></div>
+                    <div className="rounded-full flex justify-center items-center border w-[45px] h-[45px]">
+                        <CircleUserRound className="h-5 w-5" />
+                    </div>
+                    <div className="border w-[100px]"></div>
+                    <div className="rounded-full flex justify-center items-center border w-[45px] h-[45px]">
+                        <CircleUserRound className="h-5 w-5" />
+                    </div>
               </div>
             </CardContent>
           </Card>

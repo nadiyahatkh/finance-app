@@ -102,7 +102,7 @@ export function DataTableFacetedFilter({
                           : "opacity-50 [&_svg]:invisible"
                       )}
                     >
-                      <CheckIcon className={cn("h-4 w-4")} />
+                      <CheckIcon className={cn("h-4 w-4 bg-yellow-400 border border-yellow-400")} />
                     </div>
                     {option.icon && (
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
