@@ -16,9 +16,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { useFieldArray } from "react-hook-form";
 
+// Di dalam komponen SubmissionUser
 
 export default function SubmissionUser() {
+    
     const FormSchema = z.object({
         dob: z.date({
           required_error: "A date of birth is required.",
@@ -28,6 +31,10 @@ export default function SubmissionUser() {
     const form = useForm({
         resolver: zodResolver(FormSchema),
     });
+    const { fields, append, remove } = useFieldArray({
+        control: form.control, // Mengambil kontrol dari react-hook-form
+        name: "items", // Nama field yang akan dikelola
+      });
     return(
         <div className="py-4">
             <div className="w-full max-w-7xl mx-auto">
@@ -127,59 +134,64 @@ export default function SubmissionUser() {
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2">Item</Label>
                                     <Card className="">
-                                        <CardContent className="p-4">
-                                        <div className="mb-4">
+                                    <CardContent className="p-4">
+                                        {fields.map((item, index) => (
+                                        <div key={item.id} className="mb-4">
                                             <div className="mb-4">
-                                                <Label className="block text-sm mb-2">Deskripsi</Label>
-                                                <Input type="text" placeholder="Contoh: Pembelian Laptop untuk karyawan" />
+                                            <Label className="block text-sm mb-2">Deskripsi</Label>
+                                            <FormField
+                                                control={form.control}
+                                                name={`items.${index}.description`} // Nama yang unik untuk setiap field deskripsi
+                                                render={({ field }) => (
+                                                <Input {...field} placeholder="Contoh: Pembelian Laptop untuk karyawan" />
+                                                )}
+                                            />
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <div className="w-full mr-2">
-                                                    <Label className="block text-sm mb-2">Kuantitas</Label>
-                                                    <Input type="text" placeholder="Masukan nama..." />
-                                                </div>
-                                                <div className="w-full ml-2">
-                                                    <Label className="block text-sm mb-2">Jumlah (Rp)</Label>
-                                                    <Input type="" placeholder="Masukan harga..." />
-                                                </div>
+                                            <div className="w-full mr-2">
+                                                <Label className="block text-sm mb-2">Kuantitas</Label>
+                                                <FormField
+                                                control={form.control}
+                                                name={`items.${index}.quantity`} // Nama yang unik untuk setiap field kuantitas
+                                                render={({ field }) => (
+                                                    <Input {...field} placeholder="Masukan jumlah..." />
+                                                )}
+                                                />
+                                            </div>
+                                            <div className="w-full ml-2">
+                                                <Label className="block text-sm mb-2">Jumlah (Rp)</Label>
+                                                <FormField
+                                                control={form.control}
+                                                name={`items.${index}.amount`} // Nama yang unik untuk setiap field jumlah
+                                                render={({ field }) => (
+                                                    <Input {...field} placeholder="Masukan harga..." />
+                                                )}
+                                                />
+                                            </div>
+                                            </div>
+                                            <div className="flex justify-end mt-2">
+                                            <Button variant="ghost" className="text-red-600 text-xs" onClick={() => remove(index)}>
+                                                <Trash2 className="w-4 h-4 mr-1" /> Hapus item
+                                            </Button>
                                             </div>
                                         </div>
-                                        <div className="mb-4">
-                                            <div className="flex justify-end">
-                                                <Button variant="ghost" className="text-red-600 text-xs">
-                                                   <Trash2 className="w-4 h-4 mr-1" /> Hapus item
-                                                </Button>
-                                            </div>
+                                        ))}
+                                        <div className="flex justify-end">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            className="text-blue-600 text-xs"
+                                            onClick={() => append({ description: "", quantity: "", amount: "" })} // Menambah item baru
+                                        >
+                                            <Plus className="w-4 h-4 mr-1" /> Tambah item
+                                        </Button>
                                         </div>
-                                        <div className="mb-4">
-                                            <div className="mb-4">
-                                                <Label className="block text-sm mb-2">Deskripsi</Label>
-                                                <Input type="text" placeholder="Contoh: Pembelian Laptop untuk karyawan" />
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <div className="w-full mr-2">
-                                                    <Label className="block text-sm mb-2">Kuantitas</Label>
-                                                    <Input type="text" placeholder="Masukan nama..." />
-                                                </div>
-                                                <div className="w-full ml-2">
-                                                    <Label className="block text-sm mb-2">Jumlah (Rp)</Label>
-                                                    <Input type="" placeholder="Masukan harga..." />
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div className="mb-4">
-                                            <div className="flex justify-end">
-                                                <Button variant="ghost" className="text-blue-600 text-xs">
-                                                   <Plus className="w-4 h-4 mr-1" /> Tambah item
-                                                </Button>
-                                            </div>
+                                        <div className="mt-4">
+                                        <div className="flex justify-end font-bold text-lg">
+                                            Total: Rp. {/* Bisa tambahkan logika untuk menghitung total */}
                                         </div>
-                                        <div className="">
-                                            <div className="flex justify-end font-bold text-lg">
-                                                Total : Rp. 2.080.000
-                                            </div>
                                         </div>
-                                        </CardContent>
+                                    </CardContent>
                                     </Card>
                                 </div>
                                 <div className="mb-4">
@@ -187,7 +199,8 @@ export default function SubmissionUser() {
                                     <div className="border-dashed border-2 rounded-lg flex flex-col items-center justify-center p-4 mb-1">
                                         <img src="../upload.png" className="mb-4" alt="" />
                                         {/* <div className="text-sm font-semibold mb-2">Choose a file or drag & drop it here</div> */}
-                                        <div className="text-muted-foreground text-xs mb-5">Drag your file to start uploading format PDF</div>
+                                        <div className="font-semibold text-xs mb-5">Drag your file to start uploading format PDF</div>
+
                                         <input
                                             name="path"
                                             type="file"
@@ -196,7 +209,7 @@ export default function SubmissionUser() {
                                             id="fileInput"
                                             // onChange={handleFileChange}
                                         />
-                                        <Button type="button" variant="outline" className="mb-4" onClick={() => document.getElementById('fileInput').click()}>Browse File</Button>
+                                        <Button type="button" variant="outline" className="mb-4" onClick={() => document.getElementById('fileInput').click()}>Pilih File</Button>
                                     </div>
                                     {/* {selectedFiles.length > 0 && (
                                         <div className="mt-4 space-y-2">

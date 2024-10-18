@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 // import { Card } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DataTable } from "@/components/user-datatable/data-table";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
@@ -11,9 +10,19 @@ import Link from "next/link";
 import path from "path";
 import fs from "fs";
 import { Card, CardContent } from "@/components/Card";
+import { columns } from "./columns";
+import { DataTable } from "@/components/employee-management-datatable/data-table";
 // import { useState } from "react";
 
-
+async function getData() {
+  const filePath = path.join(
+    process.cwd(),
+    "src/app/user",
+    "data.json"
+  );
+  const data = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(data);
+}
 
 export default async function HomeUser() {
     // const cardData = [
@@ -45,7 +54,7 @@ export default async function HomeUser() {
     
     //   const [date, setDate] = useState(defaultDate);
 
-    //   const data = await getData()
+      const data = await getData()
     return(
         <div className="py-4">
       <div className="w-full max-w-7xl mx-auto">
@@ -130,7 +139,7 @@ export default async function HomeUser() {
             statusFilter={statusFilter} 
             setStatusFilter={setStatusFilter} 
           /> */}
-          {/* <DataTable data={data} columns={columns} /> */}
+          <DataTable data={data} columns={columns} />
           </div>
         </CardContent>
       </div>

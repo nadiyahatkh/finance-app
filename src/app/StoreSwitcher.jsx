@@ -1,16 +1,29 @@
 'use client';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { ChevronsUpDown, LogIn, User } from "lucide-react";
+import { ChevronsUpDown, LogIn, LogOut, User } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 
 export default function StoreSwitcher({ className, items = [] }){
     const [open, setOpen] = useState(false);
+    const [showDialogLogOut, setShowDialogLogOut] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const { status, data: session } = useSession();
+    const [foto, setFoto] = useState()
     const router = useRouter();
+    const isAdmin = session?.user?.role === 1 ;  // Assuming role is stored in session
+    const handleSignOut = () => {
+        setIsLoading(true)
+        signOut({ callbackUrl: '/sign-in' }); // Redirect to login page after sign out
+    };
+
     return(
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -28,7 +41,7 @@ export default function StoreSwitcher({ className, items = [] }){
                     </Avatar>
                     {/* <img src={profileImage} alt="Profile Image" className="w-4 h-4 rounded-full mr-2" /> */}
                     {/* {session?.user?.name || 'Guest'} */}
-                    Nadiyah
+                    <p>Nadiyah Atikah Juliyanti</p>
                     <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
@@ -45,16 +58,24 @@ export default function StoreSwitcher({ className, items = [] }){
                             </Link>
                         </>
                     
+                        {status === 'authenticated' ? (
+                        <button className="flex items-center p-1 rounded-md hover:bg-gray-100" onClick={() => setShowDialogLogOut(true)}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Log Out
+                        </button>
+                    ) : (
                         <button className="flex items-center p-1 rounded-md hover:bg-gray-100" onClick={() => router.push("/sign-in")}>
                             <LogIn className="mr-2 h-4 w-4" />
                             Log In
                         </button>
-                    {/* <AlertDialog open={showDialogLogOut} onClose={() => setShowDialogLogOut(false)}>
+                    )}
+
+                    <AlertDialog open={showDialogLogOut} onClose={() => setShowDialogLogOut(false)}>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Anda Ingin Keluar Dari Akun {session?.user?.name}
+                        Anda Ingin Keluar Dari Akun
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -73,7 +94,7 @@ export default function StoreSwitcher({ className, items = [] }){
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
-                </AlertDialog> */}
+                </AlertDialog>
                 </div>
             </PopoverContent>
         </Popover>

@@ -13,77 +13,133 @@ export default function DetailSubmission() {
         <div className="mt-4">
           <Card className="lg:w-5/6 p-4">
             <CardContent className="w-full">
-              <div className="grid gap-x-8 gap-y-4 grid-cols-3 mb-4"> {/* Ubah menjadi 2 kolom */}
-                {/* Kolom pertama */}
-                <div className="w-full">
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Tanggal</div> {/* Sesuaikan ukuran */}
-                    <div className="font-semibold w-2/3">Pengajuan</div>
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="">
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Tanggal</div>
+                    <div className="font-semibold">Pengajuan</div>
                   </div>
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Tujuan Pembayaran/Pengeluaran</div>
-                    <div className="font-semibold w-2/3">Waktu Pengajuan</div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Tujuan Pembayaran/Pengeluaran</div>
+                    <div className="font-semibold">Waktu Pengajuan</div>
                   </div>
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Tanggal Pembayaran</div>
-                    <div className="font-semibold w-2/3">Waktu Pengajuan</div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Tanggal Pembayaran</div>
+                    <div className="font-semibold">Waktu Pengajuan</div>
                   </div>
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Tipe</div>
-                    <div className="font-semibold w-2/3 bg-green-500 rounded text-white">
-                      Reimbursement
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Tipe</div>
+                    <div className="font-semibold bg-green-500 w-40 rounded text-white p-1">
+                      Request Payment
                     </div>
-                  </div> 
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Bukti</div>
-                    <div className="font-semibold w-2/3">Lihat Bukti</div>
+                  </div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Bukti</div>
+                    <div className="font-semibold">Lihat Bukti</div>
                   </div>
                 </div>
-                {/* Kolom kedua */}
-                <div className="w-full">
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Nama Bank</div>
-                    <div className="font-semibold w-2/3">Bank Mandiri</div>
+                <div className="">
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Nama Bank</div>
+                    <div className="font-semibold">Bank Mandiri</div>
                   </div>
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Nama Pemilik Rekening</div>
-                    <div className="font-semibold w-2/3">Ontario Branch</div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Nama Pemilik Rekening</div>
+                    <div className="font-semibold">Ontario Branch</div>
                   </div>
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Nomor Rekening</div>
-                    <div className="font-semibold w-2/3">16073434121</div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Nomor Rekening</div>
+                    <div className="font-semibold">16073434121</div>
                   </div>
-                  <div className="flex text-sm mb-2">
-                    <div className="text-muted-foreground w-1/3">Jumlah (Rp)</div>
-                    <div className="font-semibold w-2/3">Rp. 2.997.000</div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Jumlah (Rp)</div>
+                    <div className="font-semibold">Rp. 2.997.000</div>
                   </div>
                 </div>
-              <div className="flex justify-end"> {/* Atur margin agar tombol lebih ke bawah */}
-                <Button className="mr-2">Tolak</Button>
-                <Button>Terima</Button> {/* Ubah tombol untuk perbedaan aksi */}
-              </div>
+                <div className="flex justify-end"> 
+                  <Button className="mr-2">Tolak</Button>
+                  <Button>Terima</Button> 
+                </div>
               </div>
               <div className="flex justify-center items-center mb-4">
-                    <div className="rounded-full flex justify-center items-center border border-green-400 w-[45px] h-[45px]">
+
+                <div className="grid grid-cols-10 gap-4 justify-center items-center">
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>  
+                      <hr className="border-green-400" />
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>  
+                      <hr className="border-green-400" />
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>  
+                      <hr className="border-green-400" />
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>  
+                      <div className="border border-green-400 W-[55px]"></div>
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>
+                </div>
+              </div>
+              {/* <div className="flex justify-center items-center mb-4">
+
+                <div className="flex items-center">
+                  <div className="flex flex-col">
+                    <div className="flex items-center">
+
+                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
                         <Receipt className="h-5 w-5 text-green-400" />
                     </div>
                     <div className="border border-green-400 w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border border-green-400 w-[45px] h-[45px]">
+                    </div>
+                  <span style={{ marginLeft:-10 }}>testjjkjjkjk</span>
+
+                  </div>
+
+                </div>
+                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
                         <CircleUserRound className="h-5 w-5 text-green-400" />
                     </div>  
                     <div className="border border-green-400 w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border border-green-400 w-[45px] h-[45px]">
+                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
                         <CircleUserRound className="h-5 w-5 text-green-400" />
                     </div>
-                    <div className="border w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5" />
+                    <div className="border border-red-400 w-[100px]"></div>
+                    <div className="rounded-full flex justify-center items-center border-2 border-red-400 w-[45px] h-[45px]">
+                        <CircleUserRound className="h-5 w-5 text-muted-foreground text-red-400" />
                     </div>
                     <div className="border w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5" />
+                    <div className="rounded-full flex justify-center items-center border-2 w-[45px] h-[45px]">
+                        <CircleUserRound className="h-5 w-5 text-muted-foreground" />
                     </div>
-              </div>
+              </div> */}
+              {/* <div className="grid grid-cols-5 gap-4 justify-content-center">
+                    <div className="">
+                        <span>Test</span>
+                        
+                    </div>
+                    <div>
+                        <span>Test</span>
+                        
+                    </div>
+                    <div>
+                        <span>Test</span>
+                        
+                    </div>
+                    <div>
+                        <span>Test</span>
+                        
+                    </div>
+                    <div>
+                        <span>Test</span>
+                        
+                    </div>
+              </div> */}
+
             </CardContent>
           </Card>
         </div>

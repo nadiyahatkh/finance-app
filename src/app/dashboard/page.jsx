@@ -6,23 +6,23 @@ import { Circle } from "lucide-react";
 export default function Dashboard(){
     const cardData = [
         {
-          label: "Jumlah Aset",
+          label: "Permintaan Dikirimkan",
           amount: 20,
           image: "./Vector.png"
         },
         {
-          label: "Total Aset Aktif",
+          label: "Permintaan yang Disetujui",
           amount: 30,
           image: "./CekCircle.png"
         },
         {
-          label: "Aset Rusak",
+          label: "Permintaan yang Ditolak",
           amount: 40,
           image: "./VectorX.png"
         },
         {
           label: "Aset Dipinjamkan",
-          amount: 50,
+          amount: "Rp.3.000.000",
           image: "./Rp.png"
         },
       ];

@@ -9,7 +9,7 @@ export function Card({ label, amount, description, image }) {
         <p className="text-sm font-bold">{label}</p>
       </section>
       <section className="flex justify-between">
-        <h2 className="text-6xl font-semibold" style={{ color: "#335CFF" }}>{amount}</h2>
+        <p className="text-3xl h-[63px] w-[63px] font-semibold" style={{ color: "#335CFF" }}>{amount}</p>
         {/* <p className="text-xs text-gray-500">{description}</p> */}
         <img src={image} className="h-[63px] w-[63px] object-contain" alt="" />
       </section>
@@ -24,7 +24,7 @@ export function CardContent(props) {
       className={cn(
         "flex w-full flex-col gap-3 rounded-xl border p-5 shadow",
         props.className
-      )}
+      )} 
     />
   );
 }
