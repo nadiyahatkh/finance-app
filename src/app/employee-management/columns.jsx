@@ -34,33 +34,25 @@ export const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "label",
-    header: 'Label',
+    accessorKey: "name",
+    header: 'Nama Karyawan',
     cell: ({ row }) => (
-      <div className="w-[150px] capitalize">{row.getValue("label")}</div>
+      <div className="w-[150px] capitalize">{row.getValue("name")}</div>
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "note",
-    header: 'Note'
+    accessorKey: "email",
+    header: 'Email'
   },
   {
-    accessorKey: "category",
-    header: 'Category'
+    accessorKey: "department.name",
+    header: 'Departemen'
   },
   {
-    accessorKey: "type",
-    header: 'Type'
-  },
-  {
-    accessorKey: "amount",
-    header: 'Amount'
-  },
-  {
-    accessorKey: "date",
-    header: 'Date',
+    accessorKey: "position.name",
+    header: 'Posisi'
   },
   {
     id: 'aksi',

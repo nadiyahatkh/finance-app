@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { getSession, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { TailSpin } from "react-loader-spinner";
+import { TailSpin, ThreeDots } from "react-loader-spinner";
 export default function SignIn(){
 
     const { data: session, status } = useSession();
@@ -21,10 +21,8 @@ export default function SignIn(){
     const handleLogin = async (e) => {
         e.preventDefault();
         
-        // Clear previous error
         setError("");
         
-        // Validate fields
         if (!value.email || !value.password) {
           setError("Email and password are required");
           return;
@@ -42,7 +40,6 @@ export default function SignIn(){
           if (res && !res.error) {
             const session = await getSession();
             const userRole = session?.user?.role;
-            console.log(userRole)
             const redirectUrl = +userRole === 1 | 2 | 3 | 4 ? '/dashboard' : '/user';
             router.push(redirectUrl);
           } else {
@@ -69,7 +66,7 @@ export default function SignIn(){
                     <div className="mb-5 text-center">
                         <Label className="text-2xl font-semibold mb-4 block">Sign In</Label>
                     </div>
-                    <form className="space-y-2" onSubmit={handleLogin}>
+                    <form className="space-y-2" onSubmit={handleLogin} method="POST">
                         {error && <div className="text-red-600 text-center mb-4">{error}</div>}
                         <Input
                         placeholder="name@example.com"
@@ -97,10 +94,10 @@ export default function SignIn(){
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? (
-                                <TailSpin
+                                <ThreeDots
                                 height="20"
                                 width="20"
-                                color="#ffffff"
+                                color="#021526"
                                 ariaLabel="loading"
                                 />
                             ) : (

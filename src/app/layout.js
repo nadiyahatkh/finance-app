@@ -1,10 +1,12 @@
+
 import localFont from "next/font/local";
 import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Navbar from "./navbar";
 import NextAuth from "@/lib/next-auth/NextAuth";
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Provider from "@/util/Providers";
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -33,11 +35,13 @@ export default function RootLayout({ children }) {
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable)}
       >
+        <Provider>
         <NextAuth>
-
           <Navbar />
           {children}
         </NextAuth>
+
+        </Provider>
       </body>
     </html>
   );

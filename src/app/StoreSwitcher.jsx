@@ -85,7 +85,7 @@ export default function StoreSwitcher({ className, items = [] }){
                                         <TailSpin
                                             height="20"
                                             width="20"
-                                            color="#ffffff"
+                                            color="#021526"
                                             ariaLabel="loading"
                                         />
                                     ) : (

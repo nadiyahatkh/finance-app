@@ -103,36 +103,12 @@ const isFiltered = table.getState().columnFilters.length > 0;
         <div className='flex items-center py-4'>
         <Input
           placeholder="Filter labels..."
-          value={(table.getColumn("note")?.getFilterValue()) ?? ""}
+          value={(table.getColumn("name")?.getFilterValue()) ?? ""}
           onChange={(event) => {
-            table.getColumn("note")?.setFilterValue(event.target.value);
+            table.getColumn("name")?.setFilterValue(event.target.value);
           }}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-          {table.getColumn("category") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("category")}
-            title="Category"
-            options={categories}
-          />
-        )}
-        {table.getColumn("type") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("type")}
-            title="Type"
-            options={incomeType}
-          />
-        )}
-        {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
-          >
-            Reset
-            <Cross2Icon className="ml-2 h-4 w-4" />
-          </Button>
-        )}
         {/* {table.getFilteredSelectedRowModel().rows.length > 0 ? (
           <Button variant="outline" size="sm" onClick={() => setIsSelectDeleteOpen(true)} className="ml-4">
             <TrashIcon className="mr-2 size-4" aria-hidden="true" />
