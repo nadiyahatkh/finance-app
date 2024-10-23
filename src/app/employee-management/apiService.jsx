@@ -1,11 +1,15 @@
+import { getSession } from "next-auth/react";
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
 
 export const fetchEmployee = async ({token}) => {
+  const session = await getSession()
     try {
       const response = await fetch(`${BASE_URL}/api/users`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          "ngrok-skip-browser-warning": true,
+          'Authorization': `Bearer ${session.user.token}`,
         }
       })
       .then((res) => res.json())
@@ -23,7 +27,7 @@ export const fetchEmployee = async ({token}) => {
   };
 
   export const createEmployee = async ({ data, token, file }) => {
-        
+    const session = await getSession()
     try {
       const formData = new FormData();
       formData.append('name', data.name);
@@ -44,14 +48,16 @@ export const fetchEmployee = async ({token}) => {
       const response = await fetch(`${BASE_URL}/api/users`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          "ngrok-skip-browser-warning": true,
+          'Authorization': `Bearer ${session.user.token}`,
         },
         body: formData,
       });
   
       if (!response.ok) {
         const result = await response.text();
-        throw new Error(result);
+        console.log("Response error detail:", result);
+        throw new Error(result.message || "somthing wrong");
       }
   
       const result = await response.json();
@@ -62,11 +68,32 @@ export const fetchEmployee = async ({token}) => {
     }
   };
 
+  export const removeEmployee = async ({ id, token }) => {
+    const session = await getSession()
+    try {
+      const response = await fetch(`${BASE_URL}/api/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          "ngrok-skip-browser-warning": true,
+          'Authorization': `Bearer ${session.user.token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to remove item');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error removing item:', error);
+    }
+  };
+
 export const fetchDepartments = async ({token}) => {
+  const session = await getSession()
     try {
       const response = await fetch(`${BASE_URL}/api/department`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          "ngrok-skip-browser-warning": true,
+          'Authorization': `Bearer ${session.user.token}`,
         }
       })
       .then((res) => res.json())
@@ -84,10 +111,12 @@ export const fetchDepartments = async ({token}) => {
   };
 
 export const fetchPositions = async ({token}) => {
+  const session = await getSession()
     try {
       const response = await fetch(`${BASE_URL}/api/positions`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          "ngrok-skip-browser-warning": true,
+          'Authorization': `Bearer ${session.user.token}`,
         }
       })
       .then((res) => res.json())

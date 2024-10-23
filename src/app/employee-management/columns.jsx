@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 
-export const columns = [
+export const columns = (handleDelete, isDeleteDialogOpen, setIsDeleteDialogOpen, setIdToDelete) => [
   {
     id: "select",
     header: ({ table }) => (
@@ -77,7 +78,7 @@ export const columns = [
                 Ubah
               </Link>
             </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-500">
+              <DropdownMenuItem onClick={() => { setIdToDelete(id); setIsDeleteDialogOpen(true); }} className="text-red-500">
                 <Trash2 className='h-4 w-4 mr-2' /> Hapus
               </DropdownMenuItem>
             <DropdownMenuItem>
@@ -87,7 +88,7 @@ export const columns = [
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
-          {/* <AlertDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
+          <AlertDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
@@ -100,7 +101,7 @@ export const columns = [
                 <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
-          </AlertDialog> */}
+          </AlertDialog>
         </DropdownMenu>
       );
     }

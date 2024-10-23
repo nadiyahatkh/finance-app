@@ -85,27 +85,13 @@ export default function AddEmployee() {
         }
     };
 
-//     const { data, error, isLoading } = useQuery({
-//     queryKey: ['department'],
-//     queryFn: () => fetchDepartments({token}),
-//   });
-
-//   console.log(data)
-
-//   if (isLoading) {
-//     return <p>Loading...</p>;
-//   }
-
-//   if (error) {
-//     console.log(error)
-//     return <p>error</p>;
-//   }
 
     const onSubmit = async (data) => {
         data.departement_id = departmentId;
-        data.position_id = positionId
+        data.position_id = positionId;
+        console.log("Token:", token);
         try {
-        const result = await createEmployee({ data, token, file: selectedFile });
+        const result = await createEmployee({ data, token , file: selectedFile });
         console.log(result)
         } catch (error) {
 
@@ -247,7 +233,7 @@ export default function AddEmployee() {
                                 />
                             </div>
                             <div className="mb-4">
-                                <Label className="block text-sm mb-2">Bank</Label>
+                                <Label className="block text-sm mb-2">Manager</Label>
                                 <FormField
                                 control={form.control}
                                 name="manager_id"

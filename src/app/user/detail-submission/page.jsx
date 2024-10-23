@@ -61,12 +61,95 @@ export default function DetailSubmission() {
                   <Button>Terima</Button> 
                 </div>
               </div>
-              <div className="flex justify-center items-center mb-4">
+<ul class="relative flex flex-col md:flex-row gap-2">
+  <li class="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
+    <div class="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
+      <span class="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full dark:bg-neutral-700 dark:text-white">
+        1
+      </span>
+      <div class="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
+    </div>
+    <div class="grow md:grow-0 md:mt-3 pb-5">
+      <span class="block text-sm font-medium text-gray-800 dark:text-white">
+        Step
+      </span>
+      <p class="text-sm text-gray-500 dark:text-neutral-500">
+        This is a description text.
+      </p>
+    </div>
+  </li>
+  <li class="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
+    <div class="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
+      <span class="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full dark:bg-neutral-700 dark:text-white">
+        2
+      </span>
+      <div class="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
+    </div>
+    <div class="grow md:grow-0 md:mt-3 pb-5">
+      <span class="block text-sm font-medium text-gray-800 dark:text-white">
+        Step
+      </span>
+      <p class="text-sm text-gray-500 dark:text-neutral-500">
+        This is a description text.
+      </p>
+    </div>
+  </li>
+  <li class="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
+    <div class="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
+      <span class="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full dark:bg-neutral-700 dark:text-white">
+        3
+      </span>
+      <div class="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
+    </div>
+    <div class="grow md:grow-0 md:mt-3 pb-5">
+      <span class="block text-sm font-medium text-gray-800 dark:text-white">
+        Step
+      </span>
+      <p class="text-sm text-gray-500 dark:text-neutral-500">
+        This is a description text.
+      </p>
+    </div>
+  </li>
+  <li class="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
+    <div class="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
+      <span class="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full dark:bg-neutral-700 dark:text-white">
+        3
+      </span>
+      <div class="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
+    </div>
+    <div class="grow md:grow-0 md:mt-3 pb-5">
+      <span class="block text-sm font-medium text-gray-800 dark:text-white">
+        Step
+      </span>
+      <p class="text-sm text-gray-500 dark:text-neutral-500">
+        This is a description text.
+      </p>
+    </div>
+  </li>
+  <li class="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
+    <div class="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
+      <span class="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full dark:bg-neutral-700 dark:text-white">
+        3
+      </span>
+      <div class="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
+    </div>
+    <div class="grow md:grow-0 md:mt-3 pb-5">
+      <span class="block text-sm font-medium text-gray-800 dark:text-white">
+        Step
+      </span>
+      <p class="text-sm text-gray-500 dark:text-neutral-500">
+        This is a description text.
+      </p>
+    </div>
+  </li>
+</ul>
+              {/* <div className="flex justify-center items-center">
 
-                <div className="grid grid-cols-10 gap-4 justify-center items-center">
+                <div className="grid grid-cols-9 justify-center items-center">
                       <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
                           <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
+            
+                      </div>
                       <hr className="border-green-400" />
                       <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
                           <CircleUserRound className="h-5 w-5 text-green-400" />
@@ -85,6 +168,34 @@ export default function DetailSubmission() {
                       </div>
                 </div>
               </div>
+              <div className="flex justify-center items-center">
+                <div className="grid grid-cols-9 justify-center items-center">
+                      <div className="text-center w-[80px] break-words">
+                        <span>apalah</span>
+                      </div>
+                      <div>
+                        
+                      </div>
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>  
+                      <hr className="border-green-400" />
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>  
+                      <hr className="border-green-400" />
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>  
+                      <div className="border border-green-400 W-[55px]"></div>
+                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
+                          <CircleUserRound className="h-5 w-5 text-green-400" />
+                      </div>
+                </div>
+              </div> */}
+
+
+
               {/* <div className="flex justify-center items-center mb-4">
 
                 <div className="flex items-center">
