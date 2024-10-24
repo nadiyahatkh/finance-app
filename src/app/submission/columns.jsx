@@ -34,33 +34,38 @@ export const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "label",
-    header: 'label',
-    cell: ({ row }) => (
-      <div className="w-[150px] capitalize">{row.getValue("label")}</div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
+    accessorKey: "submission_date",
+    header: 'Tanggal',
   },
   {
-    accessorKey: "note",
-    header: 'note'
+    accessorKey: "purpose",
+    header: 'Tujuan'
   },
   {
-    accessorKey: "category",
-    header: 'category'
-  },
-  {
-    accessorKey: "type",
-    header: 'type'
+    accessorKey: "due_date",
+    header: 'Tanggal Pembayaran',
   },
   {
     accessorKey: "amount",
-    header: 'amount'
+    header: 'Jumlah (Rp)'
   },
   {
-    accessorKey: "date",
-    header: 'date',
+    accessorKey: "type",
+    header: 'Type',
+    cell: ({ row }) => {
+      const type = row.original.type;
+      const bgColor = type === "Payment Request" ? "bg-blue-500" : "bg-green-500";
+
+      return (
+        <span className={`px-2 py-1 rounded text-white ${bgColor}`}>
+          {type}
+        </span>
+      );
+    }
+  },
+  {
+    accessorKey: "finish_status",
+    header: 'Status'
   },
   {
     id: 'aksi',

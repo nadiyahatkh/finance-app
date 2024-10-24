@@ -1,22 +1,29 @@
+'use client'
 import { Card, CardContent } from "@/components/Card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import path from "path";
-import fs from "fs";
 import { DataTable } from "@/components/data-table-submission/data-table";
 import { columns } from "./columns";
+import { useSession } from "next-auth/react";
+import { fetchSubmission } from "./apiService";
+import { useQuery } from "@tanstack/react-query";
 
-async function getData() {
-    const filePath = path.join(
-      process.cwd(),
-      "src/app/user",
-      "data.json"
-    );
-    const data = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(data);
-  }
 
-export default async function SubmissionAdmin(){
+
+export default function SubmissionAdmin(){
+  const { data: session } = useSession();
+  const token = session?.user?.token;
+
+  const { data: dataSubmission, error, isLoading } = useQuery({
+    queryKey: ['submissions'],
+    refetchOnWindowFocus: false,
+    queryFn: () => fetchSubmission({token}),
+  });
+
+  console.log(dataSubmission)
+
+  const submissionData = dataSubmission?.submissions || [];
+
     const cardData = [
         {
           label: "Permintaan Tertunda",
@@ -39,8 +46,6 @@ export default async function SubmissionAdmin(){
           image: "./Rp.png"
         },
       ];
-
-      const data = await getData()
     return(
     <div className="py-4">
       <div className="w-full max-w-7xl mx-auto">
@@ -119,7 +124,7 @@ export default async function SubmissionAdmin(){
             statusFilter={statusFilter} 
             setStatusFilter={setStatusFilter} 
           /> */}
-          <DataTable data={data} columns={columns} />
+          <DataTable data={submissionData} columns={columns} />
           </div>
         </CardContent>
       </div>
