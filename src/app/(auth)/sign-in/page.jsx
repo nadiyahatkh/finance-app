@@ -19,39 +19,49 @@ export default function SignIn(){
     const router = useRouter()
 
     const handleLogin = async (e) => {
-        e.preventDefault();
-        
-        setError("");
-        
-        if (!value.email || !value.password) {
-          setError("Email and password are required");
-          return;
-        }
+      e.preventDefault();
+      
+      setError("");
+      
+      if (!value.email || !value.password) {
+        setError("Email and password are required");
+        return;
+      }
     
-        setIsSubmitting(true);
-        
-        try {
-          const res = await signIn("credentials", {
-            redirect: false,
-            email: value.email,
-            password: value.password,
-          });
-          console.log(res);
-          if (res && !res.error) {
-            const session = await getSession();
-            const userRole = session?.user?.role;
-            const redirectUrl = +userRole === 1 | 2 | 3 | 4 ? '/dashboard' : '/user';
-            router.push(redirectUrl);
+      setIsSubmitting(true);
+      
+      try {
+        const res = await signIn("credentials", {
+          redirect: false,
+          email: value.email,
+          password: value.password,
+        });
+    
+        console.log(res);
+    
+        if (res && !res.error) {
+          const session = await getSession();
+          const userRole = session?.user?.role;
+    
+          // Redirect based on user role
+          if ([1, 2, 3, 4].includes(+userRole)) {
+            router.push('/dashboard');
+          } else if (+userRole === 5) {
+            router.push('/user');
           } else {
-            setError("Invalid email or password");
+            setError("Unauthorized access");
           }
-        } catch (error) {
-          console.log('Handle login error:', error);
-          setError("An unexpected error occurred");
-        } finally {
-          setIsSubmitting(false);
+        } else {
+          setError("Invalid email or password");
         }
-      };
+      } catch (error) {
+        console.log('Handle login error:', error);
+        setError("An unexpected error occurred");
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+    
       
 
 

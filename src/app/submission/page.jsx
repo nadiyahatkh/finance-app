@@ -7,12 +7,15 @@ import { columns } from "./columns";
 import { useSession } from "next-auth/react";
 import { fetchSubmission } from "./apiService";
 import { useQuery } from "@tanstack/react-query";
+import { fetchAmount } from "../apiService";
+import { useEffect, useState } from "react";
 
 
 
 export default function SubmissionAdmin(){
   const { data: session } = useSession();
   const token = session?.user?.token;
+  const [cardData, setCardData] = useState()
 
   const { data: dataSubmission, error, isLoading } = useQuery({
     queryKey: ['submissions'],
@@ -24,28 +27,42 @@ export default function SubmissionAdmin(){
 
   const submissionData = dataSubmission?.submissions || [];
 
-    const cardData = [
-        {
-          label: "Permintaan Tertunda",
-          amount: 20,
-          image: "./Vector.png"
-        },
-        {
-          label: "Permintaan yang Disetujui",
-          amount: 30,
-          image: "./CekCircle.png"
-        },
-        {
-          label: "Permintaan yang Ditolak",
-          amount: 40,
-          image: "./VectorX.png"
-        },
-        {
-          label: "Jumlah (Rp)",
-          amount: 50,
-          image: "./Rp.png"
-        },
-      ];
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchAmount({ token });
+        console.log(data)
+        setCardData([
+          {
+            label: "Permintaan Tertunda",
+            amount: data.data.approval,
+            image: "./Vector.png"
+          },
+          {
+            label: "Permintaan yang Disetujui",
+            amount: data.data.denied,
+            image: "./CekCircle.png"
+          },
+          {
+            label: "Permintaan yang Ditolak",
+            amount: data.data.process,
+            image: "./VectorX.png"
+          },
+          {
+            label: "Jumlah (Rp)",
+            amount: data.data.amount,
+            image: "./Rp.png"
+          }
+        ]);
+      } catch (error) {
+        console.error('Gagal mengambil data:', error);
+      }
+    };
+    if (token) {
+      loadData();
+    }
+  }, [token]);
+
     return(
     <div className="py-4">
       <div className="w-full max-w-7xl mx-auto">
@@ -104,7 +121,7 @@ export default function SubmissionAdmin(){
           </div>
         </div>
             <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4 mb-4">
-                {cardData.map((d, i) => (
+                {cardData?.map((d, i) => (
                     <Card key={i} amount={d.amount} label={d.label} image={d.image} />
                 ))}
             </section>

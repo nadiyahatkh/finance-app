@@ -34,6 +34,7 @@ export const fetchEmployee = async ({token}) => {
       formData.append('username', data.username);
       formData.append('email', data.email);
       formData.append('password', data.password);
+      formData.append('nip', data.nip);
       formData.append('department_id', data.department_id);
       formData.append('position_id', data.position_id);
       formData.append('bank_id', data.bank_id);
@@ -133,36 +134,26 @@ export const fetchPositions = async ({token}) => {
     }
   };
 
-  // export const createEmployee = async ({ data, token }) => {
-        
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append('name', data.name);
-  //     formData.append('email', data.email);
-  //     formData.append('password', data.password);
-  //     formData.append('nip', data.nip);
-  //     formData.append('department_id', data.department_id);
-  //     formData.append('position_id', data.position_id);
-
-  
-  //     const response = await fetch('${BASE_URL}/api/employee/create', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Authorization': `Bearer ${token}`,
-  //       },
-  //       body: formData,
-  //     });
-  
-  //     if (!response.ok) {
-  //       const result = await response.text();
-  //       throw new Error(result);
-  //     }
-  
-  //     const result = await response.json();
-  //     return result;
-  //   } catch (error) {
-  //     console.log('Error creating aset:', error);
-  //     throw error;
-  //   }
-  // };
+export const fetchBanks = async ({token}) => {
+  const session = await getSession()
+    try {
+      const response = await fetch(`${BASE_URL}/api/bank/bank`, {
+        headers: {
+          "ngrok-skip-browser-warning": true,
+          'Authorization': `Bearer ${session.user.token}`,
+        }
+      })
+      .then((res) => res.json())
+      .then((data) => {
+       return {
+        data: data,
+        message: "successs"
+       }
+      })
+      return response.data
+    } catch (error) {
+      console.error(error);
+      return "abs"
+    }
+  };
 

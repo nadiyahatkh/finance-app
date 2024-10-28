@@ -48,7 +48,7 @@ import { DataTableFacetedFilter } from './data-table-faceted-filter';
 import { categories, incomeType } from './data';
 
 
-export function DataTable({ columns, data, search, setSearch, statusFilter , setStatusFilter, totalPages, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading}) {
+export function DataTable({ columns, data, search, statusFilter , setStatusFilter, totalPages, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading}) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});

@@ -1,31 +1,53 @@
+'use client'
 import { Card, CardContent } from "@/components/Card";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ValueIcon } from "@radix-ui/react-icons";
 import { Circle } from "lucide-react";
+import { fetchAmount } from "../apiService";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard(){
-    const cardData = [
-        {
-          label: "Permintaan Dikirimkan",
-          amount: 20,
-          image: "./Vector.png"
-        },
-        {
-          label: "Permintaan yang Disetujui",
-          amount: 30,
-          image: "./CekCircle.png"
-        },
-        {
-          label: "Permintaan yang Ditolak",
-          amount: 40,
-          image: "./VectorX.png"
-        },
-        {
-          label: "Aset Dipinjamkan",
-          amount: "Rp.3.000.000",
-          image: "./Rp.png"
-        },
-      ];
+  const { data: session } = useSession();
+  const token = session?.user?.token;
+  const [cardData, setCardData] = useState()
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchAmount({ token });
+        console.log(data)
+        setCardData([
+          {
+            label: "Permintaan Tertunda",
+            amount: data.data.approval,
+            image: "./Vector.png"
+          },
+          {
+            label: "Permintaan yang Disetujui",
+            amount: data.data.denied,
+            image: "./CekCircle.png"
+          },
+          {
+            label: "Permintaan yang Ditolak",
+            amount: data.data.process,
+            image: "./VectorX.png"
+          },
+          {
+            label: "Jumlah (Rp)",
+            amount: data.data.amount,
+            image: "./Rp.png"
+          }
+        ]);
+      } catch (error) {
+        console.error('Gagal mengambil data:', error);
+      }
+    };
+    if (token) {
+      loadData();
+    }
+  }, [token]);
+
     return(
         <div className="py-4">
       <div className="w-full max-w-7xl mx-auto">
@@ -34,7 +56,7 @@ export default function Dashboard(){
           
         </div>
         <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4 mb-4">
-          {cardData.map((d, i) => (
+          {cardData?.map((d, i) => (
             <Card
               key={i}
               amount={d.amount}

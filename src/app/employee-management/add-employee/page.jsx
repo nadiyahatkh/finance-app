@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { createEmployee, fetchDepartments, fetchPositions } from "../apiService";
+import { createEmployee, fetchBanks, fetchDepartments, fetchPositions } from "../apiService";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -29,6 +29,8 @@ export default function AddEmployee() {
     const [positions, setPositions] = useState()
     const [departmentId, setDepartmentId] = useState();
     const [positionId, setPositionId] = useState();
+    const [banks, setBanks] = useState()
+    const [bankId, setBankId] = useState()
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState("");
 
@@ -37,6 +39,7 @@ export default function AddEmployee() {
         username: z.string().min(1, { message: "UserName karyawan is required." }),
         email: z.string().min(1, { message: "Email is required." }),
         password: z.string().min(1, { message: "Password wajib diisi." }),
+        nip: z.string().min(1, { message: "Nip wajib diisi." }),
         department_id: z.string().min(1, { message: "Department wajib diisi." }),
         position_id: z.string().min(1, { message: "Posisi wajib diisi." }),
         manager_id: z.string().min(1, { message: "Manager wajib diisi." }),
@@ -69,10 +72,20 @@ export default function AddEmployee() {
             console.error('Failed to fetch positions:', error);
           }
         };
+        const loadDataBanks = async () => {
+          try {
+            const bankData = await fetchBanks({ token });
+            setBanks(bankData.data);
+            console.log(setBanks)
+          } catch (error) {
+            console.error('Failed to fetch positions:', error);
+          }
+        };
 
         if (token){
             loadDataDepartments();
             loadDataPositions();
+            loadDataBanks();
         }
     }, [token])
 
@@ -89,6 +102,7 @@ export default function AddEmployee() {
     const onSubmit = async (data) => {
         data.departement_id = departmentId;
         data.position_id = positionId;
+        data.bank_id = bankId;
         console.log("Token:", token);
         try {
         const result = await createEmployee({ data, token , file: selectedFile });
@@ -165,9 +179,9 @@ export default function AddEmployee() {
                                 render={({ field }) => (
                                     <>
                                     <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Alicia" type="text" />
-                                    {/* {form.formState.errors.name && (
+                                    {form.formState.errors.name && (
                                     <FormMessage type="error" className="italic">{form.formState.errors.name.message}</FormMessage>
-                                    )} */}
+                                    )}
                                     </>
                                 )}
                                 />
@@ -180,14 +194,14 @@ export default function AddEmployee() {
                                 render={({ field }) => (
                                 <>
                                 <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="****" type="password" />
-                                {/* {form.formState.errors.password && (
+                                {form.formState.errors.password && (
                                     <FormMessage type="error" className="italic">{form.formState.errors.password.message}</FormMessage>
-                                    )} */}
+                                    )}
                                 </>
                                 )}
                                 />
                             </div>
-                            {/* <div className="mb-4">
+                            <div className="mb-4">
                                 <Label className="block text-sm mb-2">NIP</Label>
                                 <FormField
                                 control={form.control}
@@ -201,7 +215,7 @@ export default function AddEmployee() {
                                 </>
                                 )}
                                 />
-                            </div> */}
+                            </div>
                             <div className="mb-4">
                                 <Label className="block text-sm mb-2">Email</Label>
                                 <FormField
@@ -210,27 +224,43 @@ export default function AddEmployee() {
                                 render={({ field }) => (
                                 <>
                                 <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="name@gmail.com" type="email" />
-                                {/* {form.formState.errors.email && (
+                                {form.formState.errors.email && (
                                     <FormMessage type="error" className="italic">{form.formState.errors.email.message}</FormMessage>
-                                )} */}
+                                )}
                                 </>
                                 )}
                                 />
                             </div>
                             <div className="mb-4">
-                                <Label className="block text-sm mb-2">Bank</Label>
+                                <Label className="block text-sm mb-2" htmlFor="department_id">Bank</Label>
                                 <FormField
-                                control={form.control}
-                                name="bank_id"
-                                render={({ field }) => (
+                                    control={form.control}
+                                    name="bank_id"
+                                    render={({ field }) => (
                                     <>
-                                    <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Isi id bank" type="number" />
-                                    {form.formState.errors.bank_id && (
-                                    <FormMessage type="error" className="italic">{form.formState.errors.bank_id.message}</FormMessage>
-                                    )}
+                                        <Select
+                                        value={field.value ? field.value.toString() : ""}
+                                        onValueChange={(value) => {
+                                            field.onChange(value); // Update react-hook-form state
+                                            setBankId(value);
+                                        }}
+                                        {...field}
+                                        >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih bank untuk ditampilkan" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {banks?.map((bank) => (
+                                            <SelectItem key={bank.id} value={bank.id.toString()}>{bank.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
+                                        {form.formState.errors.bank_id && (
+                                            <FormMessage type="error" className="italic">{form.formState.errors.bank_id.message}</FormMessage>
+                                        )}
                                     </>
-                                )}
-                                />
+                                    )}
+                                    />
                             </div>
                             <div className="mb-4">
                                 <Label className="block text-sm mb-2">Manager</Label>

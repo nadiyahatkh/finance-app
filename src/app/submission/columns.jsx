@@ -1,12 +1,12 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { TrendingUp, TrendingDown, MoreHorizontal, Trash2, PencilLine } from "lucide-react";
+import { TrendingUp, TrendingDown, MoreHorizontal, Trash2, PencilLine, CheckCheckIcon, XCircle, RefreshCw, RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
+import { formatCurrency } from "../utils/formatCurrency";
 
 export const columns = [
   {
@@ -36,6 +36,21 @@ export const columns = [
   {
     accessorKey: "submission_date",
     header: 'Tanggal',
+    cell: ({ row }) => {
+      const submissionDate = new Date(row.original.submission_date);
+      return submissionDate.toLocaleString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZoneName: "short",
+      }).replace(/\//g, '-');
+    },
+  },
+  {
+    accessorKey: "user.name",
+    header: 'Nama',
   },
   {
     accessorKey: "purpose",
@@ -44,31 +59,37 @@ export const columns = [
   {
     accessorKey: "due_date",
     header: 'Tanggal Pembayaran',
+    cell: ({ row }) => {
+      const dueDate = new Date(row.original.due_date);
+      return dueDate.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }).replace(/\//g, '-');
+    },
   },
   {
     accessorKey: "amount",
-    header: 'Jumlah (Rp)'
+    header: 'Jumlah (Rp)',
+    cell: info => formatCurrency(info.getValue())
   },
   {
     accessorKey: "type",
     header: 'Type',
     cell: ({ row }) => {
       const type = row.original.type;
-      const bgColor = type === "Payment Request" ? "bg-blue-500" : "bg-green-500";
+      const bgColor = type === "Payment Process" ? "bg-blue-500" : "bg-green-500";
 
       return (
-        <span className={`px-2 py-1 rounded text-white ${bgColor}`}>
+        <span className={`px-2 rounded text-white text-sm ${bgColor}`}>
           {type}
         </span>
       );
     }
   },
   {
-    accessorKey: "finish_status",
-    header: 'Status'
-  },
-  {
-    id: 'aksi',
+    accessorKey: 'finish_status',
+    header: 'Status', 
     cell: ({ row, data }) => {
       
       const id = row.original.id;
@@ -84,15 +105,6 @@ export const columns = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem >
-              <Link href={`./user/update-submission`} className="flex items-center">
-                <PencilLine className="mr-2 h-4 w-4" />
-                Ubah
-              </Link>
-            </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-500">
-                <Trash2 className='h-4 w-4 mr-2' /> Hapus
-              </DropdownMenuItem>
             <DropdownMenuItem>
             <Link href={`./user/detail-submission`} className="flex items-center">
                 <PencilLine className="mr-2 h-4 w-4" />

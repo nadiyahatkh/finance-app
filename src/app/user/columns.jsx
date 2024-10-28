@@ -1,11 +1,12 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { TrendingUp, TrendingDown, MoreHorizontal, Trash2, PencilLine } from "lucide-react";
+import { TrendingUp, TrendingDown, MoreHorizontal, Trash2, PencilLine, CheckCheckIcon, XCircle, RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { formatCurrency } from "../utils/formatCurrency";
 
 
 export const columns = [
@@ -34,33 +35,81 @@ export const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "label",
-    header: 'label',
-    cell: ({ row }) => (
-      <div className="w-[150px] capitalize">{row.getValue("label")}</div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
+    accessorKey: "submission_date",
+    header: 'Tanggal',
+    cell: ({ row }) => {
+      const submissionDate = new Date(row.original.submission_date);
+      return submissionDate.toLocaleString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZoneName: "short",
+      }).replace(/\//g, '-');
+    },
   },
   {
-    accessorKey: "note",
-    header: 'note'
+    accessorKey: "purpose",
+    header: 'Tujuan Pembayaran/Pengeluaran'
   },
   {
-    accessorKey: "category",
-    header: 'category'
+    accessorKey: "due_date",
+    header: 'Tanggal Pembayaran',
+    cell: ({ row }) => {
+      const dueDate = new Date(row.original.due_date);
+      return dueDate.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }).replace(/\//g, '-');
+    },
   },
   {
     accessorKey: "type",
-    header: 'type'
+    header: 'Type',
+    cell: ({ row }) => {
+      const type = row.original.type;
+      const bgColor = type === "Payment Process" ? "bg-blue-500" : "bg-green-500";
+
+      return (
+        <span className={`px-2 rounded text-white text-sm ${bgColor}`}>
+          {type}
+        </span>
+      );
+    }
   },
   {
     accessorKey: "amount",
-    header: 'amount'
+    header: 'Jumlah (Rp)',
+    cell: info => formatCurrency(info.getValue())
   },
   {
-    accessorKey: "date",
-    header: 'date',
+    accessorKey: 'finish_status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.getValue("finish_status");
+
+      let statusColor, statusIcon;
+
+      if (status === 'approved') {
+        statusColor = 'text-green-500';
+        statusIcon = <CheckCheckIcon className="h-4 w-4 mr-2" />;
+      } else if (status === 'dinied') {
+        statusColor = 'text-red-500';
+        statusIcon = <XCircle className="h-4 w-4 mr-2" />;
+      } else if (status === 'process') {
+        statusColor = 'text-black';
+        statusIcon = <RotateCw className="h-4 w-4 mr-2" />;
+      }
+
+      return (
+        <div className={`flex items-center ${statusColor}`}>
+          {statusIcon}
+          <span className="capitalize font-semibold">{status}</span>
+        </div>
+      );
+    },
   },
   {
     id: 'aksi',
@@ -79,17 +128,8 @@ export const columns = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem >
-              <Link href={`./user/update-submission`} className="flex items-center">
-                <PencilLine className="mr-2 h-4 w-4" />
-                Ubah
-              </Link>
-            </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-500">
-                <Trash2 className='h-4 w-4 mr-2' /> Hapus
-              </DropdownMenuItem>
             <DropdownMenuItem>
-            <Link href={`./user/detail-submission`} className="flex items-center">
+            <Link href={`./user/detail-submission/${id}`} className="flex items-center">
                 <PencilLine className="mr-2 h-4 w-4" />
                 Detail
               </Link>

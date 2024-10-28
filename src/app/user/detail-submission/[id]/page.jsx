@@ -1,8 +1,31 @@
+'use client'
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, ChevronRight, CircleUserRound, Receipt } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { fetchSubmissionUserDetail } from "../../apiService";
+import { formatCurrency } from "@/app/utils/formatCurrency";
 
 export default function DetailSubmission() {
+  const { data: session } = useSession();
+  const token = session?.user?.token;
+  const {id} = useParams()
+  const [detail, setDetail] = useState()
+  
+  useEffect(() => {
+    const loadDetail = async () => {
+      if (token && id) {
+        const response = await fetchSubmissionUserDetail({ token, id });
+        console.log(response)
+        setDetail(response?.data);
+      }
+    };
+
+    loadDetail();
+  }, [token, id]);
+
   return (
     <div className="py-4">
       <div className="max-w-7xl w-full mx-auto">
@@ -17,20 +40,20 @@ export default function DetailSubmission() {
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal</div>
-                    <div className="font-semibold">Pengajuan</div>
+                    <div className="font-semibold">{new Date(detail?.submission_date).toLocaleDateString()}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tujuan Pembayaran/Pengeluaran</div>
-                    <div className="font-semibold">Waktu Pengajuan</div>
+                    <div className="font-semibold">{detail?.purpose}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal Pembayaran</div>
-                    <div className="font-semibold">Waktu Pengajuan</div>
+                    <div className="font-semibold">{new Date(detail?.due_date).toLocaleDateString()}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tipe</div>
-                    <div className="font-semibold bg-green-500 w-40 rounded text-white p-1">
-                      Request Payment
+                    <div className="font-semibold bg-green-500 w-[90px] rounded text-white px-1">
+                      {detail?.type}
                     </div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
@@ -41,19 +64,19 @@ export default function DetailSubmission() {
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nama Bank</div>
-                    <div className="font-semibold">Bank Mandiri</div>
+                    <div className="font-semibold">{detail?.bank_account.bank.name}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nama Pemilik Rekening</div>
-                    <div className="font-semibold">Ontario Branch</div>
+                    <div className="font-semibold">{detail?.bank_account.account_name}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nomor Rekening</div>
-                    <div className="font-semibold">16073434121</div>
+                    <div className="font-semibold">{detail?.bank_account.account_number}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
-                    <div className="font-semibold">Rp. 2.997.000</div>
+                    <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
                   </div>
                 </div>
                 <div className="flex justify-end"> 

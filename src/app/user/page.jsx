@@ -1,4 +1,4 @@
-// 'use client'
+'use client'
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 // import { Card } from "@/components/ui/card";
@@ -8,54 +8,66 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import Link from "next/link";
-import path from "path";
-import fs from "fs";
 import { columns } from "./columns";
 import { Card, CardContent } from "@/components/Card";
-// import { useState } from "react";
+import { fetchAmount } from "../apiService";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { fetchSubmissionUser } from "./apiService";
+import { useQuery } from "@tanstack/react-query";
 
 
-async function getData() {
-    const filePath = path.join(
-      process.cwd(),
-      "src/app/user",
-      "data.json"
-    );
-    const data = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(data);
-  }
+export default function HomeUser() {
+  const { data: session } = useSession();
+  const token = session?.user?.token;
+  const [cardData, setCardData] = useState()
 
-export default async function HomeUser() {
-    const cardData = [
-        {
-          label: "Permintaan Tertunda",
-          amount: 20,
-          image: "./Vector.png"
-        },
-        {
-          label: "Permintaan yang Disetujui",
-          amount: 30,
-          image: "./CekCircle.png"
-        },
-        {
-          label: "Permintaan yang Ditolak",
-          amount: 40,
-          image: "./VectorX.png"
-        },
-        {
-          label: "Jumlah (Rp)",
-          amount: 50,
-          image: "./Rp.png"
-        },
-      ];
-    // const defaultDate = {
-    //     from: new Date(2024, 0, 1),
-    //     to: new Date(2024, 11, 31)
-    //   };
-    
-    //   const [date, setDate] = useState(defaultDate);
+  const { data: dataSubmissionUser, error, isLoading } = useQuery({
+    queryKey: ['usersubmissions'],
+    refetchOnWindowFocus: false,
+    queryFn: () => fetchSubmissionUser({token}),
+  });
 
-      const data = await getData()
+  console.log(dataSubmissionUser)
+
+  const submissionData = dataSubmissionUser?.data.data || [];
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchAmount({ token });
+        console.log(data)
+        setCardData([
+          {
+            label: "Permintaan Tertunda",
+            amount: data.data.approval,
+            image: "./Vector.png"
+          },
+          {
+            label: "Permintaan yang Disetujui",
+            amount: data.data.denied,
+            image: "./CekCircle.png"
+          },
+          {
+            label: "Permintaan yang Ditolak",
+            amount: data.data.process,
+            image: "./VectorX.png"
+          },
+          {
+            label: "Jumlah (Rp)",
+            amount: data.data.amount,
+            image: "./Rp.png"
+          }
+        ]);
+      } catch (error) {
+        console.error('Gagal mengambil data:', error);
+      }
+    };
+    if (token) {
+      loadData();
+    }
+  }, [token]);
+
     return(
         <div className="py-4">
       <div className="w-full max-w-7xl mx-auto">
@@ -120,27 +132,13 @@ export default async function HomeUser() {
           </div>
         </div>
             <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4 mb-4">
-                {cardData.map((d, i) => (
+                {cardData?.map((d, i) => (
                     <Card key={i} amount={d.amount} label={d.label} image={d.image} />
                 ))}
             </section>
         <CardContent className="shadow-md">
           <div className="container mx-auto">
-          {/* <DataTable
-            columns={columns(handleDelete, isDeleteDialogOpen, setIsDeleteDialogOpen, setIdToDelete)}
-            data={data}
-            search={search}
-            setSearch={setSearch}
-            onDelete={deleteRows}
-            currentPage={page}
-            totalPages={totalPages}
-            setPage={setPage}
-            perPage={perPage}
-            setPerPage={setPerPage}
-            statusFilter={statusFilter} 
-            setStatusFilter={setStatusFilter} 
-          /> */}
-          <DataTable data={data} columns={columns} />
+          <DataTable data={submissionData} columns={columns} />
           </div>
         </CardContent>
       </div>
