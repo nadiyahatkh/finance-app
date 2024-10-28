@@ -83,18 +83,18 @@ export function DataTable({ columns, data, search, setSearch, statusFilter , set
 const isFiltered = table.getState().columnFilters.length > 0;
 //   const isFiltered = statusFilter.length > 0;
 
-//   const handleSearchKeyDown = (e) => {
-//     if (e.key === 'Enter') {
-//       setSearch(pendingSearch);
-//     }
-//   };
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setSearch(pendingSearch);
+    }
+  };
 
-//   const handleOnChangeSearch = (e) => {
-//     if (e.target.value === "") {
-//       setSearch(e.target.value)
-//     } 
-//     setPendingSearch(e.target.value)
-//   }
+  const handleOnChangeSearch = (e) => {
+    if (e.target.value === "") {
+      setSearch(e.target.value)
+    } 
+    setPendingSearch(e.target.value)
+  }
 
   return (
     <>
@@ -103,10 +103,9 @@ const isFiltered = table.getState().columnFilters.length > 0;
         <div className='flex items-center py-4'>
         <Input
           placeholder="Filter labels..."
-          value={(table.getColumn("note")?.getFilterValue()) ?? ""}
-          onChange={(event) => {
-            table.getColumn("note")?.setFilterValue(event.target.value);
-          }}
+          value={pendingSearch}
+            onChange={(e) => handleOnChangeSearch(e)}
+            onKeyDown={handleSearchKeyDown}
           className="h-8 w-[150px] lg:w-[250px]"
         />
           {table.getColumn("category") && (

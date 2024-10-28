@@ -2,10 +2,10 @@ import { getSession } from "next-auth/react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
-export const fetchSubmission = async ({token}) => {
+export const fetchSubmission = async ({token, search}) => {
   const session = await getSession()
     try {
-      const response = await fetch(`${BASE_URL}/api/dataApplicant/index`, {
+      const response = await fetch(`${BASE_URL}/api/dataApplicant/index?search=${search}`, {
         headers: {
           "ngrok-skip-browser-warning": true,
           'Authorization': `Bearer ${session.user.token}`,

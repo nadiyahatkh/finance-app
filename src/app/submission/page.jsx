@@ -16,11 +16,12 @@ export default function SubmissionAdmin(){
   const { data: session } = useSession();
   const token = session?.user?.token;
   const [cardData, setCardData] = useState()
+  const [search, setSearch] = useState()
 
   const { data: dataSubmission, error, isLoading } = useQuery({
-    queryKey: ['submissions'],
+    queryKey: ['submissions', search],
     refetchOnWindowFocus: false,
-    queryFn: () => fetchSubmission({token}),
+    queryFn: () => fetchSubmission({token, search}),
   });
 
   console.log(dataSubmission)
@@ -141,7 +142,7 @@ export default function SubmissionAdmin(){
             statusFilter={statusFilter} 
             setStatusFilter={setStatusFilter} 
           /> */}
-          <DataTable data={submissionData} columns={columns} />
+          <DataTable data={submissionData} columns={columns} search={search} setSearch={setSearch} />
           </div>
         </CardContent>
       </div>

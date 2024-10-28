@@ -18,14 +18,15 @@ import { useQuery } from "@tanstack/react-query";
 
 
 export default function HomeUser() {
-  const { data: session } = useSession();
+  const { data: session } = useSession(); 
   const token = session?.user?.token;
   const [cardData, setCardData] = useState()
+  const [search, setSearch] = useState()
 
   const { data: dataSubmissionUser, error, isLoading } = useQuery({
-    queryKey: ['usersubmissions'],
+    queryKey: ['usersubmissions', search],
     refetchOnWindowFocus: false,
-    queryFn: () => fetchSubmissionUser({token}),
+    queryFn: () => fetchSubmissionUser({token, search}),
   });
 
   console.log(dataSubmissionUser)
@@ -138,7 +139,7 @@ export default function HomeUser() {
             </section>
         <CardContent className="shadow-md">
           <div className="container mx-auto">
-          <DataTable data={submissionData} columns={columns} />
+          <DataTable data={submissionData} columns={columns} search={search} setSearch={setSearch} />
           </div>
         </CardContent>
       </div>
