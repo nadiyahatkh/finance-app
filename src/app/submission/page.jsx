@@ -16,7 +16,7 @@ export default function SubmissionAdmin(){
   const { data: session } = useSession();
   const token = session?.user?.token;
   const [cardData, setCardData] = useState()
-  const [search, setSearch] = useState()
+  const [search, setSearch] = useState('')
 
   const { data: dataSubmission, error, isLoading } = useQuery({
     queryKey: ['submissions', search],

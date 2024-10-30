@@ -21,12 +21,13 @@ export default function HomeUser() {
   const { data: session } = useSession(); 
   const token = session?.user?.token;
   const [cardData, setCardData] = useState()
-  const [search, setSearch] = useState()
+  const [search, setSearch] = useState('')
+  const [typeFilter, setTypeFilter] = useState([]);
 
   const { data: dataSubmissionUser, error, isLoading } = useQuery({
-    queryKey: ['usersubmissions', search],
+    queryKey: ['usersubmissions', search, typeFilter],
     refetchOnWindowFocus: false,
-    queryFn: () => fetchSubmissionUser({token, search}),
+    queryFn: () => fetchSubmissionUser({token, search, type: typeFilter}),
   });
 
   console.log(dataSubmissionUser)
@@ -139,7 +140,14 @@ export default function HomeUser() {
             </section>
         <CardContent className="shadow-md">
           <div className="container mx-auto">
-          <DataTable data={submissionData} columns={columns} search={search} setSearch={setSearch} />
+          <DataTable
+              data={submissionData} 
+              columns={columns}
+              search={search} 
+              setSearch={setSearch}
+              typeFilter={typeFilter} 
+              setTypeFilter={setTypeFilter} 
+            />
           </div>
         </CardContent>
       </div>

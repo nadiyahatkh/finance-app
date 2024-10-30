@@ -16,10 +16,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { createEmployee, fetchBanks, fetchDepartments, fetchPositions } from "../apiService";
+import { createEmployee, fetchDepartments, fetchPositions } from "../apiService";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { fetchBanks } from "@/app/apiService";
 
 
 export default function AddEmployee() {
@@ -142,20 +143,20 @@ export default function AddEmployee() {
                         <Form {...form}>
                             <form action="" onSubmit={form.handleSubmit(onSubmit)}>
                             <div className="mb-4">
-                                                        <p className="font-bold text-sm mb-2">Photo</p>
-                                                        <div className="flex items-center">
-                                                        <img src={imagePreviewUrl || "/default-profile.png"} name="path" alt="Profile Image" className="w-12 h-12 rounded-full mr-4" />
-                                                            <input
-                                                                name="path"
-                                                                type="file"
-                                                                accept="image/*"
-                                                                style={{ display: 'none' }}
-                                                                id="fileInput"
-                                                                onChange={handleFileChange}
-                                                            />
-                                                                <button type="button" onClick={() => document.getElementById('fileInput').click()} className="px-4 py-2 font-semibold shadow-sm border rounded-md">Change</button>
-                                                        </div>
-                                                    </div>
+                                <p className="font-bold text-sm mb-2">Photo</p>
+                                <div className="flex items-center">
+                                <img src={imagePreviewUrl || "/default-profile.png"} name="path" alt="Profile Image" className="w-12 h-12 rounded-full mr-4" />
+                                    <input
+                                        name="path"
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        id="fileInput"
+                                        onChange={handleFileChange}
+                                    />
+                                        <button type="button" onClick={() => document.getElementById('fileInput').click()} className="px-4 py-2 font-semibold shadow-sm border rounded-md">Change</button>
+                                </div>
+                            </div>
                             <div className="mb-4">
                                 <Label className="block text-sm mb-2">Nama Karyawan</Label>
                                 <FormField
@@ -164,9 +165,9 @@ export default function AddEmployee() {
                                 render={({ field }) => (
                                     <>
                                     <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Alicia" type="text" />
-                                    {/* {form.formState.errors.name && (
+                                    {form.formState.errors.name && (
                                     <FormMessage type="error" className="italic">{form.formState.errors.name.message}</FormMessage>
-                                    )} */}
+                                    )}
                                     </>
                                 )}
                                 />
@@ -179,8 +180,8 @@ export default function AddEmployee() {
                                 render={({ field }) => (
                                     <>
                                     <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Alicia" type="text" />
-                                    {form.formState.errors.name && (
-                                    <FormMessage type="error" className="italic">{form.formState.errors.name.message}</FormMessage>
+                                    {form.formState.errors.username && (
+                                    <FormMessage type="error" className="italic">{form.formState.errors.username.message}</FormMessage>
                                     )}
                                     </>
                                 )}
