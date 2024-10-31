@@ -17,11 +17,13 @@ export default function SubmissionAdmin(){
   const token = session?.user?.token;
   const [cardData, setCardData] = useState()
   const [search, setSearch] = useState('')
+  const [typeFilter, setTypeFilter] = useState([]);
+  const [statusFilter, setStatusFilter] = useState([]);
 
   const { data: dataSubmission, error, isLoading } = useQuery({
-    queryKey: ['submissions', search],
+    queryKey: ['submissions', search, typeFilter, statusFilter],
     refetchOnWindowFocus: false,
-    queryFn: () => fetchSubmission({token, search}),
+    queryFn: () => fetchSubmission({token, search, type: typeFilter, finish_status: statusFilter}),
   });
 
   console.log(dataSubmission)
@@ -128,21 +130,17 @@ export default function SubmissionAdmin(){
             </section>
         <CardContent className="shadow-md">
           <div className="container mx-auto">
-          {/* <DataTable
-            columns={columns(handleDelete, isDeleteDialogOpen, setIsDeleteDialogOpen, setIdToDelete)}
-            data={data}
+          <DataTable
+            columns={columns}
+            data={submissionData}
             search={search}
             setSearch={setSearch}
-            onDelete={deleteRows}
-            currentPage={page}
-            totalPages={totalPages}
-            setPage={setPage}
-            perPage={perPage}
-            setPerPage={setPerPage}
             statusFilter={statusFilter} 
-            setStatusFilter={setStatusFilter} 
-          /> */}
-          <DataTable data={submissionData} columns={columns} search={search} setSearch={setSearch} />
+            setStatusFilter={setStatusFilter}
+            typeFilter={typeFilter} 
+            setTypeFilter={setTypeFilter} 
+          />
+          {/* <DataTable data={submissionData} columns={columns} search={search} setSearch={setSearch} /> */}
           </div>
         </CardContent>
       </div>

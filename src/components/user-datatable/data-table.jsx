@@ -45,10 +45,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import { DataTablePagination } from './data-table-pagination';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
-import { categories, incomeType } from './data';
+import { categories, incomeType, statuses } from './data';
 
 
-export function DataTable({ columns, data, search, setSearch, statusFilter , setStatusFilter, totalPages, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading}) {
+export function DataTable({ columns, data, search, setSearch,typeFilter, setTypeFilter, statusFilter , setStatusFilter, totalPages, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading}) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -107,11 +107,13 @@ const isFiltered = table.getState().columnFilters.length > 0;
             onKeyDown={handleSearchKeyDown}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-          {table.getColumn("category") && (
+          {table.getColumn("type") && (
           <DataTableFacetedFilter
-            column={table.getColumn("category")}
-            title="Category"
-            options={categories}
+            column={table.getColumn("type")}
+            title="Status"
+            options={statuses}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
           />
         )}
         {table.getColumn("type") && (
@@ -119,6 +121,8 @@ const isFiltered = table.getState().columnFilters.length > 0;
             column={table.getColumn("type")}
             title="Type"
             options={incomeType}
+            statusFilter={typeFilter}
+            setStatusFilter={setTypeFilter}
           />
         )}
         {isFiltered && (

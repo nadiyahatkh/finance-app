@@ -89,7 +89,33 @@ export const columns = [
   },
   {
     accessorKey: 'finish_status',
-    header: 'Status', 
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.getValue("finish_status");
+
+      let statusColor, statusIcon;
+
+      if (status === 'approved') {
+        statusColor = 'text-green-500';
+        statusIcon = <CheckCheckIcon className="h-4 w-4 mr-2" />;
+      } else if (status === 'dinied') {
+        statusColor = 'text-red-500';
+        statusIcon = <XCircle className="h-4 w-4 mr-2" />;
+      } else if (status === 'process') {
+        statusColor = 'text-black';
+        statusIcon = <RotateCw className="h-4 w-4 mr-2" />;
+      }
+
+      return (
+        <div className={`flex items-center ${statusColor}`}>
+          {statusIcon}
+          <span className="capitalize font-semibold">{status}</span>
+        </div>
+      );
+    },
+  },
+  {
+    id: 'aksi',
     cell: ({ row, data }) => {
       
       const id = row.original.id;

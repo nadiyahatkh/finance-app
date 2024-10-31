@@ -44,8 +44,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 // import { statuses } from './constants';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import { DataTablePagination } from './data-table-pagination';
-import { categories, incomeType } from './data';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
+import { incomeType, statuses } from './data';
 
 
 
@@ -108,11 +108,11 @@ const isFiltered = table.getState().columnFilters.length > 0;
             onKeyDown={handleSearchKeyDown}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-          {table.getColumn("category") && (
+          {table.getColumn("finish_status") && (
           <DataTableFacetedFilter
-            column={table.getColumn("category")}
-            title="Category"
-            options={categories}
+            column={table.getColumn("finish_status")}
+            title="Status"
+            options={statuses}
           />
         )}
         {table.getColumn("type") && (
@@ -154,10 +154,13 @@ const isFiltered = table.getState().columnFilters.length > 0;
           </AlertDialog> */}
         </div>
         
-          <div className='ml-auto'>
-            <Button variant='outline' style={{ color: "#F9B421" }}>Tolak Semua</Button>
-            <Button className="ml-2 text-black" style={{ background: "#F9B421" }} >Setujui Semua</Button>
-          </div>
+      <div className='flex items-center space-x-2'>
+        <Button variant='outline' style={{ color: "#F9B421" }}>
+          Tolak Semua
+        </Button>
+        <Button className="" style={{ background: "#F9B421" }}>
+          Setujui Semua
+        </Button>
         
         {/* Column visibility */}
         <DropdownMenu>
@@ -186,6 +189,7 @@ const isFiltered = table.getState().columnFilters.length > 0;
               ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
       </div>
 
       {/* Table */}

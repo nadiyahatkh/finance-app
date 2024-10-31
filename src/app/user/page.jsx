@@ -23,11 +23,12 @@ export default function HomeUser() {
   const [cardData, setCardData] = useState()
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState([]);
+  const [statusFilter, setStatusFilter] = useState([]);
 
   const { data: dataSubmissionUser, error, isLoading } = useQuery({
-    queryKey: ['usersubmissions', search, typeFilter],
+    queryKey: ['usersubmissions', search, typeFilter, statusFilter],
     refetchOnWindowFocus: false,
-    queryFn: () => fetchSubmissionUser({token, search, type: typeFilter}),
+    queryFn: () => fetchSubmissionUser({token, search, type: typeFilter, finish_status: statusFilter}),
   });
 
   console.log(dataSubmissionUser)
@@ -147,6 +148,8 @@ export default function HomeUser() {
               setSearch={setSearch}
               typeFilter={typeFilter} 
               setTypeFilter={setTypeFilter} 
+              statusFilter={statusFilter} 
+              setStatusFilter={setStatusFilter} 
             />
           </div>
         </CardContent>

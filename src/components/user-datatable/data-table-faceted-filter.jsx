@@ -27,8 +27,8 @@ export function DataTableFacetedFilter({
   statusFilter,
   setStatusFilter
 }) {
-    const facets = column?.getFacetedUniqueValues();
-    const selectedValues = new Set(column?.getFilterValue());
+  const facets = column?.getFacetedUniqueValues();
+  const selectedValues = new Set(statusFilter);
 
   return (
     <Popover>
@@ -83,15 +83,17 @@ export function DataTableFacetedFilter({
                     <CommandItem
                     key={option.value}
                     onSelect={() => {
+                        console.log(selectedValues)
                       if (isSelected) {
                         selectedValues.delete(option.value);
                       } else {
                         selectedValues.add(option.value);
                       }
                       const filterValues = Array.from(selectedValues);
-                      column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined
-                      );
+                      setStatusFilter(filterValues)
+                    //   column?.setFilterValue(
+                    //     filterValues.length ? filterValues : undefined
+                    //   );
                     }}
                   >
                     <div
@@ -122,7 +124,7 @@ export function DataTableFacetedFilter({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => setStatusFilter([])}
                     className="justify-center text-center"
                   >
                     Clear filters

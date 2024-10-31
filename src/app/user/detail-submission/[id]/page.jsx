@@ -168,6 +168,28 @@ export default function DetailSubmission() {
                   </li>
                   
                 </ul>
+
+                <div className="flex-grow-0">
+              <div className="flex items-center border-t justify-between w-full">
+                <p className="font-normal text-sm leading-8">Sub total:</p>
+                <h6 className="font-normal text-sm ml-auto text-gray-900">sgfgjs</h6>
+                <h6 className="font-normal text-sm ml-4 leading-8 text-gray-900">sgfgjs</h6>
+              </div>
+              <div className="flex items-center justify-between border-t w-full">
+                <p className="font-normal text-sm leading-8">Discount:</p>
+                <h6 className="font-normal text-sm leading-8 text-red-600">- jfhjs</h6>
+              </div>
+              <div className="flex items-center justify-between w-full">
+                <p className="font-normal text-sm leading-8">Discount:</p>
+                <h6 className="font-normal text-sm leading-8 text-red-600">- jfhjs</h6>
+              </div>
+              <hr className="my-4" />
+              <div className="flex items-center w-full justify-between">
+                <p className="text-sm font-bold">Total</p>
+                <h6 className="mb-1 text-sm font-bold">fhhd</h6>
+              </div>
+              
+            </div>
               {/* <div className="flex justify-center items-center">
 
                 <div className="grid grid-cols-9 justify-center items-center">
