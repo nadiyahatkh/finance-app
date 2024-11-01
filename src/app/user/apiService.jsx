@@ -67,9 +67,11 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
           formData.append(`submission_item[${index}][price]`, item.price);
         });
     
-        if (file) {
-          formData.append('file', file);
-        }
+        if (file && file.length > 0) {
+          file.forEach((file) => {
+          formData.append('file[]', file);
+        });
+      }
     
         const response = await fetch(`${BASE_URL}/api/submission/submissions`, {
           method: 'POST',

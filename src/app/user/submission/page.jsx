@@ -21,6 +21,8 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { fetchBanks } from "@/app/apiService";
 import { createSubmissionUser, fetchBankDetail, fetchSubmissionUser } from "../apiService";
+import { TailSpin, ThreeDots } from "react-loader-spinner";
+import { useRouter } from "next/navigation";
 
 
 export default function SubmissionUser() {
@@ -31,23 +33,29 @@ export default function SubmissionUser() {
     const [transactionType, setTransactionType] = useState()
     const [data, setData] = useState()
     const [selectedFiles, setSelectedFiles] = useState([]);
-
+    const [accountName, setAccountName] = useState("");
+    const [accountNumber, setAccountNumber] = useState("");
+    const [openSuccess, setOpenSuccess] = useState(false);
+    const [openError, setOpenError] = useState(false);
+    const [errorMessages, setErrorMessages] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter()
 
 
     const FormSchema = z.object({
-        due_date: z.date().min(new Date(), { message: "Due date cannot be in the past." }),
+        due_date: z.date({ message: "Due date cannot be in the past." }),
         type: z.string().min(1, { message: "Type is required." }),
         purpose: z.string().min(1, { message: "Purpose is required." }),
-        bank_account_id: z.string().min(1, { message: "Bank account is required." }),
+        bank_account_id: z.preprocess((val) => Number(val), z.number().min(1, { message: "Bank account is required." })),
         
         submission_item: z.array(
           z.object({
             description: z.string().min(1, { message: "Description is required." }),
-            quantity: z.number().min(1, { message: "Quantity must be at least 1." }),
-            price: z.number().min(0, { message: "Price cannot be negative." })
+            quantity: z.preprocess((val) => Number((val)), z.number().min(1, { message: "Quantity must be at least 1" })),
+            price:  z.preprocess((val) => Number((val)), z.number().min(1, { message: "Price is Required" })),
           })
-        ).min(1, { message: "At least one submission item is required." })
-      });
+        ).min(1, { message: "At least one submission item is required." }),
+        });
 
       useEffect(() => {
         const loadData = async () => {
@@ -80,17 +88,17 @@ export default function SubmissionUser() {
      
     useEffect(() => {
         const fetchData = async () => {
-            
-          if (token && bankId) {
-            const response = await fetchBankDetail({ token, id: bankId });
-            console.log(response)
-            form.setValue('account_name', response.account_name, {shouldValidate: true})
-            form.setValue('account_number', response.account_number, {shouldValidate: true})
-          }
+            if (token && bankId) {
+                const response = await fetchBankDetail({ token, id: bankId });
+                console.log(response);
+                setAccountName(response.account_name);
+                setAccountNumber(response.account_number);
+            }
         };
     
         fetchData();
-      }, [token, bankId]);
+    }, [token, bankId]);
+    
       
 
     const form = useForm({
@@ -101,53 +109,33 @@ export default function SubmissionUser() {
         name: "submission_item",
       });
 
-    //   const onSubmit= async (data) => {
-    //     data.bank_account_id = bankId;
-        
-    //     try{
-    //         const result = await createSubmissionUser({data, token, file });
-    //     } catch (error) {
-    //         // const message = JSON.parse(error.message)
-    //         // setErrorMessages(Object.values(message.error).flat());
-    //         console.error('Error creating asset:', error);
-    //     } finally {
-    //         setIsLoading(false);
-    //       }
-    // }
-
-    const onSubmit = async (data) => {
-        // Remove account_name and account_number before sending to server
-        delete submissionData.account_name;
-        delete submissionData.account_number;
-        // Only include bank_account_id in the submission data
-        const submissionData = {
-            ...data,
-            bank_account_id: bankId, // Ensure the bank_id is included
-        };
-    
-    
-        try {
-            const result = await createSubmissionUser({ data: submissionData, file });
-            // Handle success response if needed
+      const onSubmit= async (data) => {
+        data.bank_account_id = bankId;
+        setIsLoading(true)
+        try{
+            const result = await createSubmissionUser({data, token, file: selectedFiles.map(file => file.file) });
+            setOpenSuccess(true)
         } catch (error) {
+            const message = JSON.parse(error.message)
+            setErrorMessages(Object.values(message.error).flat());
+            setOpenError(true)
             console.error('Error creating asset:', error);
-        } finally {
+        }  finally {
             setIsLoading(false);
-        }
-    };
+          }
+    }
     
 
-    const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
-        
-    };
+    const handleFileChange = (event) => {
+        const files = Array.from(event.target.files);
+        const newFiles = files.map(file => ({ file: file }));
+        setSelectedFiles([...selectedFiles, ...newFiles]);
+      };
 
     const handleRemoveFile = (fileName) => {
-        setSelectedFiles((prevFiles) => prevFiles.filter(file => file.name !== fileName));
+        setSelectedFiles(selectedFiles.filter(file => file.file.name !== fileName));
     };
 
-    console.log(selectedFiles)
 
     return(
         <div className="py-4">
@@ -255,17 +243,12 @@ export default function SubmissionUser() {
                                     <div className="flex justify-between items-center">
                                         <div className="w-full mr-2">
                                             <Label className="block text-sm mb-2">Nama Rekening</Label>
-                                            <FormField
-                                                control={form.control}
-                                                name="account_name"
-                                                render={({ field }) => (
-                                                    <>
-                                                    <Input {...field} className="" placeholder="Masukkan Nama Rekening tujuan..." type="text" />
-                                                    {/* {form.formState.errors.purpose && (
-                                                    <FormMessage type="error" className="italic">{form.formState.errors.purpose.message}</FormMessage>
-                                                    )} */}
-                                                    </>
-                                                )}
+                                            <Input
+                                            value={accountName} // Use display-only state
+                                            className=""
+                                            placeholder="Masukan Nama Rekening..."
+                                            type="text"
+                                            readOnly
                                             />
                                         </div>
                                         <div className="w-full ml-2">
@@ -303,17 +286,12 @@ export default function SubmissionUser() {
                                 </div>
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2">Nomor Rekening</Label>
-                                    <FormField
-                                        control={form.control}
-                                        name="account_number"
-                                        render={({ field }) => (
-                                            <>
-                                            <Input {...field} className="" placeholder="Masukkan Rekening tujuan..." type="text" />
-                                            {/* {form.formState.errors.purpose && (
-                                            <FormMessage type="error" className="italic">{form.formState.errors.purpose.message}</FormMessage>
-                                            )} */}
-                                            </>
-                                        )}
+                                    <Input
+                                        value={accountNumber} // Use display-only state
+                                        className=""
+                                        placeholder="Masukan Nomor Rekening..."
+                                        type="text"
+                                        readOnly
                                     />
                                 </div>
                                 <hr className="mb-4" />
@@ -340,7 +318,7 @@ export default function SubmissionUser() {
                                                 control={form.control}
                                                 name={`submission_item.${index}.quantity`} // Nama yang unik untuk setiap field kuantitas
                                                 render={({ field }) => (
-                                                    <Input {...field} placeholder="Masukan jumlah..." />
+                                                    <Input {...field} placeholder="Masukan jumlah..." type="number" />
                                                 )}
                                                 />
                                             </div>
@@ -350,7 +328,7 @@ export default function SubmissionUser() {
                                                 control={form.control}
                                                 name={`submission_item.${index}.price`} // Nama yang unik untuk setiap field jumlah
                                                 render={({ field }) => (
-                                                    <Input {...field} placeholder="Masukan harga..." />
+                                                    <Input {...field} placeholder="Masukan harga..." type="number" />
                                                 )}
                                                 />
                                             </div>
@@ -387,7 +365,7 @@ export default function SubmissionUser() {
                                         <div className="font-semibold text-xs mb-5">Drag your file to start uploading format PDF</div>
 
                                         <input
-                                            name="path"
+                                            name="file"
                                             type="file"
                                             accept="image/*"
                                             className="hidden"
@@ -400,7 +378,7 @@ export default function SubmissionUser() {
                                         <div className="mt-4 space-y-2">
                                             {selectedFiles.map(file => (
                                                 <Card key={file.name} className="flex justify-between items-center">
-                                                    <span className="text-sm text-muted-foreground p-2">{file.name}</span>
+                                                    <span className="text-sm text-muted-foreground p-2">{file.file.name}</span>
                                                     <Button type="button" variant="danger" onClick={() => handleRemoveFile(file.name)}>
                                                         <CircleX className="h-4 w-4"/>
                                                     </Button>
@@ -412,13 +390,13 @@ export default function SubmissionUser() {
                                 <div className="flex justify-end">
                                 <Button
                                     type="submit"
-                                    // disabled={isLoading}
+                                    disabled={isLoading}
                                     onClick={() => console.log(form)}
                                     className="px-4 py-2 text-sm font-semibold rounded-lg text-black"
                                     style={{ background: "#F9B421" }}
                                     >
-                                    {/* {isLoading ? (
-                                        <Tai
+                                    {isLoading ? (
+                                        <ThreeDots
                                         height="20"
                                         width="20"
                                         color="#ffffff"
@@ -426,10 +404,70 @@ export default function SubmissionUser() {
                                         />
                                     ) : (
                                         "Pengajuan"
-                                    )} */}
-                                    Buat Pengajuan
+                                    )}
                                 </Button>
                                 </div>
+                                {/* Success Dialog */}
+                                <AlertDialog open={openSuccess} onOpenChange={setOpenSuccess}>
+                                    <AlertDialogContent className="flex flex-col items-center justify-center text-center">
+                                        <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#DCFCE7" }}>
+                                            <svg
+                                                className="w-6 h-6 text-green-600"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M5 13l4 4L19 7"
+                                                ></path>
+                                            </svg>
+                                        </div>
+                                        <AlertDialogTitle className="">Yeay! Sukses</AlertDialogTitle>
+                                        <AlertDialogDescription className="">Anda telah berhasil menambahkan pengajuan Reimbursement/Payment Request.</AlertDialogDescription>
+                                        <AlertDialogAction
+                                            onClick={() => router.push('/user')}
+                                            style={{ background: "#F9B421" }}
+                                            className="w-full"
+                                        >
+                                            Kembali
+                                        </AlertDialogAction>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+
+                                {/* Error Dialog */}
+                                <AlertDialog open={openError} onOpenChange={setOpenError}>
+                                <AlertDialogContent className="flex flex-col items-center justify-center text-center">
+                                <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#FEE2E2" }}>
+                                    <svg
+                                        className="w-6 h-6 text-red-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M6 18L18 6M6 6l12 12"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <AlertDialogTitle>Yahh! Error</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                    <div className="max-h-32 overflow-y-auto font-semibold">
+                                        {errorMessages.map((message, index) => (
+                                        <p key={index} className="text-red-500 italic">{message}</p>
+                                        ))}
+                                    </div>
+                                    </AlertDialogDescription>
+                                    <AlertDialogAction className="w-full" onClick={() => setOpenError(false)} style={{ background: "#F9B421" }}>Kembali</AlertDialogAction>
+                                </AlertDialogContent>
+                                </AlertDialog>
                             </form>
                         </Form>
                     </div>
