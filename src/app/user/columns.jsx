@@ -134,6 +134,12 @@ export const columns = [
                 Detail
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem>
+            <Link href={`./user/update-submission/${id}`} className="flex items-center">
+                <PencilLine className="mr-2 h-4 w-4" />
+                Update
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
           {/* <AlertDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
             <AlertDialogContent>

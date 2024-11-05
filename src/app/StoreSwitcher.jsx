@@ -80,7 +80,7 @@ export default function StoreSwitcher({ className, items = [] }){
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel onClick={() => setShowDialogLogOut(false)}>Batal</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleSignOut}>
+                      <AlertDialogAction onClick={handleSignOut} style={{ background: "#F9B421" }}>
                                     {isLoading ? (
                                         <TailSpin
                                             height="20"

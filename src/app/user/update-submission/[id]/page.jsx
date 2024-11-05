@@ -1,6 +1,6 @@
 'use client'
+
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,22 +10,23 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, CircleX, CloudDownload, Plus, Trash, Trash2 } from "lucide-react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { useFieldArray } from "react-hook-form";
+import { CalendarIcon, CircleX, Plus, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useParams, useRouter } from "next/navigation"
+import { useFieldArray, useForm } from "react-hook-form";
+import { ThreeDots } from "react-loader-spinner";
+import { z } from "zod";
+import { fetchBankDetail, fetchSubmissionUser, submissionDetailId, updateSubmissionUser } from "../../apiService";
 import { useEffect, useState } from "react";
 import { fetchBanks } from "@/app/apiService";
-import { createSubmissionUser, fetchBankDetail, fetchSubmissionUser } from "../apiService";
-import { TailSpin, ThreeDots } from "react-loader-spinner";
-import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 
-export default function SubmissionUser() {
+
+export default function UpdateSubmission(){
+    const {id} = useParams()
     const { data: session } = useSession();
     const token = session?.user?.token;
     const [banks, setBanks] = useState()
@@ -39,29 +40,74 @@ export default function SubmissionUser() {
     const [openError, setOpenError] = useState(false);
     const [errorMessages, setErrorMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [image, setImage] = useState()
+    const [deletedImages, setDeletedImages] = useState([]);
     const router = useRouter()
 
-
     const FormSchema = z.object({
-        due_date: z.date({ message: "Due date cannot be in the past." }),
-        type: z.string().min(1, { message: "Type is required." }),
-        purpose: z.string().min(1, { message: "Purpose is required." }),
-        bank_account_id: z.preprocess((val) => Number(val), z.number().min(1, { message: "Bank account is required." })),
+        due_date: z.date().optional(),
+        type: z.string().optional(),
+        purpose: z.string().optional(),
+        bank_account_id: z.preprocess((val) => Number((val)), z.number().optional()),
         
         submission_item: z.array(
           z.object({
-            description: z.string().min(1, { message: "Description is required." }),
-            quantity: z.preprocess((val) => Number((val)), z.number().min(1, { message: "Quantity must be at least 1" })),
-            price:  z.preprocess((val) => Number((val)), z.number().min(1, { message: "Price is Required" })),
+            description: z.string().optional(),
+            quantity: z.preprocess((val) => Number((val)), z.number().optional()),
+            price:  z.preprocess((val) => Number((val)), z.number().optional()),
           })
-        ).min(1, { message: "At least one submission item is required." }),
-        });
+        ).optional()
+    });
+
+    const form = useForm({
+        resolver: zodResolver(FormSchema),
+      });
+
+      const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "submission_item",
+      });
+
+      useEffect(() => {
+        const fetchData = async () => {
+          if (token && id) {
+            const response = await submissionDetailId({ token, id });
+            console.log(response);
+      
+            // Set value untuk field-field non-array
+            form.setValue('bank_account_id', response.data.bank_account_id, { shouldValidate: true });
+            form.setValue('purpose', response.data.purpose, { shouldValidate: true });
+            form.setValue('due_date', new Date(response.data.due_date), { shouldValidate: true });
+            form.setValue('type', response.data.type, { shouldValidate: true });
+            
+            // Kosongkan submission_item terlebih dahulu sebelum mengisi ulang
+            remove();
+            
+            // Menambahkan setiap item dari response.data.items ke dalam submission_item
+            response.data.items.forEach(item => {
+              append({
+                description: item.description,
+                quantity: item.quantity,
+                price: item.price,
+              });
+            });
+            // Parse and set existing files
+            const existingFiles = JSON.parse(response.data.files[0].file || '[]');
+            setImage(existingFiles.map(filePath => ({ file: filePath })));
+            setTransactionType(response.data.type);
+            setBankId(response.data.bank_account_id);
+          }
+        };
+      
+        fetchData();
+      }, [token, id, append, remove, form, setTransactionType, setBankId, setImage]);
+      
+
 
       useEffect(() => {
         const loadData = async () => {
           try {
             const response = await fetchSubmissionUser({ token, type: transactionType });
-            console.log(response)
             setData(response);
           } catch (error) {
             console.error('Failed to fetch data:', error);
@@ -73,6 +119,20 @@ export default function SubmissionUser() {
     }, [token, transactionType]);
 
     useEffect(() => {
+        const fetchSubmissions = async () => {
+            if (transactionType === "Reimburesent" ) {
+                const response = await fetchSubmissionUser({ token, type: transactionType });
+                console.log(response)
+                setData(response);
+            }
+        };
+
+        if (token && transactionType) {
+            fetchSubmissions();
+        }
+    }, [transactionType, token]);
+
+      useEffect(() => {
         const loadDataBanks = async () => {
             try {
               const bankData = await fetchBanks({ token });
@@ -86,8 +146,8 @@ export default function SubmissionUser() {
             loadDataBanks()
           }
     })
-     
-    useEffect(() => {
+
+      useEffect(() => {
         const fetchData = async () => {
             if (token && bankId) {
                 const response = await fetchBankDetail({ token, id: bankId });
@@ -99,22 +159,18 @@ export default function SubmissionUser() {
     
         fetchData();
     }, [token, bankId]);
-    
-      
-
-    const form = useForm({
-        resolver: zodResolver(FormSchema),
-    });
-    const { fields, append, remove } = useFieldArray({
-        control: form.control,
-        name: "submission_item",
-      });
 
       const onSubmit= async (data) => {
-        data.bank_account_id = bankId;
+        const payload = {
+            ...data,
+            bank_account_id: data.bank_account_id || bankId,
+            file: selectedFiles.map(file => file.file),
+            delete_images: deletedImages
+
+        };
         setIsLoading(true)
         try{
-            const result = await createSubmissionUser({data, token, file: selectedFiles.map(file => file.file) });
+            const result = await updateSubmissionUser({data: payload, token, file: selectedFiles.map(file => file.file) });
             setOpenSuccess(true)
         } catch (error) {
             const message = JSON.parse(error.message)
@@ -125,19 +181,22 @@ export default function SubmissionUser() {
             setIsLoading(false);
           }
     }
+
     
+const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    const newFiles = files.map(file => ({ file: file }));
+    setSelectedFiles([...selectedFiles, ...newFiles]);
+};
 
-    const handleFileChange = (event) => {
-        const files = Array.from(event.target.files);
-        const newFiles = files.map(file => ({ file: file }));
-        setSelectedFiles([...selectedFiles, ...newFiles]);
-      };
+const handleRemoveFile = (fileName) => {
+    setSelectedFiles(selectedFiles.filter(file => file.file.name !== fileName));
+};
 
-    const handleRemoveFile = (fileName) => {
-        setSelectedFiles(selectedFiles.filter(file => file.file.name !== fileName));
-    };
-
-
+const handleRemoveImage = (filePath) => {
+    setImage(prevImage => prevImage.filter(file => file.file !== filePath));
+    setDeletedImages(prevDeletedImages => [...prevDeletedImages, filePath]);
+};
     return(
         <div className="py-4">
             <div className="w-full max-w-7xl mx-auto">
@@ -172,13 +231,14 @@ export default function SubmissionUser() {
                                         render={({ field }) => (
                                             <RadioGroup
                                             onValueChange={(value) => {
-                                                field.onChange(value);
-                                                setTransactionType(value);
-                                            }} value={field.value?.toString()}
+                                                field.onChange(value); // Mengupdate nilai form
+                                                setTransactionType(value); // Menyimpan nilai pada state lokal
+                                              }}
+                                              value={field.value?.toString() || ""}
                                             >
                                                     <div className="border-none rounded-lg p-4 bg-gray-50">
                                                         <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem name="type" value="1" id="r1" style={{ color: "#F9B421" }} />
+                                                            <RadioGroupItem name="type" value="1" id="r1" style={{ color: "#F9B421" }} disabled={transactionType === "Payment Process"} />
                                                             <Label htmlFor="r1">Pengembalian <span className="italic">(Reimbursement)</span></Label>
                                                         </div>
                                                         <p className="title text-muted-foreground text-xs ml-6">Proses penggantian biaya yang dikeluarkan karyawan untuk keperluan bisnis.</p>
@@ -195,6 +255,10 @@ export default function SubmissionUser() {
                                     />
                                     
                                 </div>
+                                {/* Menampilkan nilai dari transactionType */}
+<div className="mt-2">
+    <p className="text-sm text-gray-600">Selected Type: {transactionType === "1" ? "Reimbursement" : transactionType === "2" ? "Payment Request" : "None"}</p>
+</div>
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2 font-semibold">Tujuan</Label>
                                     <FormField
@@ -222,13 +286,15 @@ export default function SubmissionUser() {
                                                 <PopoverTrigger asChild>
                                                 <FormControl>
                                                     <Button variant="outline" className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                                    {field.value ? format(field.value, 'PPP') : <span>Pilih tanggal pengajuan</span>}
+                                                    {field.value instanceof Date && !isNaN(field.value)
+                                                        ? format(field.value, 'PPP')
+                                                        : <span>Pilih tanggal pengajuan</span>}
                                                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </FormControl>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date('1900-01-01') || date > new Date('2100-12-31')} initialFocus />
+                                                <Calendar mode="single" selected={field.value} onSelect={(date) => field.onChange(date || null)} disabled={(date) => date < new Date('1900-01-01') || date > new Date('2100-12-31')} initialFocus />
                                                 </PopoverContent>
                                             </Popover>
                                             )}
@@ -387,6 +453,18 @@ export default function SubmissionUser() {
                                             ))}
                                         </div>
                                     )}
+                                    {image?.length > 0 && (
+        <div className="mt-4 space-y-2">
+            {image.map((file, index) => (
+                <Card key={index} className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground p-2">{file.file}</span>
+                    <Button type="button" variant="danger" onClick={() => handleRemoveImage(file.file)}>
+                        <CircleX className="h-4 w-4"/>
+                    </Button>
+                </Card>
+            ))}
+        </div>
+    )}
                                 </div>
                                 <div className="flex justify-end">
                                 <Button
