@@ -26,3 +26,50 @@ export const fetchSubmission = async ({token, search, type, finish_status}) => {
       return "abs"
     }
   };
+
+  export const fetchSubmissionDetail = async ({token, id}) => {
+    const session = await getSession()
+      try {
+        const response = await fetch(`${BASE_URL}/api/dataApplicant/detail/${id}`, {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            'Authorization': `Bearer ${session.user.token}`,
+          }
+        })
+        .then((res) => res.json())
+        .then((data) => {
+         return {
+          data: data,
+          message: "successs"
+         }
+        })
+        return response.data
+      } catch (error) {
+        console.error(error);
+        return "abs"
+      }
+    };
+
+    export const approvedSubmission = async ({ id, token }) => {
+      try{
+        const response = await fetch(`${BASE_URL}/api/dataApplicant/approve/${id}`, {
+          method: 'POST',
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json', // Tambahkan Content-Type jika diperlukan
+          },
+        });
+      
+        if (!response.ok) {
+            const result = await response.text();
+            throw new Error(result);
+          }
+      
+          const result = await response.json();
+          return result;
+        } catch (error) {
+          console.error('Error update users:', error);
+          throw error;
+        }
+      };

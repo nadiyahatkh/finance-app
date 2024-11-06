@@ -40,8 +40,8 @@ export default function StoreSwitcher({ className, items = [] }){
                         <AvatarFallback>Nad</AvatarFallback>
                     </Avatar>
                     {/* <img src={profileImage} alt="Profile Image" className="w-4 h-4 rounded-full mr-2" /> */}
-                    {/* {session?.user?.name || 'Guest'} */}
-                    <p>Nadiyah Atikah Juliyanti</p>
+                    {session?.user?.name || 'Guest'}
+                    {/* <p>Nadiyah Atikah Juliyanti</p> */}
                     <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>

@@ -132,7 +132,7 @@ export const columns = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-            <Link href={`./user/detail-submission`} className="flex items-center">
+            <Link href={`./submission/detail-submission/${id}`} className="flex items-center">
                 <PencilLine className="mr-2 h-4 w-4" />
                 Detail
               </Link>

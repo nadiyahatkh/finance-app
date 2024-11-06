@@ -454,17 +454,17 @@ const handleRemoveImage = (filePath) => {
                                         </div>
                                     )}
                                     {image?.length > 0 && (
-        <div className="mt-4 space-y-2">
-            {image.map((file, index) => (
-                <Card key={index} className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground p-2">{file.file}</span>
-                    <Button type="button" variant="danger" onClick={() => handleRemoveImage(file.file)}>
-                        <CircleX className="h-4 w-4"/>
-                    </Button>
-                </Card>
-            ))}
-        </div>
-    )}
+                                        <div className="mt-4 space-y-2">
+                                            {image.map((file, index) => (
+                                                <Card key={index} className="flex justify-between items-center">
+                                                    <span className="text-sm text-muted-foreground p-2">{file.file}</span>
+                                                    <Button type="button" variant="danger" onClick={() => handleRemoveImage(file.file)}>
+                                                        <CircleX className="h-4 w-4"/>
+                                                    </Button>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex justify-end">
                                 <Button
