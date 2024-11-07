@@ -6,36 +6,87 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { formatCurrency } from "@/app/utils/formatCurrency";
-import { approvedSubmission, fetchSubmissionDetail } from "../../apiService";
+import { approvedSubmission, deniedSubmission, fetchSubmissionDetail } from "../../apiService";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Hearts, ThreeDots } from "react-loader-spinner";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export default function DetailSubmission() {
   const { data: session } = useSession();
   const token = session?.user?.token;
   const {id: submissionId} = useParams()
+  const currentAdminId = session?.user?.id;
+  const [notes, setNotes] = useState('');
+  const [currentApplicantId, setCurrentApplicantId] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState({});
+  const [isLoading, setIsLoading] = useState(false)
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [openError, setOpenError] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [detail, setDetail] = useState()
   const router = useRouter();
+  const [showActions, setShowActions] = useState(true);
   
   useEffect(() => {
     const loadDetail = async () => {
       if (token && submissionId) {
         const response = await fetchSubmissionDetail({ token, id: submissionId });
-        console.log(response)
+        console.log(response);
         setDetail(response?.submission);
+
+        // Check if the current admin has already approved or denied
+        const adminApproval = response?.submission?.admin_approvals?.find(
+          (approval) => approval.user_id === currentAdminId
+        );
+        if (adminApproval && (adminApproval.status === 'approved' || adminApproval.status === 'denied')) {
+          setShowActions(false); // Hide the buttons if already approved/denied by the current admin
+        }
       }
     };
 
     loadDetail();
-  }, [token, submissionId]);
+  }, [token, submissionId, currentAdminId]);
+
+  const items = detail?.items || [];
+  const totalAmount = items.reduce((acc, item) => acc + (item.quantity * item.price), 0)
 
   const handleAccept = async () => {
-    console.log(handleAccept)
+    setIsLoading(true)
     try {
       await approvedSubmission({ id: submissionId, token });
-      router.push('/submission');
+      setOpenSuccess(true)
     } catch (error) {
-      console.error('Error accepting applicant:', error);
+      const message = JSON.parse(error.message);
+          setErrorMessages(Object.values(message).flat());
+          setOpenError(true);
+          console.error('Error updating profile:', error);
+    } finally {
+      setIsLoading(false)
     }
-};
+  };
+
+  const handleDeny = async (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    if (!currentApplicantId || !notes) return; // Ensure we have an ID and notes
+
+    setLoadingStatus((prevState) => ({ ...prevState, [currentApplicantId]: true }));
+    try {
+      await deniedSubmission({ id: currentApplicantId, token, notes });
+      router.push('/submission');
+        
+      
+    } catch (error) {
+      console.error('Error denying applicant:', error);
+    } finally {
+      setLoadingStatus((prevState) => ({ ...prevState, [currentApplicantId]: false }));
+      setNotes(''); // Clear notes after submission
+      setCurrentApplicantId(null);
+      setIsDialogOpen(false); 
+    }
+  };
 
   return (
     <div className="py-4">
@@ -90,13 +141,80 @@ export default function DetailSubmission() {
                     <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
                   </div>
                 </div>
-                <div className="flex justify-end"> 
-                <Button variant='outline' className="text-[#F9B421]">
-                    Tolak
-                </Button>
-                <Button onClick={handleAccept} className="ml-2 bg-[#F9B421] hover:bg-[#E5A50F] transition-colors">
-                    Setujui
-                </Button>
+                <div className="flex justify-end">
+                  {showActions && (
+                    <>
+                      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            className="text-[#F9B421]" 
+                            onClick={() => setCurrentApplicantId(detail?.id)}
+                          >
+                            Tolak
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Alasan Penolakan</DialogTitle>
+                          </DialogHeader>
+                          <form onSubmit={handleDeny}>
+                            <div className="grid w-full gap-1.5">
+                              <Textarea
+                                id="notes"
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                              />
+                              <p className="text-sm text-muted-foreground">
+                                Tuliskan alasan penolakan pengajuan
+                              </p>
+                            </div>
+                            <DialogFooter>
+                              <Button
+                                variant="outline"
+                                onClick={() => setIsDialogOpen(false)}
+                                type="button"
+                                className="mr-2 shadow-md h-8 w-[20%] text-[#F9B421]"
+                              >
+                                Kembali
+                              </Button>
+                              <Button 
+                                type="submit"
+                                className="text-white h-8 w-[20%] bg-[#F9B421]"
+                                disabled={loadingStatus[currentApplicantId]}
+                              >
+                                {loadingStatus[currentApplicantId] ? (
+                                  <ThreeDots
+                                  height="20"
+                                  width="20"
+                                  color="#ffffff"
+                                  ariaLabel="loading"
+                                  />
+                                ) : (
+                                  'Simpan'
+                                )}
+                              </Button>
+                            </DialogFooter>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        onClick={handleAccept}
+                        className="ml-2 bg-[#F9B421] hover:bg-[#E5A50F] transition-colors"
+                      >
+                        {isLoading ? (
+                              <ThreeDots
+                              height="20"
+                              width="20"
+                              color="#ffffff"
+                              ariaLabel="loading"
+                              />
+                          ) : (
+                              "Setujui"
+                          )}
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -184,27 +302,34 @@ export default function DetailSubmission() {
                   
                 </ul>
 
-                <div className="flex-grow-0">
-              <div className="flex items-center border-t justify-between w-full">
-                <p className="font-normal text-sm leading-8">Sub total:</p>
-                <h6 className="font-normal text-sm ml-auto text-gray-900">sgfgjs</h6>
-                <h6 className="font-normal text-sm ml-4 leading-8 text-gray-900">sgfgjs</h6>
+                <div className="flex flex-col">
+                <div className="flex items-center border-t justify-between w-full py-2">
+                  <p className="font-normal text-sm w-1/4">DESKRIPSI</p>
+                  <h6 className="font-normal text-sm w-1/6 text-gray-900 text-center">KUANTITAS</h6>
+                  <h6 className="font-normal text-sm w-1/6 text-gray-900 text-center">HARGA</h6>
+                  <h6 className="font-normal text-sm w-1/6 text-gray-900 text-center">TOTAL</h6>
+                </div>
+
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between border-t w-full py-2">
+                    <p className="font-normal text-sm w-1/4">{item.description || 'N/A'}</p>
+                    <h6 className="font-normal text-sm w-1/6 text-center text-gray-900">{item.quantity}</h6>
+                    <h6 className="font-normal text-sm w-1/6 text-center text-red-600">
+                      Rp. {item.price.toLocaleString('id-ID')}
+                    </h6>
+                    <h6 className="font-normal text-sm w-1/6 text-center text-red-600">
+                      Rp. {(item.quantity * item.price).toLocaleString('id-ID')}
+                    </h6>
+                  </div>
+                ))}
+
+                <hr className="my-4" />
+
+                <div className="flex items-center w-full justify-between">
+                  <p className="text-sm font-bold w-1/4">Total</p>
+                  <h6 className="text-sm font-bold w-1/6 text-center">Rp. {totalAmount.toLocaleString('id-ID')}</h6>
+                </div>
               </div>
-              <div className="flex items-center justify-between border-t w-full">
-                <p className="font-normal text-sm leading-8">Discount:</p>
-                <h6 className="font-normal text-sm leading-8 text-red-600">- jfhjs</h6>
-              </div>
-              <div className="flex items-center justify-between w-full">
-                <p className="font-normal text-sm leading-8">Discount:</p>
-                <h6 className="font-normal text-sm leading-8 text-red-600">- jfhjs</h6>
-              </div>
-              <hr className="my-4" />
-              <div className="flex items-center w-full justify-between">
-                <p className="text-sm font-bold">Total</p>
-                <h6 className="mb-1 text-sm font-bold">fhhd</h6>
-              </div>
-              
-            </div>
               {/* <div className="flex justify-center items-center">
 
                 <div className="grid grid-cols-9 justify-center items-center">
@@ -312,6 +437,66 @@ export default function DetailSubmission() {
                         
                     </div>
               </div> */}
+              {/* Success Dialog */}
+              <AlertDialog open={openSuccess} onOpenChange={setOpenSuccess}>
+                        <AlertDialogContent className="flex flex-col items-center justify-center text-center">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#DCFCE7" }}>
+                                <svg
+                                    className="w-6 h-6 text-green-600"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M5 13l4 4L19 7"
+                                    ></path>
+                                </svg>
+                            </div>
+                            <AlertDialogTitle className="">Yeay! Sukses</AlertDialogTitle>
+                            <AlertDialogDescription className="">Anda telah berhasil menyetujui pengajuan pembayaran</AlertDialogDescription>
+                            <AlertDialogAction
+                                onClick={() => router.push('/submission')}
+                                className="w-full bg-[#F9B421]"
+                            >
+                                Kembali
+                            </AlertDialogAction>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    {/* Error Dialog */}
+                    <AlertDialog open={openError} onOpenChange={setOpenError}>
+                    <AlertDialogContent className="flex flex-col items-center justify-center text-center">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#FEE2E2" }}>
+                        <svg
+                            className="w-6 h-6 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            ></path>
+                        </svg>
+                    </div>
+                    <AlertDialogTitle>Yahh! Error</AlertDialogTitle>
+                        <AlertDialogDescription>
+                        <div className="max-h-32 overflow-y-auto font-semibold">
+                            {errorMessages.map((message, index) => (
+                            <p key={index} className="text-red-500 italic">{message}</p>
+                            ))}
+                        </div>
+                        </AlertDialogDescription>
+                        <AlertDialogAction className="w-full bg-[#F9B421]" onClick={() => setOpenError(false)}>Kembali</AlertDialogAction>
+                    </AlertDialogContent>
+                    </AlertDialog>
 
             </CardContent>
           </Card>

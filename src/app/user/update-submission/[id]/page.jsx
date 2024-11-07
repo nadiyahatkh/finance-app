@@ -170,7 +170,7 @@ export default function UpdateSubmission(){
         };
         setIsLoading(true)
         try{
-            const result = await updateSubmissionUser({data: payload, token, file: selectedFiles.map(file => file.file) });
+            const result = await updateSubmissionUser({data: payload, id, token, file: selectedFiles.map(file => file.file) });
             setOpenSuccess(true)
         } catch (error) {
             const message = JSON.parse(error.message)
@@ -238,14 +238,14 @@ const handleRemoveImage = (filePath) => {
                                             >
                                                     <div className="border-none rounded-lg p-4 bg-gray-50">
                                                         <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem name="type" value="1" id="r1" style={{ color: "#F9B421" }} disabled={transactionType === "Payment Process"} />
+                                                            <RadioGroupItem name="type" value="Reimburesent" id="r1" style={{ color: "#F9B421" }} disabled={transactionType === "Payment Process"} />
                                                             <Label htmlFor="r1">Pengembalian <span className="italic">(Reimbursement)</span></Label>
                                                         </div>
                                                         <p className="title text-muted-foreground text-xs ml-6">Proses penggantian biaya yang dikeluarkan karyawan untuk keperluan bisnis.</p>
                                                     </div>
                                                     <div className="border-none rounded-lg p-4 bg-gray-50">
                                                         <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem name="type" value="2" id="r2" style={{ color: "#F9B421" }} />
+                                                            <RadioGroupItem name="type" value="Payment Process" id="r2" style={{ color: "#F9B421" }} />
                                                             <Label htmlFor="r2">Permintaan Pembayaran <span className="italic">(Payment Request)</span></Label>
                                                         </div>
                                                         <p className="title text-muted-foreground text-xs ml-6">Pengajuan pembayaran kepada pihak ketiga untuk barang atau jasa yang diterima.</p>

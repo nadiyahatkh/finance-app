@@ -73,3 +73,28 @@ export const fetchSubmission = async ({token, search, type, finish_status}) => {
           throw error;
         }
       };
+
+      export const deniedSubmission = async ({ id, token, notes }) => {
+        try{
+        const formData = new FormData();
+        formData.append('notes', notes);
+        const response = await fetch(`${BASE_URL}/api/dataApplicant/denied/${id}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+      
+        if (!response.ok) {
+          const result = await response.text();
+          throw new Error(result);
+        }
+    
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error('Error update users:', error);
+        throw error;
+      }
+      };

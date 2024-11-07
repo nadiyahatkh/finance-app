@@ -16,50 +16,49 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { createEmployee, fetchDepartments, fetchManagers, fetchPositions } from "../apiService";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchBanks } from "@/app/apiService";
 import { ThreeDots } from "react-loader-spinner";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { fetchDepartments, fetchManagers, fetchPositions, updateUsers, userDetailId } from "../../apiService";
 
 
-export default function AddEmployee() {
+export default function UpdateEmployee() {
     const { data: session } = useSession();
     const token = session?.user?.token;
+    const {id} = useParams()
     const router = useRouter()
     const [departments, setDepartments] = useState()
     const [positions, setPositions] = useState()
     const [departmentId, setDepartmentId] = useState();
     const [positionId, setPositionId] = useState();
+    const [banks, setBanks] = useState()
     const [managers, setManagers] = useState()
     const [managerId, setManagerId] = useState()
-    const [banks, setBanks] = useState()
     const [bankId, setBankId] = useState()
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+    const [profileImage, setProfileImage] = useState();
     const [openSuccess, setOpenSuccess] = useState(false);
     const [openError, setOpenError] = useState(false);
     const [errorMessages, setErrorMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const FormSchema = z.object({
-        name: z.string().min(1, { message: "Nama karyawan is required." }),
-        username: z.string().min(1, { message: "UserName karyawan is required." }),
-        email: z.string().min(1, { message: "Email is required." }),
-        password: z.string().min(1, { message: "Password wajib diisi." }),
-        nip: z.string().min(1, { message: "Nip wajib diisi." }),
-        department_id: z.string().min(1, { message: "Department wajib diisi." }),
-        position_id: z.string().min(1, { message: "Posisi wajib diisi." }),
-        manager_id: z.string().min(1, { message: "Manager wajib diisi." }),
+        name: z.string().optional(),
+        username: z.string().optional(),
+        email: z.string().optional(),
+        password: z.string().optional(),
+        department_id: z.string().optional(),
+        position_id: z.string().optional(),
+        manager_id: z.string().optional(),
         bank: z.array(
             z.object({
-              bank_id: z.preprocess((val) => Number((val)), z.number().min(1, { message: "Bank is Required" })),
-              account_name: z.string().min(1, { message: "Nama Rekening is required." }),
-              account_number:  z.preprocess((val) => Number((val)), z.number().min(1, { message: "Nomer Rekening is Required" })),
+              bank_id: z.preprocess((val) => Number((val)), z.number().optional()),
+              account_name: z.string().optional(),
+              account_number:  z.preprocess((val) => Number((val)), z.number().optional()),
             })
-          ).min(1, { message: "At least one submission item is required." }),
+          ).optional(),
         path: z.any().optional()
       });
 
@@ -100,14 +99,14 @@ export default function AddEmployee() {
           }
         };
         const loadDataMangers = async () => {
-          try {
-            const managerData = await fetchManagers({ token });
-            console.log(managerData)
-            setManagers(managerData.data);
-          } catch (error) {
-            console.error('Failed to fetch managers:', error);
-          }
-        };
+            try {
+              const managerData = await fetchManagers({ token });
+              console.log(managerData)
+              setManagers(managerData.data);
+            } catch (error) {
+              console.error('Failed to fetch managers:', error);
+            }
+          };
 
         if (token){
             loadDataMangers();
@@ -120,27 +119,57 @@ export default function AddEmployee() {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            setSelectedFile(file);
-            const previewUrl = URL.createObjectURL(file);
-            setImagePreviewUrl(previewUrl);
+            setProfileImage(URL.createObjectURL(file));
+            form.setValue('path', event.target.files);
         }
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+          if (token && id) {
+            const response = await userDetailId({ token, id });
+            console.log(response);
+            form.setValue('name', response.data.name, { shouldValidate: true });
+            form.setValue('username', response.data.username, { shouldValidate: true });
+            form.setValue('email', response.data.email, { shouldValidate: true });
+            form.setValue('password', response.data.password, { shouldValidate: true });
+            form.setValue('department_id', response.data.department_id, { shouldValidate: true });
+            form.setValue('position_id', response.data.position_id, { shouldValidate: true });
+            const managerId = response.data.staff[0]?.manager_id || null;
+            form.setValue('manager_id', managerId, { shouldValidate: true });
+
+            setProfileImage(response.data.path)
+            
+            remove();
+            
+            response.data.bank_accounts.forEach(item => {
+              append({
+                bank_id: item.bank_id,
+                account_name: item.account_name,
+                account_number: item.account_number,
+              });
+            });
+          }
+        };
+      
+        fetchData();
+      }, [token, id, append, remove, form]);
 
     const onSubmit = async (data) => {
-        data.manager_id = managerId;
-        data.departement_id = departmentId;
-        data.position_id = positionId;
-        data.bank_id = bankId;
+        // Buat salinan data dan hapus password/password_confirmation jika tidak diisi
+        const filteredData = { ...data };
+    
+        if (!data.password) {
+            delete filteredData.password;
+        }
         setIsLoading(true)
         console.log("Token:", token);
         try {
-        const result = await createEmployee({ data, token , file: selectedFile });
+        const result = await updateUsers({ data: filteredData, token, id });
         setOpenSuccess(true)
         console.log(result)
         } catch (error) {
-            // Parse the JSON error message (since it's thrown as a JSON string)
-        let message = '';
+            let message = '';
         try {
             const errorDetail = JSON.parse(error.message);
             setErrorMessages(Object.values(errorDetail.errors).flat());
@@ -184,7 +213,7 @@ export default function AddEmployee() {
                             <div className="mb-4">
                                 <p className="font-bold text-sm mb-2">Photo</p>
                                 <div className="flex items-center">
-                                <img src={imagePreviewUrl || "/default-profile.png"} name="path" alt="Profile Image" className="w-12 h-12 rounded-full mr-4" />
+                                <img src={profileImage} name="path" alt="Profile Image" className="w-12 h-12 rounded-full mr-4" />
                                     <input
                                         name="path"
                                         type="file"
@@ -242,21 +271,6 @@ export default function AddEmployee() {
                                 />
                             </div>
                             <div className="mb-4">
-                                <Label className="block text-sm mb-2">NIP</Label>
-                                <FormField
-                                control={form.control}
-                                name="nip"
-                                render={({ field }) => (
-                                <>
-                                    <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="121300" type="text" />
-                                    {form.formState.errors.nip && (
-                                    <FormMessage type="error" className="italic">{form.formState.errors.nip.message}</FormMessage>
-                                    )}
-                                </>
-                                )}
-                                />
-                            </div>
-                            <div className="mb-4">
                                 <Label className="block text-sm mb-2">Email</Label>
                                 <FormField
                                 control={form.control}
@@ -285,7 +299,7 @@ export default function AddEmployee() {
                                                 render={({ field }) => (
                                                     <>
                                                     <Select
-                                                    value={field.value ? field.value.toString() : ""}
+                                                    value={field.value ?? ""}
                                                     onValueChange={(value) => {
                                                         field.onChange(value); // Update react-hook-form state
                                                         setBankId(value);
@@ -297,7 +311,7 @@ export default function AddEmployee() {
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {banks?.map((bank) => (
-                                                        <SelectItem key={bank.id} value={bank.id.toString()}>{bank.name}</SelectItem>
+                                                        <SelectItem key={bank.id} value={bank.id}>{bank.name}</SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                     </Select>
@@ -350,7 +364,7 @@ export default function AddEmployee() {
                                     </CardContent>
                                     </Card>
                                 </div>
-                            <div className="mb-4">
+                                <div className="mb-4">
                                 <Label className="block text-sm mb-2">Manager</Label>
                                 <FormField
                                 control={form.control}
@@ -374,9 +388,6 @@ export default function AddEmployee() {
                                             ))}
                                         </SelectContent>
                                         </Select>
-                                        {form.formState.errors.manager_id && (
-                                            <FormMessage type="error" className="italic">{form.formState.errors.manager_id.message}</FormMessage>
-                                        )}
                                     </>
                                 )}
                                 />
@@ -405,9 +416,6 @@ export default function AddEmployee() {
                                             ))}
                                         </SelectContent>
                                         </Select>
-                                        {form.formState.errors.department_id && (
-                                            <FormMessage type="error" className="italic">{form.formState.errors.department_id.message}</FormMessage>
-                                        )}
                                     </>
                                     )}
                                     />
@@ -437,9 +445,6 @@ export default function AddEmployee() {
                                             ))}
                                         </SelectContent>
                                         </Select>
-                                        {form.formState.errors.position_id && (
-                                            <FormMessage type="error" className="italic">{form.formState.errors.position_id.message}</FormMessage>
-                                        )}
                                     </>
                                     )}
                                     />
@@ -460,7 +465,7 @@ export default function AddEmployee() {
                                         ariaLabel="loading"
                                         />
                                     ) : (
-                                        "Tambah Karyawan"
+                                        "Ubah Karyawan"
                                     )}
                             </Button>
                             {/* Success Dialog */}
@@ -483,7 +488,7 @@ export default function AddEmployee() {
                                             </svg>
                                         </div>
                                         <AlertDialogTitle className="">Yeay! Sukses</AlertDialogTitle>
-                                        <AlertDialogDescription className="">Anda telah berhasil menambahkan karyawan.</AlertDialogDescription>
+                                        <AlertDialogDescription className="">Anda telah berhasil mengubah karyawan.</AlertDialogDescription>
                                         <AlertDialogAction
                                             onClick={() => router.push('/employee-management')}
                                             style={{ background: "#F9B421" }}

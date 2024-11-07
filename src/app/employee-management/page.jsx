@@ -22,11 +22,19 @@ export default function EmployeeManagement() {
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [idToDelete, setIdToDelete] = useState(null);
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(10)
+  // const [totalPage, setTotalPage] = useState(0)
+
 
   // const deleteRow = (id, employeeData) => {
   //   return employeeData.filter(item => item.id !== id);
   // };
 
+
+  useEffect(() => {
+    setPage(1); // Reset ke halaman pertama setiap kali `perPage` berubah
+  }, [perPage]);
 
   const handleDelete = async () => {
     try {
@@ -41,12 +49,15 @@ export default function EmployeeManagement() {
   };
 
   const { data: dataEmployee, error, isLoading } = useQuery({
-    queryKey: ['employees'],
+    queryKey: ['employees', page, perPage],
     refetchOnWindowFocus: false,
-    queryFn: () => fetchEmployee({token}),
+    queryFn: () => fetchEmployee({token, page, per_page: perPage}),
   });
 
   const employeeData = dataEmployee?.data.data || [];
+  const totalPage = dataEmployee?.data.last_page || 1; // Ambil last_page untuk totalPage
+
+console.log(totalPage); // Pastikan last_page berhasil diambil
 
   console.log(employeeData)
   // console.log(data)
@@ -88,7 +99,7 @@ export default function EmployeeManagement() {
             </section> */}
         <CardContent className="shadow-md">
           <div className="container mx-auto">
-          <DataTable data={employeeData} columns={columns(handleDelete, isDeleteDialogOpen, setIsDeleteDialogOpen, setIdToDelete)} />
+          <DataTable data={employeeData} columns={columns(handleDelete, isDeleteDialogOpen, setIsDeleteDialogOpen, setIdToDelete)} currentPage={page} setPage={setPage} totalPage={totalPage} perPage={perPage} setPerPage={setPerPage} />
           </div>
         </CardContent>
       </div>

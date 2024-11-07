@@ -26,9 +26,9 @@ export default function SubmissionAdmin(){
     queryFn: () => fetchSubmission({token, search, type: typeFilter, finish_status: statusFilter}),
   });
 
-  console.log(dataSubmission)
-
+  
   const submissionData = dataSubmission?.submissions || [];
+  console.log(submissionData)
 
   useEffect(() => {
     const loadData = async () => {

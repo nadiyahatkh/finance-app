@@ -73,7 +73,7 @@ export const columns = (handleDelete, isDeleteDialogOpen, setIsDeleteDialogOpen,
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem >
-              <Link href={`./user/update-submission`} className="flex items-center">
+              <Link href={`./employee-management/update-employee/${id}`} className="flex items-center">
                 <PencilLine className="mr-2 h-4 w-4" />
                 Ubah
               </Link>
@@ -81,12 +81,6 @@ export const columns = (handleDelete, isDeleteDialogOpen, setIsDeleteDialogOpen,
               <DropdownMenuItem onClick={() => { setIdToDelete(id); setIsDeleteDialogOpen(true); }} className="text-red-500">
                 <Trash2 className='h-4 w-4 mr-2' /> Hapus
               </DropdownMenuItem>
-            <DropdownMenuItem>
-            <Link href={`./user/detail-submission`} className="flex items-center">
-                <PencilLine className="mr-2 h-4 w-4" />
-                Detail
-              </Link>
-            </DropdownMenuItem>
           </DropdownMenuContent>
           <AlertDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
             <AlertDialogContent>

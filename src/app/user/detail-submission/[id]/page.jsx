@@ -26,6 +26,9 @@ export default function DetailSubmission() {
     loadDetail();
   }, [token, id]);
 
+  const items = detail?.items || [];
+  const totalAmount = items.reduce((acc, item) => acc + (item.quantity * item.price), 0)
+
   return (
     <div className="py-4">
       <div className="max-w-7xl w-full mx-auto">
@@ -36,7 +39,7 @@ export default function DetailSubmission() {
         <div className="mt-4">
           <Card className="lg:w-5/6 p-4">
             <CardContent className="w-full">
-              <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal</div>
@@ -78,10 +81,6 @@ export default function DetailSubmission() {
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
                     <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
                   </div>
-                </div>
-                <div className="flex justify-end"> 
-                  <Button className="mr-2">Tolak</Button>
-                  <Button>Terima</Button> 
                 </div>
               </div>
 
@@ -169,27 +168,34 @@ export default function DetailSubmission() {
                   
                 </ul>
 
-                <div className="flex-grow-0">
-              <div className="flex items-center border-t justify-between w-full">
-                <p className="font-normal text-sm leading-8">Sub total:</p>
-                <h6 className="font-normal text-sm ml-auto text-gray-900">sgfgjs</h6>
-                <h6 className="font-normal text-sm ml-4 leading-8 text-gray-900">sgfgjs</h6>
+                <div className="flex flex-col">
+                <div className="flex items-center border-t justify-between w-full py-2">
+                  <p className="font-normal text-sm w-1/4">DESKRIPSI</p>
+                  <h6 className="font-normal text-sm w-1/6 text-gray-900 text-center">KUANTITAS</h6>
+                  <h6 className="font-normal text-sm w-1/6 text-gray-900 text-center">HARGA</h6>
+                  <h6 className="font-normal text-sm w-1/6 text-gray-900 text-center">TOTAL</h6>
+                </div>
+
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between border-t w-full py-2">
+                    <p className="font-normal text-sm w-1/4">{item.description || 'N/A'}</p>
+                    <h6 className="font-normal text-sm w-1/6 text-center text-gray-900">{item.quantity}</h6>
+                    <h6 className="font-normal text-sm w-1/6 text-center text-red-600">
+                      Rp. {item.price.toLocaleString('id-ID')}
+                    </h6>
+                    <h6 className="font-normal text-sm w-1/6 text-center text-red-600">
+                      Rp. {(item.quantity * item.price).toLocaleString('id-ID')}
+                    </h6>
+                  </div>
+                ))}
+
+                <hr className="my-4" />
+
+                <div className="flex items-center w-full justify-between">
+                  <p className="text-sm font-bold w-1/4">Total</p>
+                  <h6 className="text-sm font-bold w-1/6 text-center">Rp. {totalAmount.toLocaleString('id-ID')}</h6>
+                </div>
               </div>
-              <div className="flex items-center justify-between border-t w-full">
-                <p className="font-normal text-sm leading-8">Discount:</p>
-                <h6 className="font-normal text-sm leading-8 text-red-600">- jfhjs</h6>
-              </div>
-              <div className="flex items-center justify-between w-full">
-                <p className="font-normal text-sm leading-8">Discount:</p>
-                <h6 className="font-normal text-sm leading-8 text-red-600">- jfhjs</h6>
-              </div>
-              <hr className="my-4" />
-              <div className="flex items-center w-full justify-between">
-                <p className="text-sm font-bold">Total</p>
-                <h6 className="mb-1 text-sm font-bold">fhhd</h6>
-              </div>
-              
-            </div>
               {/* <div className="flex justify-center items-center">
 
                 <div className="grid grid-cols-9 justify-center items-center">

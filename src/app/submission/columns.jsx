@@ -88,20 +88,21 @@ export const columns = [
     }
   },
   {
-    accessorKey: 'finish_status',
+    accessorKey: 'submissions.admin_approvals.status',
     header: 'Status',
     cell: ({ row }) => {
-      const status = row.getValue("finish_status");
+      const adminApprovals = row.original.admin_approvals;
+      const status = adminApprovals && adminApprovals.length > 0 ? adminApprovals[0].status : 'Unknown';
 
       let statusColor, statusIcon;
 
       if (status === 'approved') {
         statusColor = 'text-green-500';
         statusIcon = <CheckCheckIcon className="h-4 w-4 mr-2" />;
-      } else if (status === 'dinied') {
+      } else if (status === 'denied') {
         statusColor = 'text-red-500';
         statusIcon = <XCircle className="h-4 w-4 mr-2" />;
-      } else if (status === 'process') {
+      } else if (status === 'pending') {
         statusColor = 'text-black';
         statusIcon = <RotateCw className="h-4 w-4 mr-2" />;
       }
