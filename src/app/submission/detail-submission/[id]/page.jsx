@@ -114,7 +114,12 @@ export default function DetailSubmission() {
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tipe</div>
-                    <div className="font-semibold bg-green-500 w-[90px] rounded text-white px-1">
+                    <div
+                      className={`font-semibold w-[90px] rounded text-white px-1 ${
+                        detail?.type === 'Reimburesent' ? 'bg-green-500' : 
+                        detail?.type === 'Payment Process' ? 'bg-blue-500' : ''
+                      }`}
+                    >
                       {detail?.type}
                     </div>
                   </div>
@@ -126,15 +131,15 @@ export default function DetailSubmission() {
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nama Bank</div>
-                    <div className="font-semibold">djad</div>
+                    <div className="font-semibold">{detail?.bank_account.bank.name}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nama Pemilik Rekening</div>
-                    <div className="font-semibold">dsjhfds</div>
+                    <div className="font-semibold">{detail?.bank_account.account_name}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nomor Rekening</div>
-                    <div className="font-semibold">sudfyis</div>
+                    <div className="font-semibold">{detail?.bank_account.account_number}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>

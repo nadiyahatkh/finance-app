@@ -31,6 +31,7 @@ export default function UpdateSubmission(){
     const token = session?.user?.token;
     const [banks, setBanks] = useState()
     const [bankId, setBankId] = useState()
+    const [accountId, setAccountId] = useState()
     const [transactionType, setTransactionType] = useState()
     const [data, setData] = useState()
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -74,16 +75,12 @@ export default function UpdateSubmission(){
             const response = await submissionDetailId({ token, id });
             console.log(response);
       
-            // Set value untuk field-field non-array
             form.setValue('bank_account_id', response.data.bank_account_id, { shouldValidate: true });
             form.setValue('purpose', response.data.purpose, { shouldValidate: true });
             form.setValue('due_date', new Date(response.data.due_date), { shouldValidate: true });
             form.setValue('type', response.data.type, { shouldValidate: true });
-            
-            // Kosongkan submission_item terlebih dahulu sebelum mengisi ulang
             remove();
             
-            // Menambahkan setiap item dari response.data.items ke dalam submission_item
             response.data.items.forEach(item => {
               append({
                 description: item.description,
@@ -91,11 +88,9 @@ export default function UpdateSubmission(){
                 price: item.price,
               });
             });
-            // Parse and set existing files
-            const existingFiles = JSON.parse(response.data.files[0].file || '[]');
-            setImage(existingFiles.map(filePath => ({ file: filePath })));
+            setImage(response.data.files || '[]');
             setTransactionType(response.data.type);
-            setBankId(response.data.bank_account_id);
+            setBankId(response.data.bank_account.bank_id);
           }
         };
       
@@ -136,7 +131,7 @@ export default function UpdateSubmission(){
         const loadDataBanks = async () => {
             try {
               const bankData = await fetchBanks({ token });
-              setBanks(bankData.data);
+              setBanks(bankData);
             } catch (error) {
               console.error('Failed to fetch positions:', error);
             }
@@ -152,6 +147,7 @@ export default function UpdateSubmission(){
             if (token && bankId) {
                 const response = await fetchBankDetail({ token, id: bankId });
                 console.log(response);
+                setAccountId(response.account_id);
                 setAccountName(response.account_name);
                 setAccountNumber(response.account_number);
             }
@@ -163,9 +159,8 @@ export default function UpdateSubmission(){
       const onSubmit= async (data) => {
         const payload = {
             ...data,
-            bank_account_id: data.bank_account_id || bankId,
+            bank_account_id: accountId,
             file: selectedFiles.map(file => file.file),
-            delete_images: deletedImages
 
         };
         setIsLoading(true)
@@ -173,10 +168,17 @@ export default function UpdateSubmission(){
             const result = await updateSubmissionUser({data: payload, id, token, file: selectedFiles.map(file => file.file) });
             setOpenSuccess(true)
         } catch (error) {
-            const message = JSON.parse(error.message)
-            setErrorMessages(Object.values(message.error).flat());
-            setOpenError(true)
-            console.error('Error creating asset:', error);
+            let message = '';
+        try {
+            const errorDetail = JSON.parse(error.message);
+            setErrorMessages(Object.values(errorDetail.errors).flat());
+        } catch (e) {
+            message = error.message || "An unexpected error occurred.";
+            setErrorMessages([message]);
+        }
+
+        setOpenError(true);
+        console.error('Error creating asset:', error);
         }  finally {
             setIsLoading(false);
           }
@@ -195,7 +197,6 @@ const handleRemoveFile = (fileName) => {
 
 const handleRemoveImage = (filePath) => {
     setImage(prevImage => prevImage.filter(file => file.file !== filePath));
-    setDeletedImages(prevDeletedImages => [...prevDeletedImages, filePath]);
 };
     return(
         <div className="py-4">
@@ -245,7 +246,7 @@ const handleRemoveImage = (filePath) => {
                                                     </div>
                                                     <div className="border-none rounded-lg p-4 bg-gray-50">
                                                         <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem name="type" value="Payment Process" id="r2" style={{ color: "#F9B421" }} />
+                                                            <RadioGroupItem name="type" value="Payment Process" id="r2" style={{ color: "#F9B421" }} disabled={transactionType === "Reimburesent"} />
                                                             <Label htmlFor="r2">Permintaan Pembayaran <span className="italic">(Payment Request)</span></Label>
                                                         </div>
                                                         <p className="title text-muted-foreground text-xs ml-6">Pengajuan pembayaran kepada pihak ketiga untuk barang atau jasa yang diterima.</p>
@@ -255,10 +256,6 @@ const handleRemoveImage = (filePath) => {
                                     />
                                     
                                 </div>
-                                {/* Menampilkan nilai dari transactionType */}
-<div className="mt-2">
-    <p className="text-sm text-gray-600">Selected Type: {transactionType === "1" ? "Reimbursement" : transactionType === "2" ? "Payment Request" : "None"}</p>
-</div>
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2 font-semibold">Tujuan</Label>
                                     <FormField
@@ -311,7 +308,7 @@ const handleRemoveImage = (filePath) => {
                                         <div className="w-full mr-2">
                                             <Label className="block text-sm mb-2">Nama Rekening</Label>
                                             <Input
-                                            value={accountName} // Use display-only state
+                                            value={accountName}
                                             className=""
                                             placeholder="Masukan Nama Rekening..."
                                             type="text"
@@ -328,7 +325,7 @@ const handleRemoveImage = (filePath) => {
                                                     <Select
                                                     value={field.value ? field.value.toString() : ""}
                                                     onValueChange={(value) => {
-                                                        field.onChange(value); // Update react-hook-form state
+                                                        field.onChange(value);
                                                         setBankId(value);
                                                     }}
                                                     {...field}
@@ -354,7 +351,7 @@ const handleRemoveImage = (filePath) => {
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2">Nomor Rekening</Label>
                                     <Input
-                                        value={accountNumber} // Use display-only state
+                                        value={accountNumber}
                                         className=""
                                         placeholder="Masukan Nomor Rekening..."
                                         type="text"
@@ -455,7 +452,7 @@ const handleRemoveImage = (filePath) => {
                                     )}
                                     {image?.length > 0 && (
                                         <div className="mt-4 space-y-2">
-                                            {image.map((file, index) => (
+                                            {image?.map((file, index) => (
                                                 <Card key={index} className="flex justify-between items-center">
                                                     <span className="text-sm text-muted-foreground p-2">{file.file}</span>
                                                     <Button type="button" variant="danger" onClick={() => handleRemoveImage(file.file)}>
@@ -482,7 +479,7 @@ const handleRemoveImage = (filePath) => {
                                         ariaLabel="loading"
                                         />
                                     ) : (
-                                        "Pengajuan"
+                                        "Ubah Pengajuan"
                                     )}
                                 </Button>
                                 </div>
@@ -506,7 +503,7 @@ const handleRemoveImage = (filePath) => {
                                             </svg>
                                         </div>
                                         <AlertDialogTitle className="">Yeay! Sukses</AlertDialogTitle>
-                                        <AlertDialogDescription className="">Anda telah berhasil menambahkan pengajuan Reimbursement/Payment Request.</AlertDialogDescription>
+                                        <AlertDialogDescription className="">Anda telah berhasil mengubah pengajuan Reimbursement/Payment Request.</AlertDialogDescription>
                                         <AlertDialogAction
                                             onClick={() => router.push('/user')}
                                             style={{ background: "#F9B421" }}

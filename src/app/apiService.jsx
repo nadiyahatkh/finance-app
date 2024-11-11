@@ -28,7 +28,7 @@ export const fetchAmount = async ({token}) => {
     export const fetchBanks = async ({token}) => {
       const session = await getSession()
         try {
-          const response = await fetch(`${BASE_URL}/api/bank/bank`, {
+          const response = await fetch(`${BASE_URL}/api/submission/banks`, {
             headers: {
               "ngrok-skip-browser-warning": true,
               'Authorization': `Bearer ${session.user.token}`,

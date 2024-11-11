@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export function Card({ label, amount, description, image }) {
+export function Card({ label, amount, description, image, color }) {
   return (
     <CardContent>
       <section className="flex justify-between">
@@ -9,7 +9,7 @@ export function Card({ label, amount, description, image }) {
         <p className="text-sm font-bold">{label}</p>
       </section>
       <section className="flex justify-between">
-        <p className="text-3xl h-[63px] w-[63px] font-semibold" style={{ color: "#335CFF" }}>{amount}</p>
+        <p className="text-5xl w-[150px] font-semibold whitespace-nowrap overflow-hidden overflow-x-auto scrollbar-hide" style={{ color: color }}>{amount}</p>
         {/* <p className="text-xs text-gray-500">{description}</p> */}
         <img src={image} className="h-[63px] w-[63px] object-contain" alt="" />
       </section>

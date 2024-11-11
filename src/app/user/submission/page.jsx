@@ -30,6 +30,7 @@ export default function SubmissionUser() {
     const token = session?.user?.token;
     const [banks, setBanks] = useState()
     const [bankId, setBankId] = useState()
+    const [accountId, setAccountId] = useState()
     const [transactionType, setTransactionType] = useState()
     const [data, setData] = useState()
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -76,7 +77,7 @@ export default function SubmissionUser() {
         const loadDataBanks = async () => {
             try {
               const bankData = await fetchBanks({ token });
-              setBanks(bankData.data);
+              setBanks(bankData);
             } catch (error) {
               console.error('Failed to fetch positions:', error);
             }
@@ -92,6 +93,7 @@ export default function SubmissionUser() {
             if (token && bankId) {
                 const response = await fetchBankDetail({ token, id: bankId });
                 console.log(response);
+                setAccountId(response.account_id);
                 setAccountName(response.account_name);
                 setAccountNumber(response.account_number);
             }
@@ -111,16 +113,23 @@ export default function SubmissionUser() {
       });
 
       const onSubmit= async (data) => {
-        data.bank_account_id = bankId;
+        data.bank_account_id = accountId;
         setIsLoading(true)
         try{
             const result = await createSubmissionUser({data, token, file: selectedFiles.map(file => file.file) });
             setOpenSuccess(true)
         } catch (error) {
-            const message = JSON.parse(error.message)
-            setErrorMessages(Object.values(message.error).flat());
-            setOpenError(true)
-            console.error('Error creating asset:', error);
+            let message = '';
+        try {
+            const errorDetail = JSON.parse(error.message);
+            setErrorMessages(Object.values(errorDetail.errors).flat());
+        } catch (e) {
+            message = error.message || "An unexpected error occurred.";
+            setErrorMessages([message]);
+        }
+
+        setOpenError(true);
+        console.error('Error creating asset:', error);
         }  finally {
             setIsLoading(false);
           }

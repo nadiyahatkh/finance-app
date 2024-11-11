@@ -54,11 +54,16 @@ export default function DetailSubmission() {
                     <div className="font-semibold">{new Date(detail?.due_date).toLocaleDateString()}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Tipe</div>
-                    <div className="font-semibold bg-green-500 w-[90px] rounded text-white px-1">
-                      {detail?.type}
-                    </div>
+                  <div className="text-muted-foreground">Tipe</div>
+                  <div
+                    className={`font-semibold w-[90px] rounded text-white px-1 ${
+                      detail?.type === 'Reimburesent' ? 'bg-green-500' : 
+                      detail?.type === 'Payment Process' ? 'bg-blue-500' : ''
+                    }`}
+                  >
+                    {detail?.type}
                   </div>
+                </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Bukti</div>
                     <div className="font-semibold">Lihat Bukti</div>
@@ -168,7 +173,7 @@ export default function DetailSubmission() {
                   
                 </ul>
 
-                <div className="flex flex-col">
+                <div className="flex flex-col mb-4">
                 <div className="flex items-center border-t justify-between w-full py-2">
                   <p className="font-normal text-sm w-1/4">DESKRIPSI</p>
                   <h6 className="font-normal text-sm w-1/6 text-gray-900 text-center">KUANTITAS</h6>

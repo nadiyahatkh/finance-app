@@ -7,6 +7,8 @@ import { fetchAmount } from "../apiService";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
+const colorStyles = ["#335CFF", "#1DAF61", "#FB3748", "#09090B"]; 
+
 export default function Dashboard(){
   const { data: session } = useSession();
   const token = session?.user?.token;
@@ -21,22 +23,26 @@ export default function Dashboard(){
           {
             label: "Permintaan Tertunda",
             amount: data.data.approval,
-            image: "./Vector.png"
+            image: "./Vector.png",
+            color: colorStyles[0]
           },
           {
             label: "Permintaan yang Disetujui",
             amount: data.data.denied,
-            image: "./CekCircle.png"
+            image: "./CekCircle.png",
+            color: colorStyles[1],
           },
           {
             label: "Permintaan yang Ditolak",
             amount: data.data.process,
-            image: "./VectorX.png"
+            image: "./VectorX.png",
+            color: colorStyles[2]
           },
           {
             label: "Jumlah (Rp)",
-            amount: data.data.amount,
-            image: "./Rp.png"
+            amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.data.amount),
+            image: "./Rp.png",
+            color: colorStyles[3]
           }
         ]);
       } catch (error) {

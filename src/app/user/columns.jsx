@@ -95,7 +95,7 @@ export const columns = [
       if (status === 'approved') {
         statusColor = 'text-green-500';
         statusIcon = <CheckCheckIcon className="h-4 w-4 mr-2" />;
-      } else if (status === 'dinied') {
+      } else if (status === 'denied') {
         statusColor = 'text-red-500';
         statusIcon = <XCircle className="h-4 w-4 mr-2" />;
       } else if (status === 'process') {

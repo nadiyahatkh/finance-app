@@ -7,8 +7,8 @@ export const fetchSubmissionUser = async ({token, search, type, finish_status}) 
     const session = await getSession()
     const statusParams = finish_status?.map(s => `finish_status=${s}`).join('&');
     const typeParams = Array.isArray(type) 
-  ? type.map(t => `type=${t}`).join('&') 
-  : `type=${type || ''}`;
+    ? type.map(t => `type=${t}`).join('&') 
+    : `type=${type || ''}`;
 
       try {
         const response = await fetch(`${BASE_URL}/api/submission/index?search=${search}&${typeParams}&${statusParams}`, {
@@ -86,9 +86,11 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
         });
     
         if (!response.ok) {
-          const result = await response.text();
-          throw new Error(result);
-        }
+          const result = await response.json();
+          // Throw the actual validation error message
+          throw new Error(JSON.stringify(result));
+      }
+    
     
         const result = await response.json();
         return result;
@@ -129,9 +131,10 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
         });
     
         if (!response.ok) {
-          const result = await response.text();
-          throw new Error(result);
-        }
+          const result = await response.json();
+          // Throw the actual validation error message
+          throw new Error(JSON.stringify(result));
+      }
     
         const result = await response.json();
         return result;
