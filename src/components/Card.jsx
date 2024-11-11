@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export function Card({ label, amount, description, image, color }) {
   return (
-    <CardContent>
+    <CardContent className="hover:bg-gray-50">
       <section className="flex justify-between">
         {/* label */}
         <p className="text-sm font-bold">{label}</p>
@@ -22,7 +22,7 @@ export function CardContent(props) {
     <div
       {...props}
       className={cn(
-        "flex w-full flex-col gap-3 rounded-xl border p-5 shadow",
+        "flex w-full flex-col rounded-xl border p-5 shadow",
         props.className
       )} 
     />

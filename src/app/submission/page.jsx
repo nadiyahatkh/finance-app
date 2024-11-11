@@ -129,7 +129,7 @@ export default function SubmissionAdmin(){
         </div>
             <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4 mb-4">
                 {cardData?.map((d, i) => (
-                    <Card key={i} amount={d.amount} label={d.label} image={d.image} />
+                    <Card key={i} amount={d.amount} label={d.label} image={d.image} color={d.color} />
                 ))}
             </section>
         <CardContent className="shadow-md">
@@ -144,7 +144,6 @@ export default function SubmissionAdmin(){
             typeFilter={typeFilter} 
             setTypeFilter={setTypeFilter} 
           />
-          {/* <DataTable data={submissionData} columns={columns} search={search} setSearch={setSearch} /> */}
           </div>
         </CardContent>
       </div>
