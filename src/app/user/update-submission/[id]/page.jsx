@@ -55,7 +55,7 @@ export default function UpdateSubmission(){
           z.object({
             description: z.string().optional(),
             quantity: z.preprocess((val) => Number((val)), z.number().optional()),
-            price:  z.preprocess((val) => Number((val)), z.number().optional()),
+            price:  z.preprocess((val) => Number(String(val).replace(/[^0-9]/g, '')), z.number().optional()),
           })
         ).optional()
     });
@@ -88,7 +88,7 @@ export default function UpdateSubmission(){
                 price: item.price,
               });
             });
-            setImage(response.data.files || '[]');
+            setImage(response.data.files?.map(file => file.file_urls)?.flat() || []);
             setTransactionType(response.data.type);
             setBankId(response.data.bank_account.bank_id);
           }
@@ -160,12 +160,12 @@ export default function UpdateSubmission(){
         const payload = {
             ...data,
             bank_account_id: accountId,
-            file: selectedFiles.map(file => file.file),
+            file: [...image, ...selectedFiles.map(file => file.file)],
 
         };
         setIsLoading(true)
         try{
-            const result = await updateSubmissionUser({data: payload, id, token, file: selectedFiles.map(file => file.file) });
+            const result = await updateSubmissionUser({data: payload, id, token, file: [...image, ...selectedFiles.map(file => file.file)] });
             setOpenSuccess(true)
         } catch (error) {
             let message = '';
@@ -196,8 +196,20 @@ const handleRemoveFile = (fileName) => {
 };
 
 const handleRemoveImage = (filePath) => {
-    setImage(prevImage => prevImage.filter(file => file.file !== filePath));
+    setImage(prevImage => prevImage.filter(file => file !== filePath));
 };
+
+const formatPrice = (value) => {
+    if (!value) return "";
+    const numberValue = Number(value.replace(/[^0-9]/g, ""));
+    const numberFormat = new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    });
+    return numberFormat.format(numberValue).replace('Rp', 'Rp ');
+  };
+
     return(
         <div className="py-4">
             <div className="w-full max-w-7xl mx-auto">
@@ -392,7 +404,7 @@ const handleRemoveImage = (filePath) => {
                                                 control={form.control}
                                                 name={`submission_item.${index}.price`} // Nama yang unik untuk setiap field jumlah
                                                 render={({ field }) => (
-                                                    <Input {...field} placeholder="Masukan harga..." type="number" />
+                                                    <Input {...field} placeholder="Masukan harga..." type="text"  onChange={(e) => field.onChange(formatPrice(e.target.value))} />
                                                 )}
                                                 />
                                             </div>
@@ -454,8 +466,8 @@ const handleRemoveImage = (filePath) => {
                                         <div className="mt-4 space-y-2">
                                             {image?.map((file, index) => (
                                                 <Card key={index} className="flex justify-between items-center">
-                                                    <span className="text-sm text-muted-foreground p-2">{file.file}</span>
-                                                    <Button type="button" variant="danger" onClick={() => handleRemoveImage(file.file)}>
+                                                    <span className="text-sm text-muted-foreground p-2">{file}</span>
+                                                    <Button type="button" variant="danger" onClick={() => handleRemoveImage(file)}>
                                                         <CircleX className="h-4 w-4"/>
                                                     </Button>
                                                 </Card>

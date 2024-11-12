@@ -7,6 +7,10 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { fetchSubmissionUserDetail } from "../../apiService";
 import { formatCurrency } from "@/app/utils/formatCurrency";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay"
+import Image from "next/image";
 
 export default function DetailSubmission() {
   const { data: session } = useSession();
@@ -25,6 +29,16 @@ export default function DetailSubmission() {
 
     loadDetail();
   }, [token, id]);
+
+  const steps = [
+    { role: "Pengajuan dibuat", user_id: null }, // For the initial submission step
+    { role: "General Affairs", user_id: 6 },
+    { role: "Manager", user_id: 3 },
+    { role: "CEO", user_id: 1 }, // Replace with correct user_id if available
+    { role: "Head of FAT", user_id: 7 }, // Replace with correct user_id if available
+  ];
+
+  const images = detail?.files?.map(file => file.file_urls)?.flat() || [];
 
   const items = detail?.items || [];
   const totalAmount = items.reduce((acc, item) => acc + (item.quantity * item.price), 0)
@@ -66,7 +80,40 @@ export default function DetailSubmission() {
                 </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Bukti</div>
-                    <div className="font-semibold">Lihat Bukti</div>
+                    <div className="">
+
+                    <Dialog>
+                      <DialogTrigger>
+                        <span className='h-4 w-4 p-0 cursor-pointer' style={{ color: "#F9B421" }}>
+                          Lihat
+                        </span>
+                      </DialogTrigger>
+                      <DialogContent className="flex items-center justify-center">
+                        <div className="w-full max-w-xs">
+                          <Carousel
+                            plugins={[Autoplay({ delay: 2000 })]}
+                            className="w-full"
+                          >
+                            <CarouselContent>
+                            {images.map((image, index) => (
+                              <CarouselItem key={index}>
+                                <div className="p-1">
+                                  <Card>
+                                    <CardContent className="flex aspect-square items-center justify-center p-0">
+                                      <img src={image} alt={`${index}`} width={500} height={500} className="w-full h-full object-cover rounded" />
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              </CarouselItem>
+                            ))}
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                          </Carousel>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    </div>
                   </div>
                 </div>
                 <div className="">
@@ -89,89 +136,81 @@ export default function DetailSubmission() {
                 </div>
               </div>
 
-                <ul className="flex justify-center items-center">
-                  <li className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
+              <ul className="relative flex flex-col md:flex-row gap-2">
+              {steps.map((step, index) => {
+                // Find the corresponding approval status
+                const approval = detail?.admin_approvals?.find(
+                  (approval) => approval.user_id === step.user_id
+                );
+
+                // Check if the first step "Pengajuan dibuat" should be green
+                const isFirstStep = index === 0;
+                const isApproved = approval?.status === "approved" || isFirstStep;
+                const isDenied = approval?.status === "denied";
+
+                // Determine styles based on status
+                const borderColor = isDenied ? "border-red-400" : isApproved ? "border-green-400" : "border-gray-200";
+                const iconColor = isDenied ? "text-red-400" : isApproved ? "text-green-400" : "text-gray-200";
+                const bgColor = isDenied ? "bg-red-400" : isApproved ? "bg-green-400" : "bg-gray-200";
+
+                // Display submission date only for the first step
+                const displayDate =
+                  isFirstStep && detail?.created_at
+                    ? new Date(detail.created_at).toLocaleString("id-ID", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "";
+
+                return (
+                  <li key={index} className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
                     <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
-                      <span className="size-7 flex justify-center items-center shrink-0 border rounded-full w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
+                      <span
+                        className={`size-7 flex justify-center items-center shrink-0 border ${borderColor} rounded-full w-[45px] h-[45px]`}
+                      >
+                        {/* Use ReceiptIcon for the first step, CircleUserRound for the rest */}
+                        {isFirstStep ? (
+                          <Receipt className={`h-5 w-5 ${iconColor}`} />
+                        ) : (
+                          <CircleUserRound className={`h-5 w-5 ${iconColor}`} />
+                        )}
                       </span>
-                      <div className="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
+                      <div
+                        className={`mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 ${bgColor} group-last:hidden dark:bg-neutral-700`}
+                      ></div>
                     </div>
                     <div className="grow md:grow-0 md:mt-3 pb-5 flex flex-col">
-                      <span className="block text-sm font-medium text-gray-800 dark:text-white">
-                        Step
-                      </span>
-                      <p className="text-sm text-gray-500 dark:text-neutral-500">
-                        This is a 
-                      </p>
+                      {isFirstStep ? (
+                        <>
+                          <span className="block text-xs font-medium text-gray-800 dark:text-white">
+                            Pengajuan dibuat
+                          </span>
+                          <p className="text-xs text-gray-500 dark:text-neutral-500">
+                            {displayDate}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <span className="block text-xs font-medium text-gray-800 dark:text-white">
+                            {isDenied ? "Denied" : isApproved ? "Approved" : "Menunggu"}
+                          </span>
+                          <p className="text-xs text-gray-500 dark:text-neutral-500">
+                            {step.role}
+                          </p>
+                        </>
+                      )}
                     </div>
                   </li>
-                  <li className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
-                    <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
-                      <span className="size-7 flex justify-center items-center shrink-0 border rounded-full w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </span>
-                      <div className="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
-                    </div>
-                    <div className="grow md:grow-0 md:mt-3 pb-5">
-                      <span className="block text-sm font-medium text-gray-800 dark:text-white">
-                        Step
-                      </span>
-                      <p className="text-sm text-gray-500 dark:text-neutral-500">
-                        This is a 
-                      </p>
-                    </div>
-                  </li>
-                  <li className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
-                    <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
-                      <span className="size-7 flex justify-center items-center shrink-0 border rounded-full w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </span>
-                      <div className="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
-                    </div>
-                    <div className="grow md:grow-0 md:mt-3 pb-5">
-                      <span className="block text-sm font-medium text-gray-800 dark:text-white">
-                        Step
-                      </span>
-                      <p className="text-sm text-gray-500 dark:text-neutral-500">
-                        This is a 
-                      </p>
-                    </div>
-                  </li>
-                  <li className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
-                    <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
-                      <span className="size-7 flex justify-center items-center shrink-0 border rounded-full w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </span>
-                      <div className="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
-                    </div>
-                    <div className="grow md:grow-0 md:mt-3 pb-5">
-                      <span className="block text-sm font-medium text-gray-800 dark:text-white">
-                        Step
-                      </span>
-                      <p className="text-sm text-gray-500 dark:text-neutral-500">
-                        This is a 
-                      </p>
-                    </div>
-                  </li>
-                  <li className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
-                    <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
-                      <span className="size-7 flex justify-center items-center shrink-0 border rounded-full w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </span>
-                      <div className="mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 bg-gray-200 group-last:hidden dark:bg-neutral-700"></div>
-                    </div>
-                    <div className="grow md:grow-0 md:mt-3 pb-5">
-                      <span className="block text-sm font-medium text-gray-800 dark:text-white">
-                        Step
-                      </span>
-                      <p className="text-sm text-gray-500 dark:text-neutral-500">
-                        This is a 
-                      </p>
-                    </div>
-                  </li>
-                  
-                </ul>
+                );
+              })}
+              </ul>
+
+              <div className="flex justify-center items-center mb-4">
+                  <span className="text-red-500">*Catatan: Jumlah nominal tidak sesuai dengan struk (General Affairs)</span>
+              </div>
 
                 <div className="flex flex-col mb-4">
                 <div className="flex items-center border-t justify-between w-full py-2">
@@ -201,113 +240,7 @@ export default function DetailSubmission() {
                   <h6 className="text-sm font-bold w-1/6 text-center">Rp. {totalAmount.toLocaleString('id-ID')}</h6>
                 </div>
               </div>
-              {/* <div className="flex justify-center items-center">
-
-                <div className="grid grid-cols-9 justify-center items-center">
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-            
-                      </div>
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <div className="border border-green-400 W-[55px]"></div>
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>
-                </div>
-              </div>
-              <div className="flex justify-center items-center">
-                <div className="grid grid-cols-9 justify-center items-center">
-                      <div className="text-center w-[80px] break-words">
-                        <span>apalah</span>
-                      </div>
-                      <div>
-                        
-                      </div>
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <div className="border border-green-400 W-[55px]"></div>
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>
-                </div>
-              </div> */}
-
-
-
-              {/* <div className="flex justify-center items-center mb-4">
-
-                <div className="flex items-center">
-                  <div className="flex flex-col">
-                    <div className="flex items-center">
-
-                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                        <Receipt className="h-5 w-5 text-green-400" />
-                    </div>
-                    <div className="border border-green-400 w-[100px]"></div>
-                    </div>
-                  <span style={{ marginLeft:-10 }}>testjjkjjkjk</span>
-
-                  </div>
-
-                </div>
-                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
-                    </div>  
-                    <div className="border border-green-400 w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
-                    </div>
-                    <div className="border border-red-400 w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border-2 border-red-400 w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-muted-foreground text-red-400" />
-                    </div>
-                    <div className="border w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border-2 w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-muted-foreground" />
-                    </div>
-              </div> */}
-              {/* <div className="grid grid-cols-5 gap-4 justify-content-center">
-                    <div className="">
-                        <span>Test</span>
-                        
-                    </div>
-                    <div>
-                        <span>Test</span>
-                        
-                    </div>
-                    <div>
-                        <span>Test</span>
-                        
-                    </div>
-                    <div>
-                        <span>Test</span>
-                        
-                    </div>
-                    <div>
-                        <span>Test</span>
-                        
-                    </div>
-              </div> */}
+              
 
             </CardContent>
           </Card>
@@ -315,4 +248,4 @@ export default function DetailSubmission() {
       </div>
     </div>
   );
-}
+};
