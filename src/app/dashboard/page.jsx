@@ -36,19 +36,19 @@ export default function Dashboard(){
         setCardData([
           {
             label: "Permintaan Tertunda",
-            amount: amountData.data.approval,
+            amount: amountData.data.process,
             image: "./Vector.png",
             color: colorStyles[0],
           },
           {
             label: "Permintaan yang Disetujui",
-            amount: amountData.data.denied,
+            amount: amountData.data.approval,
             image: "./CekCircle.png",
             color: colorStyles[1],
           },
           {
             label: "Permintaan yang Ditolak",
-            amount: amountData.data.process,
+            amount: amountData.data.denied,
             image: "./VectorX.png",
             color: colorStyles[2],
           },

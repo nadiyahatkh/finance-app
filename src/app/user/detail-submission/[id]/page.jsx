@@ -80,11 +80,11 @@ export default function DetailSubmission() {
                 </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Bukti</div>
-                    <div className="">
+                    <div className="font-semibold">
 
                     <Dialog>
                       <DialogTrigger>
-                        <span className='h-4 w-4 p-0 cursor-pointer' style={{ color: "#F9B421" }}>
+                        <span className='h-4 w-4 p-0 cursor-pointer'>
                           Lihat
                         </span>
                       </DialogTrigger>
@@ -209,7 +209,13 @@ export default function DetailSubmission() {
               </ul>
 
               <div className="flex justify-center items-center mb-4">
-                  <span className="text-red-500">*Catatan: Jumlah nominal tidak sesuai dengan struk (General Affairs)</span>
+                {detail?.admin_approvals?.map((approval) => (
+                    approval.status === 'denied' && approval.notes ? (
+                      <div key={approval.id} className="text-red-500 mt-2">
+                        *Catatan: {approval.notes}
+                      </div>
+                    ) : null
+                  ))}
               </div>
 
                 <div className="flex flex-col mb-4">

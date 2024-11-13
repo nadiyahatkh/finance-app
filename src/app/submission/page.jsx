@@ -38,19 +38,19 @@ export default function SubmissionAdmin(){
         setCardData([
           {
             label: "Permintaan Tertunda",
-            amount: data.data.approval,
+            amount: data.data.process,
             image: "./Vector.png",
             color: colorStyles[0]
           },
           {
             label: "Permintaan yang Disetujui",
-            amount: data.data.denied,
+            amount: data.data.approval,
             image: "./CekCircle.png",
             color: colorStyles[1],
           },
           {
             label: "Permintaan yang Ditolak",
-            amount: data.data.process,
+            amount: data.data.denied,
             image: "./VectorX.png",
             color: colorStyles[2]
           },
