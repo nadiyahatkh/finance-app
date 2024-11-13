@@ -98,3 +98,53 @@ export const fetchSubmission = async ({token, search, type, finish_status}) => {
         throw error;
       }
       };
+
+      export const approvedAllSubmission = async ({ token }) => {
+        try{
+          const response = await fetch(`${BASE_URL}/api/dataApplicant/approveall`, {
+            method: 'POST',
+            headers: {
+              "ngrok-skip-browser-warning": true,
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json', // Tambahkan Content-Type jika diperlukan
+            },
+          });
+        
+          if (!response.ok) {
+            const result = await response.json();
+            // Throw the actual validation error message
+            throw new Error(JSON.stringify(result));
+        }
+        
+            const result = await response.json();
+            return result;
+          } catch (error) {
+            console.error('Error update users:', error);
+            throw error;
+          }
+        };
+
+        export const deniedAllSubmission = async ({ token, notes }) => {
+          try{
+          const formData = new FormData();
+          formData.append('notes', notes);
+          const response = await fetch(`${BASE_URL}/api/dataApplicant/deniedAll`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+          });
+        
+          if (!response.ok) {
+            const result = await response.text();
+            throw new Error(result);
+          }
+      
+          const result = await response.json();
+          return result;
+        } catch (error) {
+          console.error('Error update users:', error);
+          throw error;
+        }
+        };

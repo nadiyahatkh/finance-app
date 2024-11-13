@@ -17,6 +17,7 @@ export default function Dashboard(){
   const token = session?.user?.token;
   const [cardData, setCardData] = useState();
   const [chartData, setChartData] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState("");
   
   const chartConfig = {
     Reimburesent: {
@@ -60,7 +61,7 @@ export default function Dashboard(){
           },
         ]);
 
-        const dashboardData = await fetchDashboard({ token });
+        const dashboardData = await fetchDashboard({ token, month: selectedMonth });
         const formattedChartData = dashboardData.data.chart.map((item) => ({
           month: item.month,
           Reimburesent: item.types.Reimburesent,
@@ -73,12 +74,16 @@ export default function Dashboard(){
     };
 
     if (token) {
-      loadData();
+      loadData(selectedMonth);
     }
-  }, [token]);
+  }, [token, selectedMonth]);
 
   const formatYAxisTick = (value) => {
-    return value.toString(); // Mengembalikan angka apa adanya
+    return value.toString();
+  };
+
+  const handleMonthChange = (value) => {
+    setSelectedMonth(value);
   };
 
   return (
@@ -103,20 +108,29 @@ export default function Dashboard(){
             <div className="flex justify-between items-center mb-8">
               <p className="font-bold">Pengeluaran</p>
               <div className="flex items-center space-x-4">
-                <Select>
+                <Select  onValueChange={handleMonthChange}>
                   <SelectTrigger className="w-[150px] font-semibold">
                     <SelectValue placeholder="Bulan" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
+                    <SelectItem value="1">Januari</SelectItem>
+                    <SelectItem value="2">Februari</SelectItem>
+                    <SelectItem value="3">Maret</SelectItem>
+                    <SelectItem value="4">April</SelectItem>
+                    <SelectItem value="5">Mei</SelectItem>
+                    <SelectItem value="6">Juni</SelectItem>
+                    <SelectItem value="7">Juli</SelectItem>
+                    <SelectItem value="8">Agustus</SelectItem>
+                    <SelectItem value="9">September</SelectItem>
+                    <SelectItem value="10">Oktober</SelectItem>
+                    <SelectItem value="11">November</SelectItem>
+                    <SelectItem value="12">Desember</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            <ChartContainer config={chartConfig}>
-              <BarChart data={chartData}>
+            <ChartContainer config={chartConfig} className="w-full h-[400px]">
+              <BarChart data={chartData} >
                 <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey="month"
@@ -138,16 +152,16 @@ export default function Dashboard(){
                   cursor={false}
                   content={<ChartTooltipContent indicator="dashed" />}
                 />
-                <Bar dataKey="Reimburesent" fill="#28A745" radius={4} />
-                <Bar dataKey="PaymentProcess" fill="#2563EB" radius={4} />
+                <Bar dataKey="Reimburesent" fill="#28A745" radius={4} barSize={30} />
+                <Bar dataKey="PaymentProcess" fill="#2563EB" radius={4} barSize={30} />
               </BarChart>
             </ChartContainer>
             <div className="flex justify-center items-center space-x-4">
               <p className="flex items-center font-semibold text-sm">
-                <Circle className="h-4 w-4 mr-2 fill-green-600" style={{ color: "#28A745" }} barSize={20} /> Reimburesent
+                <Circle className="h-4 w-4 mr-2 fill-green-600" style={{ color: "#28A745" }} /> Reimburesent
               </p>
               <p className="flex items-center font-semibold text-sm">
-                <Circle className="h-4 w-4 mr-2 fill-blue-600" style={{ color: "#2563EB" }} barSize={20} /> Payment Process
+                <Circle className="h-4 w-4 mr-2 fill-blue-600" style={{ color: "#2563EB" }} /> Payment Process
               </p>
             </div>
           </CardContent>

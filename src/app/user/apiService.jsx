@@ -189,3 +189,41 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
           return "abs"
         }
       };
+
+      export const updateProfile = async ({ data, token }) => {
+        try {
+          const formData = new FormData();
+          formData.append('username', data.username);
+          formData.append('email', data.email);
+          // Hanya tambahkan password jika ada nilainya
+          if (data.password) {
+              formData.append('password', data.password);
+          }
+
+          // Hanya tambahkan password_confirmation jika ada nilainya
+          if (data.password_confirmation) {
+              formData.append('password_confirmation', data.password_confirmation);
+          }
+          if (data.foto) {
+            formData.append('foto', data.foto);
+        }
+      
+          
+          const response = await fetch(`${BASE_URL}/api/update`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+          });
+          if (!response.ok) {
+            const result = await response.text();
+            throw new Error(result);
+          }
+          const result = await response.json();
+          return result;
+        } catch (error) {
+          console.log('Error creating aset:', error);
+          throw error;
+        }
+      };

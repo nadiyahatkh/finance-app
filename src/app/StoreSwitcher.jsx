@@ -52,7 +52,7 @@ export default function StoreSwitcher({ className, items = [] }){
                                 My Account
                             </div>
                             <hr className="my-1 border-gray-200" />
-                            <Link href="./profile" className="flex items-center p-1 rounded-md hover:bg-gray-100">
+                            <Link href="/user/update-profile" className="flex items-center p-1 rounded-md hover:bg-gray-100">
                                 <User className="mr-2 h-4 w-4" />
                                 Profile
                             </Link>

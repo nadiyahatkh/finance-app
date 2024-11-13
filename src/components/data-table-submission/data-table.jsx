@@ -49,7 +49,7 @@ import { incomeType, statuses } from './data';
 
 
 
-export function DataTable({ columns, data, search, setSearch, statusFilter , setStatusFilter, totalPages, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading}) {
+export function DataTable({ columns, data, search, setSearch, handleApproveAll, statusFilter , setStatusFilter, totalPages, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading}) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -158,7 +158,7 @@ const isFiltered = table.getState().columnFilters.length > 0;
         <Button variant='outline' style={{ color: "#F9B421" }}>
           Tolak Semua
         </Button>
-        <Button className="" style={{ background: "#F9B421" }}>
+        <Button className="" onClick={handleApproveAll} style={{ background: "#F9B421" }}>
           Setujui Semua
         </Button>
         

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { DataTable } from "@/components/data-table-submission/data-table";
 import { columns } from "./columns";
 import { useSession } from "next-auth/react";
-import { fetchSubmission } from "./apiService";
+import { approvedAllSubmission, fetchSubmission } from "./apiService";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAmount } from "../apiService";
 import { useEffect, useState } from "react";
@@ -69,6 +69,16 @@ export default function SubmissionAdmin(){
       loadData();
     }
   }, [token]);
+
+  const handleApproveAll = async () => {
+    try {
+      await approvedAllSubmission({ token });
+      await refetch(); 
+    } catch (error) {
+    
+          console.error('Error updating profile:', error);
+    }
+  };
 
     return(
     <div className="py-4">
@@ -143,6 +153,7 @@ export default function SubmissionAdmin(){
             setStatusFilter={setStatusFilter}
             typeFilter={typeFilter} 
             setTypeFilter={setTypeFilter} 
+            handleApproveAll={handleApproveAll}
           />
           </div>
         </CardContent>

@@ -53,7 +53,7 @@ export default function SubmissionUser() {
           z.object({
             description: z.string().min(1, { message: "Description is required." }),
             quantity: z.preprocess((val) => Number((val)), z.number().min(1, { message: "Quantity must be at least 1" })),
-            price:  z.preprocess((val) => Number((val)), z.number().min(1, { message: "Price is Required" })),
+            price:  z.preprocess((val) => Number(String(val).replace(/[^0-9]/g, '')), z.number().min(1, { message: "Price is required." })),
           })
         ).min(1, { message: "At least one submission item is required." }),
         });
@@ -146,6 +146,16 @@ export default function SubmissionUser() {
         setSelectedFiles(selectedFiles.filter(file => file.file.name !== fileName));
     };
 
+    const formatPrice = (value) => {
+        if (!value) return "";
+        const numberValue = Number(value.replace(/[^0-9]/g, ""));
+        const numberFormat = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          minimumFractionDigits: 0,
+        });
+        return numberFormat.format(numberValue).replace('Rp', 'Rp ');
+      };
 
     return(
         <div className="py-4">
@@ -338,7 +348,7 @@ export default function SubmissionUser() {
                                                 control={form.control}
                                                 name={`submission_item.${index}.price`} // Nama yang unik untuk setiap field jumlah
                                                 render={({ field }) => (
-                                                    <Input {...field} placeholder="Masukan harga..." type="number" />
+                                                    <Input {...field} placeholder="Masukan harga..." type="text" onChange={(e) => field.onChange(formatPrice(e.target.value))} />
                                                 )}
                                                 />
                                             </div>
