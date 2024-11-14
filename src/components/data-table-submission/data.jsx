@@ -8,8 +8,8 @@ export const statuses = [
     label: "Denied"
   },
   {
-    value: "process",
-    label: "Process"
+    value: "pending",
+    label: "Pending"
   },
 ];
 

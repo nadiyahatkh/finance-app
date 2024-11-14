@@ -25,10 +25,10 @@ export function DataTableFacetedFilter({
   title,
   options,
   statusFilter,
-  setStatusFilter
+  setStatusFilter,
 }) {
-    const facets = column?.getFacetedUniqueValues();
-    const selectedValues = new Set(column?.getFilterValue());
+  const facets = column?.getFacetedUniqueValues();
+  const selectedValues = new Set(statusFilter);
 
   return (
     <Popover>
@@ -80,18 +80,20 @@ export function DataTableFacetedFilter({
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value);
                 return (
-                    <CommandItem
+                  <CommandItem
                     key={option.value}
                     onSelect={() => {
+                        console.log(selectedValues)
                       if (isSelected) {
                         selectedValues.delete(option.value);
                       } else {
                         selectedValues.add(option.value);
                       }
                       const filterValues = Array.from(selectedValues);
-                      column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined
-                      );
+                      setStatusFilter(filterValues)
+                    //   column?.setFilterValue(
+                    //     filterValues.length ? filterValues : undefined
+                    //   );
                     }}
                   >
                     <div
@@ -102,7 +104,7 @@ export function DataTableFacetedFilter({
                           : "opacity-50 [&_svg]:invisible"
                       )}
                     >
-                      <CheckIcon className={cn("h-4 w-4 bg-yellow-400 border border-yellow-400")} />
+                      <CheckIcon className={cn("h-4 w-4")} />
                     </div>
                     {option.icon && (
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -122,7 +124,7 @@ export function DataTableFacetedFilter({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => setStatusFilter([])}
                     className="justify-center text-center"
                   >
                     Clear filters

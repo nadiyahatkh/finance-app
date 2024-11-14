@@ -29,7 +29,7 @@ export default function UpdateSubmission(){
     const {id} = useParams()
     const { data: session } = useSession();
     const token = session?.user?.token;
-    const [banks, setBanks] = useState()
+    const [banks, setBanks] = useState([])
     const [bankId, setBankId] = useState()
     const [accountId, setAccountId] = useState()
     const [transactionType, setTransactionType] = useState()
@@ -41,7 +41,8 @@ export default function UpdateSubmission(){
     const [openError, setOpenError] = useState(false);
     const [errorMessages, setErrorMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [image, setImage] = useState()
+    const [image, setImage] = useState([]);
+    const [pdfFiles, setPdfFiles] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
     const router = useRouter()
 
@@ -88,7 +89,8 @@ export default function UpdateSubmission(){
                 price: item.price,
               });
             });
-            setImage(response.data.files?.map(file => file.file_urls)?.flat() || []);
+            setImage(response.data.files?.map(file => file.image_urls)?.flat() || []);
+            setPdfFiles(response.data.files?.map(file => file.pdf_urls)?.flat() || []);
             setTransactionType(response.data.type);
             setBankId(response.data.bank_account.bank_id);
           }
@@ -156,48 +158,60 @@ export default function UpdateSubmission(){
         fetchData();
     }, [token, bankId]);
 
-      const onSubmit= async (data) => {
+    const onSubmit = async (data) => {
+        const updatedImage = image.filter(file => file !== null); // Filter image yang masih ada
+        const updatedFiles = selectedFiles.filter(file => file.file !== null); // Filter selected files yang masih ada
+    
         const payload = {
             ...data,
             bank_account_id: accountId,
-            file: [...image, ...selectedFiles.map(file => file.file)],
-
+            file: [...updatedImage, ...updatedFiles.map(file => file.file)],
         };
-        setIsLoading(true)
-        try{
-            const result = await updateSubmissionUser({data: payload, id, token, file: [...image, ...selectedFiles.map(file => file.file)] });
-            setOpenSuccess(true)
+    
+        setIsLoading(true);
+        try {
+            const result = await updateSubmissionUser({
+                data: payload,
+                id,
+                token,
+                file: [...updatedImage, ...updatedFiles.map(file => file.file)],
+            });
+            setOpenSuccess(true);
         } catch (error) {
             let message = '';
-        try {
-            const errorDetail = JSON.parse(error.message);
-            setErrorMessages(Object.values(errorDetail.errors).flat());
-        } catch (e) {
-            message = error.message || "An unexpected error occurred.";
-            setErrorMessages([message]);
-        }
-
-        setOpenError(true);
-        console.error('Error creating asset:', error);
-        }  finally {
+            try {
+                const errorDetail = JSON.parse(error.message);
+                setErrorMessages(Object.values(errorDetail.errors).flat());
+            } catch (e) {
+                message = error.message || "An unexpected error occurred.";
+                setErrorMessages([message]);
+            }
+            setOpenError(true);
+            console.error('Error creating asset:', error);
+        } finally {
             setIsLoading(false);
-          }
-    }
+        }
+    };
+    
 
     
-const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
-    const newFiles = files.map(file => ({ file: file }));
-    setSelectedFiles([...selectedFiles, ...newFiles]);
-};
+        const handleFileChange = (event) => {
+            const files = Array.from(event.target.files);
+            const newFiles = files.map(file => ({ file: file }));
+            setSelectedFiles([...selectedFiles, ...newFiles]);
+        };
 
-const handleRemoveFile = (fileName) => {
-    setSelectedFiles(selectedFiles.filter(file => file.file.name !== fileName));
-};
+        const handleRemoveFile = (fileName) => {
+            setSelectedFiles(selectedFiles.filter(file => file.file.name !== fileName));
+        };
 
-const handleRemoveImage = (filePath) => {
-    setImage(prevImage => prevImage.filter(file => file !== filePath));
-};
+        const handleRemoveImage = (filePath) => {
+            setImage(prevImage => prevImage.filter(file => file !== filePath));
+        };
+
+        const handleRemovePdf = (pdfPath) => {
+            setPdfFiles(prevPdfFiles => prevPdfFiles.filter(file => file !== pdfPath));
+        };
 
 const formatPrice = (value) => {
     if (!value) return "";
@@ -346,9 +360,9 @@ const formatPrice = (value) => {
                                                         <SelectValue placeholder="Pilih bank..." />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {banks?.map((bank) => (
+                                                    {Array.isArray(banks) && banks.map((bank) => (
                                                         <SelectItem key={bank.id} value={bank.id.toString()}>{bank.name}</SelectItem>
-                                                        ))}
+                                                    ))}
                                                     </SelectContent>
                                                     </Select>
                                                     {form.formState.errors.bank_id && (
@@ -443,7 +457,7 @@ const formatPrice = (value) => {
                                         <input
                                             name="file"
                                             type="file"
-                                            accept="image/*"
+                                            accept="image/*,application/pdf"
                                             className="hidden"
                                             id="fileInput"
                                             onChange={handleFileChange}
@@ -468,6 +482,21 @@ const formatPrice = (value) => {
                                                 <Card key={index} className="flex justify-between items-center">
                                                     <span className="text-sm text-muted-foreground p-2">{file}</span>
                                                     <Button type="button" variant="danger" onClick={() => handleRemoveImage(file)}>
+                                                        <CircleX className="h-4 w-4"/>
+                                                    </Button>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {/* Render existing PDF URLs */}
+                                    {pdfFiles?.length > 0 && (
+                                        <div className="mt-4 space-y-2">
+                                            {pdfFiles.map((file, index) => (
+                                                <Card key={index} className="flex justify-between items-center">
+                                                    <span className="text-sm text-muted-foreground p-2">
+                                                        <a href={file} target="_blank" rel="noopener noreferrer">{file}</a>
+                                                    </span>
+                                                    <Button type="button" variant="danger" onClick={() => handleRemovePdf(file)}>
                                                         <CircleX className="h-4 w-4"/>
                                                     </Button>
                                                 </Card>

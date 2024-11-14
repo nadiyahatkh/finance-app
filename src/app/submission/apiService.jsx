@@ -2,12 +2,13 @@ import { getSession } from "next-auth/react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
-export const fetchSubmission = async ({token, search, type, finish_status}) => {
+export const fetchSubmission = async ({token, search, type, status, due_date}) => {
   const session = await getSession()
-  const statusParams = finish_status.map(s => `finish_status[]=${s}`).join('&');
+  const statusParams = status.map(s => `status[]=${s}`).join('&');
     const typeParams = type.map(t => `type[]=${t}`).join('&');
+    const dateParam = due_date ? `due_date=${due_date}` : '';
     try {
-      const response = await fetch(`${BASE_URL}/api/dataApplicant/index?search=${search}&${typeParams}&${statusParams}`, {
+      const response = await fetch(`${BASE_URL}/api/dataApplicant/index?search=${search}&${dateParam}&${typeParams}&${statusParams}`, {
         headers: {
           "ngrok-skip-browser-warning": true,
           'Authorization': `Bearer ${session.user.token}`,
@@ -128,18 +129,20 @@ export const fetchSubmission = async ({token, search, type, finish_status}) => {
           try{
           const formData = new FormData();
           formData.append('notes', notes);
-          const response = await fetch(`${BASE_URL}/api/dataApplicant/deniedAll`, {
+          const response = await fetch(`${BASE_URL}/api/dataApplicant/deniedall`, {
             method: 'POST',
             headers: {
+              "ngrok-skip-browser-warning": true,
               'Authorization': `Bearer ${token}`,
             },
             body: formData,
           });
         
           if (!response.ok) {
-            const result = await response.text();
-            throw new Error(result);
-          }
+            const result = await response.json();
+            // Throw the actual validation error message
+            throw new Error(JSON.stringify(result));
+        }
       
           const result = await response.json();
           return result;

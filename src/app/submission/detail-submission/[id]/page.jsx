@@ -37,13 +37,11 @@ export default function DetailSubmission() {
         const response = await fetchSubmissionDetail({ token, id: submissionId });
         console.log(response);
         setDetail(response?.submission);
-
-        // Check if the current admin has already approved or denied
         const adminApproval = response?.submission?.admin_approvals?.find(
           (approval) => approval.user_id === currentAdminId
         );
         if (adminApproval && (adminApproval.status === 'approved' || adminApproval.status === 'denied')) {
-          setShowActions(false); // Hide the buttons if already approved/denied by the current admin
+          setShowActions(false);
         }
       }
     };
@@ -188,6 +186,23 @@ export default function DetailSubmission() {
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
                     <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
+                  </div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Bukti Pdf</div>
+                    <div className="font-semibold">
+                    {detail?.files?.[0]?.pdf_urls?.map((pdfUrl, index) => (
+                        <a
+                          key={index}
+                          href={pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 underline"
+                          download
+                        >
+                          Download PDF
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="flex justify-end">
@@ -343,7 +358,7 @@ export default function DetailSubmission() {
                 {detail?.admin_approvals?.map((approval) => (
                     approval.status === 'denied' && approval.notes ? (
                       <div key={approval.id} className="text-red-500 mt-2">
-                        *Catatan: {approval.notes}
+                        *Catatan: {approval.notes} ({approval.user.role.name})
                       </div>
                     ) : null
                   ))}

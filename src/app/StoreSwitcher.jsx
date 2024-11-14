@@ -18,7 +18,7 @@ export default function StoreSwitcher({ className, items = [] }){
     const { status, data: session } = useSession();
     const [foto, setFoto] = useState()
     const router = useRouter();
-    const isAdmin = session?.user?.role === 1 ;  // Assuming role is stored in session
+    const isUser = session?.user?.role === 5 ;  // Assuming role is stored in session
     const handleSignOut = () => {
         setIsLoading(true)
         signOut({ callbackUrl: '/sign-in' }); // Redirect to login page after sign out
@@ -47,16 +47,22 @@ export default function StoreSwitcher({ className, items = [] }){
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-2">
                 <div className="flex flex-col space-y-1">
-                        <>
                             <div className="px-2 py-1 text-sm font-medium text-gray-900">
                                 My Account
                             </div>
                             <hr className="my-1 border-gray-200" />
+                            <Link href="/update-profile" className="flex items-center p-1 rounded-md hover:bg-gray-100">
+                                <User className="mr-2 h-4 w-4" />
+                                Profile
+                            </Link>
+                            {isUser && (
+                        <>
                             <Link href="/user/update-profile" className="flex items-center p-1 rounded-md hover:bg-gray-100">
                                 <User className="mr-2 h-4 w-4" />
                                 Profile
                             </Link>
                         </>
+                            )}
                     
                         {status === 'authenticated' ? (
                         <button className="flex items-center p-1 rounded-md hover:bg-gray-100" onClick={() => setShowDialogLogOut(true)}>

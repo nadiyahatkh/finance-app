@@ -190,29 +190,31 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
         }
       };
 
-      export const updateProfile = async ({ data, token }) => {
+      export const updateProfileUser = async ({ data }) => {
+        const session = await getSession()
         try {
           const formData = new FormData();
+          formData.append('name', data.name);
           formData.append('username', data.username);
           formData.append('email', data.email);
-          // Hanya tambahkan password jika ada nilainya
+          data.bank.forEach((item, index) => {
+            formData.append(`bank[${index}][bank_id]`, item.bank_id);
+            formData.append(`bank[${index}][account_name]`, item.account_name);
+            formData.append(`bank[${index}][account_number]`, item.account_number);
+          });
           if (data.password) {
               formData.append('password', data.password);
           }
-
-          // Hanya tambahkan password_confirmation jika ada nilainya
-          if (data.password_confirmation) {
-              formData.append('password_confirmation', data.password_confirmation);
-          }
-          if (data.foto) {
-            formData.append('foto', data.foto);
+          if (data.path) {
+            formData.append('path', data.path);
         }
       
           
-          const response = await fetch(`${BASE_URL}/api/update`, {
+          const response = await fetch(`${BASE_URL}/api/submission/update/profiles/user`, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${token}`,
+              "ngrok-skip-browser-warning": true,
+              'Authorization': `Bearer ${session.user.token}`,
             },
             body: formData,
           });
@@ -227,3 +229,26 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
           throw error;
         }
       };
+
+      export const fetchProfileUserId = async () => {
+        const session = await getSession()
+        try {
+          const response = await fetch(`${BASE_URL}/api/submission/profile`, {
+            headers: {
+              "ngrok-skip-browser-warning": true,
+              'Authorization': `Bearer ${session.user.token}`,
+            }
+          })
+          .then((res) => res.json())
+          .then((data) => {
+           return {
+            data: data,
+            message: "successs"
+           }
+          })
+          return response.data
+        } catch (error) {
+          console.error(error);
+          return "abs"
+        }
+      }

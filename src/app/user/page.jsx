@@ -26,6 +26,7 @@ export default function HomeUser() {
   const [typeFilter, setTypeFilter] = useState([]);
   const [statusFilter, setStatusFilter] = useState([]);
 
+  
   const { data: dataSubmissionUser, error, isLoading } = useQuery({
     queryKey: ['usersubmissions', search, typeFilter, statusFilter],
     refetchOnWindowFocus: false,

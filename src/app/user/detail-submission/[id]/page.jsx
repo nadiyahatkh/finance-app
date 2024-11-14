@@ -133,6 +133,23 @@ export default function DetailSubmission() {
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
                     <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
                   </div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Instal Pdf</div>
+                    <div className="font-semibold">
+                    {detail?.files?.[0]?.pdf_urls?.map((pdfUrl, index) => (
+                        <a
+                          key={index}
+                          href={pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 underline"
+                          download
+                        >
+                          Download PDF
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -212,7 +229,7 @@ export default function DetailSubmission() {
                 {detail?.admin_approvals?.map((approval) => (
                     approval.status === 'denied' && approval.notes ? (
                       <div key={approval.id} className="text-red-500 mt-2">
-                        *Catatan: {approval.notes}
+                        *Catatan: {approval.notes} ({approval.user.role.name})
                       </div>
                     ) : null
                   ))}

@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 export default function SubmissionUser() {
     const { data: session } = useSession();
     const token = session?.user?.token;
-    const [banks, setBanks] = useState()
+    const [banks, setBanks] = useState([])
     const [bankId, setBankId] = useState()
     const [accountId, setAccountId] = useState()
     const [transactionType, setTransactionType] = useState()
@@ -41,7 +41,7 @@ export default function SubmissionUser() {
     const [errorMessages, setErrorMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter()
-
+    const [total, setTotal] = useState(0);
 
     const FormSchema = z.object({
         due_date: z.date({ message: "Due date cannot be in the past." }),
@@ -111,6 +111,7 @@ export default function SubmissionUser() {
         control: form.control,
         name: "submission_item",
       });
+      
 
       const onSubmit= async (data) => {
         data.bank_account_id = accountId;
@@ -290,9 +291,9 @@ export default function SubmissionUser() {
                                                         <SelectValue placeholder="Pilih bank..." />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {banks?.map((bank) => (
+                                                    {Array.isArray(banks) && banks.map((bank) => (
                                                         <SelectItem key={bank.id} value={bank.id.toString()}>{bank.name}</SelectItem>
-                                                        ))}
+                                                    ))}
                                                     </SelectContent>
                                                     </Select>
                                                     {form.formState.errors.bank_id && (
@@ -387,7 +388,7 @@ export default function SubmissionUser() {
                                         <input
                                             name="file"
                                             type="file"
-                                            accept="image/*"
+                                            accept="image/*,application/pdf"
                                             className="hidden"
                                             id="fileInput"
                                             onChange={handleFileChange}
