@@ -89,8 +89,8 @@ export default function UpdateSubmission(){
                 price: item.price,
               });
             });
-            setImage(response.data.files?.map(file => file.image_urls)?.flat() || []);
-            setPdfFiles(response.data.files?.map(file => file.pdf_urls)?.flat() || []);
+            setImage(response.data.files?.map(file => file.image)?.flat() || []);
+            setPdfFiles(response.data.files?.map(file => file.pdf)?.flat() || []);
             setTransactionType(response.data.type);
             setBankId(response.data.bank_account.bank_id);
           }
@@ -159,13 +159,12 @@ export default function UpdateSubmission(){
     }, [token, bankId]);
 
     const onSubmit = async (data) => {
-        const updatedImage = image.filter(file => file !== null); // Filter image yang masih ada
-        const updatedFiles = selectedFiles.filter(file => file.file !== null); // Filter selected files yang masih ada
     
         const payload = {
             ...data,
             bank_account_id: accountId,
-            file: [...updatedImage, ...updatedFiles.map(file => file.file)],
+            file: selectedFiles.map(file => file.file),
+            delete_images: deletedImages
         };
     
         setIsLoading(true);
@@ -174,7 +173,7 @@ export default function UpdateSubmission(){
                 data: payload,
                 id,
                 token,
-                file: [...updatedImage, ...updatedFiles.map(file => file.file)],
+                file: selectedFiles.map(file => file.file)
             });
             setOpenSuccess(true);
         } catch (error) {
@@ -207,10 +206,14 @@ export default function UpdateSubmission(){
 
         const handleRemoveImage = (filePath) => {
             setImage(prevImage => prevImage.filter(file => file !== filePath));
+            setDeletedImages(prevDeletedImages => [...prevDeletedImages, filePath]);
         };
+        
+    
 
         const handleRemovePdf = (pdfPath) => {
             setPdfFiles(prevPdfFiles => prevPdfFiles.filter(file => file !== pdfPath));
+            setDeletedImages((prevDeletedPdf) => [...prevDeletedPdf, pdfPath]);
         };
 
 const formatPrice = (value) => {

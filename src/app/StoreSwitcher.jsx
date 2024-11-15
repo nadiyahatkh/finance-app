@@ -18,10 +18,11 @@ export default function StoreSwitcher({ className, items = [] }){
     const { status, data: session } = useSession();
     const [foto, setFoto] = useState()
     const router = useRouter();
-    const isUser = session?.user?.role === 5 ;  // Assuming role is stored in session
+    const isAdminRole = [1, 2, 3, 4].includes(session?.user?.role);
+    const isUserRole = session?.user?.role === 5;
     const handleSignOut = () => {
         setIsLoading(true)
-        signOut({ callbackUrl: '/sign-in' }); // Redirect to login page after sign out
+        signOut({ callbackUrl: '/sign-in' });
     };
 
     return(
@@ -51,17 +52,18 @@ export default function StoreSwitcher({ className, items = [] }){
                                 My Account
                             </div>
                             <hr className="my-1 border-gray-200" />
-                            <Link href="/update-profile" className="flex items-center p-1 rounded-md hover:bg-gray-100">
-                                <User className="mr-2 h-4 w-4" />
-                                Profile
-                            </Link>
-                            {isUser && (
-                        <>
-                            <Link href="/user/update-profile" className="flex items-center p-1 rounded-md hover:bg-gray-100">
-                                <User className="mr-2 h-4 w-4" />
-                                Profile
-                            </Link>
-                        </>
+                            {isAdminRole && (
+                                <Link href="/update-profile" className="flex items-center p-1 rounded-md hover:bg-gray-100">
+                                    <User className="mr-2 h-4 w-4" />
+                                    Profile
+                                </Link>
+                            )}
+
+                            {isUserRole && (
+                                <Link href="/user/update-profile" className="flex items-center p-1 rounded-md hover:bg-gray-100">
+                                    <User className="mr-2 h-4 w-4" />
+                                    Profile
+                                </Link>
                             )}
                     
                         {status === 'authenticated' ? (

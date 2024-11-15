@@ -34,6 +34,9 @@ export default function SubmissionAdmin(){
     const [isDialogOpen, setIsDialogOpen] = useState(false)
   
     const [date, setDate] = useState();
+    const [page, setPage] = useState(1)
+    const [perPage, setPerPage] = useState(10)
+    const [totalPage, setTotalPage] = useState(0);
   
   
   
@@ -42,9 +45,10 @@ export default function SubmissionAdmin(){
   const submissionData = async () => {
     try {
       const due_date = date?.from ? format(date.from, "yyyy-MM-dd") : "";
-        const pengajuan = await fetchSubmission({ token, search, due_date,  status: statusFilter, type: typeFilter});
+        const pengajuan = await fetchSubmission({ token, search, due_date,page, per_page: perPage,  status: statusFilter, type: typeFilter});
         console.log(pengajuan )
-        setData(pengajuan.submissions);
+        setData(pengajuan.submissions.data);
+        setTotalPage(pengajuan.submissions.last_page)
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -54,7 +58,7 @@ export default function SubmissionAdmin(){
     if (token) {
       submissionData();
     }
-  }, [token, search, statusFilter, typeFilter, date]);
+  }, [token, search, statusFilter, typeFilter, date, page, perPage]);
 
  
 
@@ -241,6 +245,11 @@ export default function SubmissionAdmin(){
             handleDeniedAll={handleDeniedAll}
             notes={notes}
             setNotes={setNotes}
+            currentPage={page} 
+              setPage={setPage} 
+              totalPage={totalPage} 
+              perPage={perPage} 
+              setPerPage={setPerPage}
           />
           </div>
         </CardContent>

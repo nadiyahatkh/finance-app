@@ -3,15 +3,13 @@ import { getSession } from "next-auth/react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
-export const fetchSubmissionUser = async ({token, search, type, finish_status}) => {
+export const fetchSubmissionUser = async ({token, search, type, finish_status, page, per_page}) => {
     const session = await getSession()
-    const statusParams = finish_status?.map(s => `finish_status=${s}`).join('&');
-    const typeParams = Array.isArray(type) 
-    ? type.map(t => `type=${t}`).join('&') 
-    : `type=${type || ''}`;
+    const statusParams = finish_status?.map(s => `finish_status[]=${s}`).join('&');
+    const typeParams = type.map(t => `type[]=${t}`).join('&');
 
       try {
-        const response = await fetch(`${BASE_URL}/api/submission/index?search=${search}&${typeParams}&${statusParams}`, {
+        const response = await fetch(`${BASE_URL}/api/submission/index?search=${search}&${typeParams}&${statusParams}&page=${page}&per_page=${per_page}`, {
           headers: {
             "ngrok-skip-browser-warning": true,
             'Authorization': `Bearer ${session.user.token}`,
@@ -118,8 +116,16 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
         if (file && file.length > 0) {
           file.forEach((file) => {
           formData.append('file[]', file);
-        });
-      }
+          });
+        }
+
+        console.log(data.delete_images)
+
+        if (data.delete_images && data.delete_images.length > 0) {
+          data.delete_images.forEach((file) => {
+          formData.append('delete_files[]', file);
+          });
+        }
     
         const response = await fetch(`${BASE_URL}/api/submission/update/${id}`, {
           method: 'POST',

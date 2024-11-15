@@ -59,19 +59,30 @@ export function DataTable({ columns, data, search, setSearch, statusFilter , set
   const table = useReactTable({
     data,
     columns,
+    pageCount: totalPage, // Tambahkan totalPage
+    manualPagination: true, // Gunakan paginasi manual
     state: {
       sorting,
       columnFilters,
-      columnVisibility
+      columnVisibility,
+      pagination: {
+        pageIndex: currentPage - 1, // halaman dalam index-based
+        pageSize: perPage,
+      },
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: (updater) => {
+      const pageIndex = typeof updater === "function" ? updater(table.getState().pagination).pageIndex : updater.pageIndex;
+      setPage(pageIndex + 1); // perbarui halaman ke state
+    },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel()
+    getPaginationRowModel: getPaginationRowModel(),
   });
+  
 
 //   const handleDelete = () => {
 //     const deleteRows = table.getSelectedRowModel().rows.map(row => row.original.id);

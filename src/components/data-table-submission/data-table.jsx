@@ -52,7 +52,7 @@ import { incomeType, statuses } from './data';
 
 
 
-export function DataTable({ columns, data, search, setSearch, openSuccess, setOpenSuccess, handleApproveAll, handleDeniedAll, notes, setNotes, errorMessages , openError,setOpenError, isDialogOpen, setIsDialogOpen, isLoadingTolak, setIsLoadingTolak, statusFilter , setStatusFilter, totalPages, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading, typeFilter, setTypeFilter}) {
+export function DataTable({ columns, data, search, setSearch, openSuccess, setOpenSuccess, handleApproveAll, handleDeniedAll, notes, setNotes, errorMessages , openError,setOpenError, isDialogOpen, setIsDialogOpen, isLoadingTolak, setIsLoadingTolak, statusFilter , setStatusFilter, totalPage, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading, typeFilter, setTypeFilter}) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -62,18 +62,28 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
   const table = useReactTable({
     data,
     columns,
+    pageCount: totalPage, // Tambahkan totalPage
+    manualPagination: true, // Gunakan paginasi manual
     state: {
       sorting,
       columnFilters,
-      columnVisibility
+      columnVisibility,
+      pagination: {
+        pageIndex: currentPage - 1, // halaman dalam index-based
+        pageSize: perPage,
+      },
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: (updater) => {
+      const pageIndex = typeof updater === "function" ? updater(table.getState().pagination).pageIndex : updater.pageIndex;
+      setPage(pageIndex + 1); // perbarui halaman ke state
+    },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel()
+    getPaginationRowModel: getPaginationRowModel(),
   });
 
 //   const handleDelete = () => {
@@ -83,8 +93,7 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
 //   };
 
 
-const isFiltered = table.getState().columnFilters.length > 0;
-//   const isFiltered = statusFilter.length > 0;
+  const isFiltered = statusFilter.length > 0 || typeFilter.length > 0;
 
   const handleSearchKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -352,7 +361,15 @@ const isFiltered = table.getState().columnFilters.length > 0;
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination 
+        table={table} 
+        currentPage={currentPage} 
+        setPage={setPage} 
+        totalPage={totalPage} 
+        perPage={perPage} 
+        setPerPage={setPerPage}
+
+      />
     </>
   );
 }

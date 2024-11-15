@@ -13,7 +13,7 @@ import {
     SelectValue,
   } from "@/components/ui/select";
   
-  export function DataTablePagination({ table }) {
+  export function DataTablePagination({ table, currentPage, setPage, totalPage, perPage, setPerPage }) {
     return (
       <div className="flex flex-col items-center justify-between space-y-4 px-2 lg:flex-row lg:space-y-0">
         <div className="flex flex-col items-center space-y-2 sm:flex-row sm:space-x-6 sm:space-y-0">
@@ -24,16 +24,16 @@ import {
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <Select
-              value={`${table.getState().pagination.pageSize}`}
+              value={`${perPage}`}
               onValueChange={(value) => {
-                table.setPageSize(Number(value));
+                setPerPage(Number(value));
               }}
             >
               <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
+                <SelectValue placeholder={perPage} />
               </SelectTrigger>
               <SelectContent side="top">
-                {[6, 10, 20, 30, 40, 50].map((pageSize) => (
+                {[1, 6, 10, 20, 30, 40, 50].map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
                     {pageSize}
                   </SelectItem>
@@ -44,15 +44,14 @@ import {
         </div>
         <div className="flex items-center space-x-2">
           <div className="flex items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
+            Page {currentPage} of {totalPage}
           </div>
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               className="h-8 w-8 p-0"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
+              onClick={() => setPage(1)}
+              disabled={currentPage === 1}
             >
               <span className="sr-only">Go to first page</span>
               <DoubleArrowLeftIcon className="h-4 w-4" />
@@ -60,8 +59,8 @@ import {
             <Button
               variant="outline"
               className="h-8 w-8 p-0"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={() => setPage(currentPage - 1)}
+              disabled={currentPage === 1}
             >
               <span className="sr-only">Go to previous page</span>
               <ChevronLeftIcon className="h-4 w-4" />
@@ -69,8 +68,8 @@ import {
             <Button
               variant="outline"
               className="h-8 w-8 p-0"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              onClick={() => setPage(currentPage + 1)}
+              disabled={currentPage === totalPage}
             >
               <span className="sr-only">Go to next page</span>
               <ChevronRightIcon className="h-4 w-4" />
@@ -78,8 +77,8 @@ import {
             <Button
               variant="outline"
               className="h-8 w-8 p-0"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
+              onClick={() => setPage(totalPage)}
+              disabled={currentPage === totalPage}
             >
               <span className="sr-only">Go to last page</span>
               <DoubleArrowRightIcon className="h-4 w-4" />

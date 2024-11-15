@@ -42,8 +42,6 @@ export default function SignIn(){
         if (res && !res.error) {
           const session = await getSession();
           const userRole = session?.user?.role;
-    
-          // Redirect based on user role
           if ([1, 2, 3, 4].includes(+userRole)) {
             router.push('/dashboard');
           } else if (+userRole === 5) {

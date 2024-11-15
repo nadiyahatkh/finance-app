@@ -48,7 +48,7 @@ import { DataTableFacetedFilter } from './data-table-faceted-filter';
 import { categories, incomeType, statuses } from './data';
 
 
-export function DataTable({ columns, data, search, setSearch,typeFilter, setTypeFilter, statusFilter , setStatusFilter, totalPages, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading}) {
+export function DataTable({ columns, data, search, setSearch,typeFilter, setTypeFilter, statusFilter , setStatusFilter, totalPage, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading}) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -58,18 +58,28 @@ export function DataTable({ columns, data, search, setSearch,typeFilter, setType
   const table = useReactTable({
     data,
     columns,
+    pageCount: totalPage, // Tambahkan totalPage
+    manualPagination: true, // Gunakan paginasi manual
     state: {
       sorting,
       columnFilters,
-      columnVisibility
+      columnVisibility,
+      pagination: {
+        pageIndex: currentPage - 1, // halaman dalam index-based
+        pageSize: perPage,
+      },
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: (updater) => {
+      const pageIndex = typeof updater === "function" ? updater(table.getState().pagination).pageIndex : updater.pageIndex;
+      setPage(pageIndex + 1); // perbarui halaman ke state
+    },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel()
+    getPaginationRowModel: getPaginationRowModel(),
   });
 
 //   const handleDelete = () => {
@@ -79,7 +89,7 @@ export function DataTable({ columns, data, search, setSearch,typeFilter, setType
 //   };
 
 
-const isFiltered = table.getState().columnFilters.length > 0;
+const isFiltered = statusFilter.length > 0 || typeFilter.length > 0;
 //   const isFiltered = statusFilter.length > 0;
 
   const handleSearchKeyDown = (e) => {
@@ -128,7 +138,10 @@ const isFiltered = table.getState().columnFilters.length > 0;
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={() => {
+              setStatusFilter([]);
+              setTypeFilter([]);
+            }}
             className="h-8 px-2 lg:px-3"
           >
             Reset
@@ -236,7 +249,14 @@ const isFiltered = table.getState().columnFilters.length > 0;
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination 
+        table={table} 
+        currentPage={currentPage} 
+        setPage={setPage} 
+        totalPage={totalPage} 
+        perPage={perPage} 
+        setPerPage={setPerPage}
+      />
       {/* Pagination
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">

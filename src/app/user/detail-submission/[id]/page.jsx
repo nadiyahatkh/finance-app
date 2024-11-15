@@ -38,7 +38,7 @@ export default function DetailSubmission() {
     { role: "Head of FAT", user_id: 7 }, // Replace with correct user_id if available
   ];
 
-  const images = detail?.files?.map(file => file.file_urls)?.flat() || [];
+  const images = detail?.files?.map(file => file.image_urls)?.flat() || [];
 
   const items = detail?.items || [];
   const totalAmount = items.reduce((acc, item) => acc + (item.quantity * item.price), 0)

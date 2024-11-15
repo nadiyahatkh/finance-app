@@ -21,21 +21,42 @@ const colorStyles = ["#335CFF", "#1DAF61", "#FB3748", "#09090B"];
 export default function HomeUser() {
   const { data: session } = useSession(); 
   const token = session?.user?.token;
+  const [data, setData] = useState([])
   const [cardData, setCardData] = useState()
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState([]);
   const [statusFilter, setStatusFilter] = useState([]);
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(10)
+  const [totalPage, setTotalPage] = useState(0);
 
   
-  const { data: dataSubmissionUser, error, isLoading } = useQuery({
-    queryKey: ['usersubmissions', search, typeFilter, statusFilter],
-    refetchOnWindowFocus: false,
-    queryFn: () => fetchSubmissionUser({token, search, type: typeFilter, finish_status: statusFilter}),
-  });
+  // const { data: dataSubmissionUser, error, isLoading } = useQuery({
+  //   queryKey: ['usersubmissions', search, typeFilter, statusFilter, page, perPage],
+  //   refetchOnWindowFocus: false,
+  //   queryFn: () => fetchSubmissionUser({token, search, page, per_page: perPage, type: typeFilter, finish_status: statusFilter}),
+  // });
 
-  console.log(dataSubmissionUser)
+  // console.log(dataSubmissionUser)
 
-  const submissionData = dataSubmissionUser?.data.data || [];
+  // const submissionData = dataSubmissionUser?.data.data || [];
+  // const totalPage = dataSubmissionUser?.data.last_page || 1; 
+  const submissionData = async () => {
+    try {
+        const pengajuan = await fetchSubmissionUser({ token, search, page, per_page: perPage,  finish_status: statusFilter, type: typeFilter});
+        console.log(pengajuan)
+        setData(pengajuan.data.data);
+        setTotalPage(pengajuan.data.last_page)
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    useEffect(() => {
+    if (token) {
+      submissionData();
+    }
+  }, [token, search, statusFilter, typeFilter, page, perPage]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -148,7 +169,7 @@ export default function HomeUser() {
         <CardContent className="shadow-md">
           <div className="container mx-auto">
           <DataTable
-              data={submissionData} 
+              data={data} 
               columns={columns}
               search={search} 
               setSearch={setSearch}
@@ -156,6 +177,11 @@ export default function HomeUser() {
               setTypeFilter={setTypeFilter} 
               statusFilter={statusFilter} 
               setStatusFilter={setStatusFilter} 
+              currentPage={page} 
+              setPage={setPage} 
+              totalPage={totalPage} 
+              perPage={perPage} 
+              setPerPage={setPerPage}
             />
           </div>
         </CardContent>

@@ -24,9 +24,11 @@ import {
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <Select
-              value={`${perPage}`}
+              value={perPage.toString()} // pastikan perPage diubah menjadi string
               onValueChange={(value) => {
-                setPerPage(Number(value));
+                const newPageSize = Number(value);
+                setPerPage(newPageSize); // ubah jumlah per halaman
+                setPage(1); // reset ke halaman pertama setelah mengganti page size
               }}
             >
               <SelectTrigger className="h-8 w-[70px]">
@@ -34,7 +36,7 @@ import {
               </SelectTrigger>
               <SelectContent side="top">
                 {[6, 10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                  <SelectItem key={pageSize} value={pageSize.toString()}>
                     {pageSize}
                   </SelectItem>
                 ))}
