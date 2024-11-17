@@ -35,7 +35,7 @@ export const updateProfileAdmin = async ({ data }) => {
       throw error;
     }
   };
-
+ 
   export const fetchProfileAdminId = async () => {
     const session = await getSession()
     try {

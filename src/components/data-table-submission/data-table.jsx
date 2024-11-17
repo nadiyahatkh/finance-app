@@ -38,10 +38,8 @@ import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
-// import { DataTableFacetedFilter } from './data-table-faceted-filter';
 import { ChevronLeftIcon, ChevronRightIcon, Cross2Icon, DoubleArrowLeftIcon, DoubleArrowRightIcon } from '@radix-ui/react-icons';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-// import { statuses } from './constants';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import { DataTablePagination } from './data-table-pagination';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
@@ -85,12 +83,6 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
-
-//   const handleDelete = () => {
-//     const deleteRows = table.getSelectedRowModel().rows.map(row => row.original.id);
-//     onDelete(deleteRows);
-//     setIsSelectDeleteOpen(false);
-//   };
 
 
   const isFiltered = statusFilter.length > 0 || typeFilter.length > 0;
@@ -151,9 +143,6 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
         </div>
         
       <div className='flex items-center space-x-2'>
-        {/* <Button variant='outline' style={{ color: "#F9B421" }}>
-          Tolak Semua
-        </Button> */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
                           <Button 

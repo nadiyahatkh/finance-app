@@ -59,16 +59,6 @@ export default function SignIn(){
         setIsSubmitting(false);
       }
     };
-    
-    if (status === "loading") {
-      return (
-          <div className="w-full h-screen flex justify-center items-center">
-              <TailSpin height="80" width="80" color="#021526" ariaLabel="loading" />
-          </div>
-      );
-    }
-      
-
 
 
     return(
