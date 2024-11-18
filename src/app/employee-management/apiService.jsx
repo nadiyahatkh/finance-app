@@ -58,11 +58,10 @@ export const fetchEmployee = async ({token, page, per_page}) => {
       });
   
       if (!response.ok) {
-        const result = await response.json();
-        // Throw the actual validation error message
-        throw new Error(JSON.stringify(result));
-    }
-  
+        const result = await response.text();
+        throw new Error(result);
+      }
+      
       const result = await response.json();
       return result;
     } catch (error) {
@@ -103,10 +102,9 @@ export const fetchEmployee = async ({token, page, per_page}) => {
       });
   
       if (!response.ok) {
-        const result = await response.json();
-        // Throw the actual validation error message
-        throw new Error(JSON.stringify(result));
-    }
+        const result = await response.text();
+        throw new Error(result);
+      }
   
       const result = await response.json();
       return result;

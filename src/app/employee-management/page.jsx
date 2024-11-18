@@ -1,11 +1,5 @@
 'use client'
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-// import { Card } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
 import Link from "next/link";
 
 import { Card, CardContent } from "@/components/Card";
@@ -24,24 +18,15 @@ export default function EmployeeManagement() {
   const [idToDelete, setIdToDelete] = useState(null);
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
-  // const [totalPage, setTotalPage] = useState(0)
-
-
-  // const deleteRow = (id, employeeData) => {
-  //   return employeeData.filter(item => item.id !== id);
-  // };
-
 
   useEffect(() => {
-    setPage(1); // Reset ke halaman pertama setiap kali `perPage` berubah
+    setPage(1);
   }, [perPage]);
 
   const handleDelete = async () => {
     try {
       await removeEmployee({ id: idToDelete, token });
-      // Refetch data setelah delete berhasil
       queryClient.invalidateQueries(['employees']);
-      // Menutup dialog setelah berhasil menghapus
       setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error('Gagal menghapus data:', error);
@@ -55,36 +40,18 @@ export default function EmployeeManagement() {
   });
 
   const employeeData = dataEmployee?.data.data || [];
-  const totalPage = dataEmployee?.data.last_page || 1; // Ambil last_page untuk totalPage
-
-console.log(totalPage); // Pastikan last_page berhasil diambil
-
-  console.log(employeeData)
-  // console.log(data)
-
-  // if (isLoading) {
-  //   return <p>Loading...</p>;
-  // }
-
-  // if (error) {
-  //   console.log(error)
-  //   return <p>error</p>;
-  // }
+  const totalPage = dataEmployee?.data.last_page || 1;
     return(
         <div className="py-4">
       <div className="w-full max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          {/* Left section */}
           <div>
             <p className="title font-manrope font-bold text-2xl leading-10">Manajemen Karyawan</p>
             <p className="text-muted-foreground text-sm">
                 Heres a list of your employe.
             </p>
           </div>
-          {/* Right section */}
           <div className="flex items-center space-x-4">
-          
-            {/* Add Asset Button */}
             <Button variant="solid" className="" style={{ background: "#F9B421" }}>
                 <Link href="./employee-management/add-employee">
                     Tambah Karyawan
@@ -92,11 +59,6 @@ console.log(totalPage); // Pastikan last_page berhasil diambil
             </Button>
           </div>
         </div>
-            {/* <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4 mb-4">
-                {cardData.map((d, i) => (
-                    <Card key={i} amount={d.amount} label={d.label} image={d.image} />
-                ))}
-            </section> */}
         <CardContent className="shadow-md">
           <div className="container mx-auto">
           <DataTable data={employeeData} columns={columns(handleDelete, isDeleteDialogOpen, setIsDeleteDialogOpen, setIdToDelete)} currentPage={page} setPage={setPage} totalPage={totalPage} perPage={perPage} setPerPage={setPerPage} />

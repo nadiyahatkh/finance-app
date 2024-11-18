@@ -68,9 +68,9 @@ export default function DetailSubmission() {
   };
 
   const handleDeny = async (event) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
 
-    if (!currentApplicantId || !notes) return; // Ensure we have an ID and notes
+    if (!currentApplicantId || !notes) return;
 
     setLoadingStatus((prevState) => ({ ...prevState, [currentApplicantId]: true }));
     try {
@@ -82,19 +82,42 @@ export default function DetailSubmission() {
       console.error('Error denying applicant:', error);
     } finally {
       setLoadingStatus((prevState) => ({ ...prevState, [currentApplicantId]: false }));
-      setNotes(''); // Clear notes after submission
+      setNotes('');
       setCurrentApplicantId(null);
       setIsDialogOpen(false); 
     }
   };
 
   const steps = [
-    { role: "Pengajuan dibuat", user_id: null }, // For the initial submission step
-    { role: "General Affairs", user_id: 6 },
-    { role: "Manager", user_id: 3 },
-    { role: "CEO", user_id: 1 }, // Replace with correct user_id if available
-    { role: "Head of FAT", user_id: 7 }, // Replace with correct user_id if available
+    { role: "Pengajuan dibuat", role_id: null },
+    { role: "General Affairs", role_id: 3 },
+    { role: "Manager", role_id: 2 },
+    { role: "CEO", role_id: 1 },
+    { role: "Head of FAT", role_id: 4 },
   ];
+  
+  const userPositionName = detail?.user?.position?.name;
+  let filteredSteps;
+
+  if (userPositionName === "GA") {
+    filteredSteps = steps.filter((step) =>
+      ["Pengajuan dibuat", "Manager", "CEO", "Head of FAT"].includes(step.role)
+    );
+  } else if (userPositionName === "Manager") {
+    filteredSteps = steps.filter((step) =>
+      ["Pengajuan dibuat", "CEO", "Head of FAT"].includes(step.role)
+    );
+  } else if (userPositionName === "CEO") {
+    filteredSteps = steps.filter((step) =>
+      ["Pengajuan dibuat", "Head of FAT"].includes(step.role)
+    );
+  } else if (userPositionName === "Finance") {
+    filteredSteps = steps.filter((step) =>
+      ["Pengajuan dibuat", "Head of FAT"].includes(step.role)
+    );
+  } else {
+    filteredSteps = steps; 
+  }
 
   const images = detail?.files?.map(file => file.file_urls)?.flat() || [];
 
@@ -283,75 +306,85 @@ export default function DetailSubmission() {
               </div>
 
               <ul className="relative flex flex-col md:flex-row gap-2">
-              {steps.map((step, index) => {
-                // Find the corresponding approval status
-                const approval = detail?.admin_approvals?.find(
-                  (approval) => approval.user_id === step.user_id
-                );
+                {filteredSteps.map((step, index) => {
+                  const approval = detail?.admin_approvals?.find(
+                    (approval) => approval.user?.role_id === step.role_id
+                  );
 
-                // Check if the first step "Pengajuan dibuat" should be green
-                const isFirstStep = index === 0;
-                const isApproved = approval?.status === "approved" || isFirstStep;
-                const isDenied = approval?.status === "denied";
+                  const isFirstStep = index === 0;
+                  const isApproved = approval?.status === "approved" || isFirstStep;
+                  const isDenied = approval?.status === "denied";
 
-                // Determine styles based on status
-                const borderColor = isDenied ? "border-red-400" : isApproved ? "border-green-400" : "border-gray-200";
-                const iconColor = isDenied ? "text-red-400" : isApproved ? "text-green-400" : "text-gray-200";
-                const bgColor = isDenied ? "bg-red-400" : isApproved ? "bg-green-400" : "bg-gray-200";
+                  const borderColor = isDenied
+                    ? "border-red-400"
+                    : isApproved
+                    ? "border-green-400"
+                    : "border-gray-200";
+                  const iconColor = isDenied
+                    ? "text-red-400"
+                    : isApproved
+                    ? "text-green-400"
+                    : "text-gray-200";
+                  const bgColor = isDenied
+                    ? "bg-red-400"
+                    : isApproved
+                    ? "bg-green-400"
+                    : "bg-gray-200";
 
-                // Display submission date only for the first step
-                const displayDate =
-                  isFirstStep && detail?.created_at
-                    ? new Date(detail.created_at).toLocaleString("id-ID", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "";
+                  const displayDate =
+                    isFirstStep && detail?.created_at
+                      ? new Date(detail.created_at).toLocaleString("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "";
 
-                return (
-                  <li key={index} className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block">
-                    <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
-                      <span
-                        className={`size-7 flex justify-center items-center shrink-0 border ${borderColor} rounded-full w-[45px] h-[45px]`}
-                      >
-                        {/* Use ReceiptIcon for the first step, CircleUserRound for the rest */}
+                  return (
+                    <li
+                      key={index}
+                      className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block"
+                    >
+                      <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
+                        <span
+                          className={`size-7 flex justify-center items-center shrink-0 border ${borderColor} rounded-full w-[45px] h-[45px]`}
+                        >
+                          {isFirstStep ? (
+                            <Receipt className={`h-5 w-5 ${iconColor}`} />
+                          ) : (
+                            <CircleUserRound className={`h-5 w-5 ${iconColor}`} />
+                          )}
+                        </span>
+                        <div
+                          className={`mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 ${bgColor} group-last:hidden dark:bg-neutral-700`}
+                        ></div>
+                      </div>
+                      <div className="grow md:grow-0 md:mt-3 pb-5 flex flex-col">
                         {isFirstStep ? (
-                          <Receipt className={`h-5 w-5 ${iconColor}`} />
+                          <>
+                            <span className="block text-xs font-medium text-gray-800 dark:text-white">
+                              Pengajuan dibuat
+                            </span>
+                            <p className="text-xs text-gray-500 dark:text-neutral-500">
+                              {displayDate}
+                            </p>
+                          </>
                         ) : (
-                          <CircleUserRound className={`h-5 w-5 ${iconColor}`} />
+                          <>
+                            <span className="block text-xs font-medium text-gray-800 dark:text-white">
+                              {isDenied ? "Denied" : isApproved ? "Approved" : "Menunggu"}
+                            </span>
+                            <p className="text-xs text-gray-500 dark:text-neutral-500">
+                              {step.role}
+                            </p>
+                          </>
                         )}
-                      </span>
-                      <div
-                        className={`mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 ${bgColor} group-last:hidden dark:bg-neutral-700`}
-                      ></div>
-                    </div>
-                    <div className="grow md:grow-0 md:mt-3 pb-5 flex flex-col">
-                      {isFirstStep ? (
-                        <>
-                          <span className="block text-xs font-medium text-gray-800 dark:text-white">
-                            Pengajuan dibuat
-                          </span>
-                          <p className="text-xs text-gray-500 dark:text-neutral-500">
-                            {displayDate}
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <span className="block text-xs font-medium text-gray-800 dark:text-white">
-                            {isDenied ? "Denied" : isApproved ? "Approved" : "Menunggu"}
-                          </span>
-                          <p className="text-xs text-gray-500 dark:text-neutral-500">
-                            {step.role}
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="flex justify-center items-center mb-4">

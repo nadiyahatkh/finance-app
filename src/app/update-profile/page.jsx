@@ -63,10 +63,17 @@ export default function UpdateProfilAdmin() {
             const result = await updateProfileAdmin({ data: filteredData, token });
             setOpenSuccess(true);
         } catch (error) {
-            const message = JSON.parse(error.message);
-            setErrorMessages(Object.values(message.error).flat());
-            setOpenError(true);
-            console.error('Error updating profile:', error);
+            let message = '';
+        try {
+            const errorDetail = JSON.parse(error.message);
+            setErrorMessages(Object.values(errorDetail.errors).flat());
+        } catch (e) {
+            message = error.message || "An unexpected error occurred.";
+            setErrorMessages([message]);
+        }
+
+        setOpenError(true);
+        console.error('Error creating asset:', error);
         } finally {
             setIsLoading(false);
         }
@@ -204,28 +211,66 @@ export default function UpdateProfilAdmin() {
                                 </div>
 
                                 {/* Success Dialog */}
-                                    <AlertDialog open={openSuccess} onOpenChange={setOpenSuccess}>
-                                    <AlertDialogContent>
-                                    <AlertDialogTitle>Success</AlertDialogTitle>
-                                        <AlertDialogDescription>Profile has been updated successfully!</AlertDialogDescription>
-                                        <AlertDialogAction onClick={() => router.push('/dashboard')} style={{ background: "#F9B421" }}>OK</AlertDialogAction>
-                                    </AlertDialogContent>
-                                    </AlertDialog>
-
-                                    {/* Error Dialog */}
-                                    <AlertDialog open={openError} onOpenChange={setOpenError}>
-                                    <AlertDialogContent>
-                                    <AlertDialogTitle className="text-2xl">Error</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                        <div className="max-h-32 overflow-y-auto">
-                                            {errorMessages.map((message, index) => (
-                                            <p key={index} className="text-red-500 italic">{message}</p>
-                                            ))}
+                                <AlertDialog open={openSuccess} onOpenChange={setOpenSuccess}>
+                                    <AlertDialogContent className="flex flex-col items-center justify-center text-center">
+                                        <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#DCFCE7" }}>
+                                            <svg
+                                                className="w-6 h-6 text-green-600"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M5 13l4 4L19 7"
+                                                ></path>
+                                            </svg>
                                         </div>
-                                        </AlertDialogDescription>
-                                        <AlertDialogAction onClick={() => setOpenError(false)} style={{ background: "#F9B421" }}>Close</AlertDialogAction>
+                                        <AlertDialogTitle className="">Yeay! Sukses</AlertDialogTitle>
+                                        <AlertDialogDescription className="">Anda telah berhasil mengubah profile.</AlertDialogDescription>
+                                        <AlertDialogAction
+                                            onClick={() => router.push('/dashboard')}
+                                            style={{ background: "#F9B421" }}
+                                            className="w-full"
+                                        >
+                                            Kembali
+                                        </AlertDialogAction>
                                     </AlertDialogContent>
-                                    </AlertDialog>
+                                </AlertDialog>
+
+                                {/* Error Dialog */}
+                                <AlertDialog open={openError} onOpenChange={setOpenError}>
+                                <AlertDialogContent className="flex flex-col items-center justify-center text-center">
+                                <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#FEE2E2" }}>
+                                    <svg
+                                        className="w-6 h-6 text-red-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M6 18L18 6M6 6l12 12"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <AlertDialogTitle>Yahh! Error</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                    <div className="max-h-32 overflow-y-auto font-semibold">
+                                        {errorMessages.map((message, index) => (
+                                        <p key={index} className="text-red-500 italic">{message}</p>
+                                        ))}
+                                    </div>
+                                    </AlertDialogDescription>
+                                    <AlertDialogAction className="w-full" onClick={() => setOpenError(false)} style={{ background: "#F9B421" }}>Kembali</AlertDialogAction>
+                                </AlertDialogContent>
+                                </AlertDialog>
 
                             </form>
                         </Form>

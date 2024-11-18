@@ -20,7 +20,7 @@ import { createEmployee, fetchDepartments, fetchManagers, fetchPositions } from 
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { fetchBanks } from "@/app/apiService";
+import { fetchBankAll } from "@/app/apiService";
 import { ThreeDots } from "react-loader-spinner";
 import { useRouter } from "next/navigation";
 
@@ -76,7 +76,6 @@ export default function AddEmployee() {
           try {
             const departmentData = await fetchDepartments({ token });
             setDepartments(departmentData.data);
-            console.log(setDepartments)
           } catch (error) {
             console.error('Failed to fetch departments:', error);
           }
@@ -85,16 +84,14 @@ export default function AddEmployee() {
           try {
             const positionsData = await fetchPositions({ token });
             setPositions(positionsData.data);
-            console.log(setPositions)
           } catch (error) {
             console.error('Failed to fetch positions:', error);
           }
         };
         const loadDataBanks = async () => {
           try {
-            const bankData = await fetchBanks({ token });
+            const bankData = await fetchBankAll({ token });
             setBanks(bankData.data);
-            console.log(setBanks)
           } catch (error) {
             console.error('Failed to fetch positions:', error);
           }
@@ -102,7 +99,6 @@ export default function AddEmployee() {
         const loadDataMangers = async () => {
           try {
             const managerData = await fetchManagers({ token });
-            console.log(managerData)
             setManagers(managerData.data);
           } catch (error) {
             console.error('Failed to fetch managers:', error);
@@ -133,14 +129,11 @@ export default function AddEmployee() {
         data.position_id = positionId;
         data.bank_id = bankId;
         setIsLoading(true)
-        console.log("Token:", token);
         try {
         const result = await createEmployee({ data, token , file: selectedFile });
         setOpenSuccess(true)
-        console.log(result)
         } catch (error) {
-            // Parse the JSON error message (since it's thrown as a JSON string)
-        let message = '';
+            let message = '';
         try {
             const errorDetail = JSON.parse(error.message);
             setErrorMessages(Object.values(errorDetail.errors).flat());
@@ -272,7 +265,7 @@ export default function AddEmployee() {
                                 />
                             </div>
                             <div className="mb-4">
-                                    <Label className="block text-sm mb-2">Item</Label>
+                                    <Label className="block text-sm mb-2">Bank</Label>
                                     <Card className="">
                                     <CardContent className="p-4">
                                         {fields.map((item, index) => (
@@ -281,13 +274,13 @@ export default function AddEmployee() {
                                             <Label className="block text-sm mb-2">Bank</Label>
                                             <FormField
                                                 control={form.control}
-                                                name={`bank.${index}.bank_id`} // Nama yang unik untuk setiap field deskripsi
+                                                name={`bank.${index}.bank_id`}
                                                 render={({ field }) => (
                                                     <>
                                                     <Select
                                                     value={field.value ? field.value.toString() : ""}
                                                     onValueChange={(value) => {
-                                                        field.onChange(value); // Update react-hook-form state
+                                                        field.onChange(value);
                                                         setBankId(value);
                                                     }}
                                                     {...field}
@@ -313,7 +306,7 @@ export default function AddEmployee() {
                                                 <Label className="block text-sm mb-2">Nama Rekening</Label>
                                                 <FormField
                                                 control={form.control}
-                                                name={`bank.${index}.account_name`} // Nama yang unik untuk setiap field kuantitas
+                                                name={`bank.${index}.account_name`}
                                                 render={({ field }) => (
                                                     <Input {...field} placeholder="Masukan Nama Rekening..." type="text" />
                                                 )}
@@ -323,7 +316,7 @@ export default function AddEmployee() {
                                                 <Label className="block text-sm mb-2">Nomer Rekening</Label>
                                                 <FormField
                                                 control={form.control}
-                                                name={`bank.${index}.account_number`} // Nama yang unik untuk setiap field jumlah
+                                                name={`bank.${index}.account_number`}
                                                 render={({ field }) => (
                                                     <Input {...field} placeholder="Masukan Nomer Rekening..." type="number" />
                                                 )}
@@ -342,7 +335,7 @@ export default function AddEmployee() {
                                             type="button"
                                             variant="ghost"
                                             className="text-blue-600 text-xs"
-                                            onClick={() => append({ bank_id: "", account_name: "", account_number: "" })} // Menambah item baru
+                                            onClick={() => append({ bank_id: "", account_name: "", account_number: "" })}
                                         >
                                             <Plus className="w-4 h-4 mr-1" /> Tambah item
                                         </Button>
@@ -360,7 +353,7 @@ export default function AddEmployee() {
                                         <Select
                                         value={field.value ? field.value.toString() : ""}
                                         onValueChange={(value) => {
-                                            field.onChange(value); // Update react-hook-form state
+                                            field.onChange(value);
                                             setManagerId(value);
                                         }}
                                         {...field}
@@ -423,7 +416,7 @@ export default function AddEmployee() {
                                         <Select
                                         value={field.value ? field.value.toString() : ""}
                                         onValueChange={(value) => {
-                                            field.onChange(value); // Update react-hook-form state
+                                            field.onChange(value);
                                             setPositionId(value);
                                         }}
                                         {...field}

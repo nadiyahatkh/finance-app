@@ -248,7 +248,7 @@ export default function SubmissionUser() {
                                                 </FormControl>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date('1900-01-01') || date > new Date('2100-12-31')} initialFocus />
+                                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date().setHours(0, 0, 0, 0)} initialFocus />
                                                 </PopoverContent>
                                             </Popover>
                                             )}
@@ -265,7 +265,7 @@ export default function SubmissionUser() {
                                         <div className="w-full mr-2">
                                             <Label className="block text-sm mb-2">Nama Rekening</Label>
                                             <Input
-                                            value={accountName} // Use display-only state
+                                            value={accountName}
                                             className=""
                                             placeholder="Masukan Nama Rekening..."
                                             type="text"
@@ -308,7 +308,7 @@ export default function SubmissionUser() {
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2">Nomor Rekening</Label>
                                     <Input
-                                        value={accountNumber} // Use display-only state
+                                        value={accountNumber}
                                         className=""
                                         placeholder="Masukan Nomor Rekening..."
                                         type="text"

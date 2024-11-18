@@ -320,7 +320,7 @@ const formatPrice = (value) => {
                                                 </FormControl>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar mode="single" selected={field.value} onSelect={(date) => field.onChange(date || null)} disabled={(date) => date < new Date('1900-01-01') || date > new Date('2100-12-31')} initialFocus />
+                                                <Calendar mode="single" selected={field.value} onSelect={(date) => field.onChange(date || null)} disabled={(date) => date < new Date().setHours(0, 0, 0, 0)} initialFocus />
                                                 </PopoverContent>
                                             </Popover>
                                             )}

@@ -6,7 +6,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 export const fetchSubmissionUser = async ({token, search, type, finish_status, page, per_page}) => {
     const session = await getSession()
     const statusParams = finish_status?.map(s => `finish_status[]=${s}`).join('&');
-    const typeParams = type.map(t => `type[]=${t}`).join('&');
+    const typeParams = type?.map(t => `type[]=${t}`).join('&');
 
       try {
         const response = await fetch(`${BASE_URL}/api/submission/index?search=${search}&${typeParams}&${statusParams}&page=${page}&per_page=${per_page}`, {
@@ -84,10 +84,9 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
         });
     
         if (!response.ok) {
-          const result = await response.json();
-          // Throw the actual validation error message
-          throw new Error(JSON.stringify(result));
-      }
+          const result = await response.text();
+          throw new Error(result);
+        }
     
     
         const result = await response.json();
@@ -137,10 +136,9 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
         });
     
         if (!response.ok) {
-          const result = await response.json();
-          // Throw the actual validation error message
-          throw new Error(JSON.stringify(result));
-      }
+          const result = await response.text();
+          throw new Error(result);
+        }
     
         const result = await response.json();
         return result;

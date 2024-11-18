@@ -112,10 +112,9 @@ export const fetchSubmission = async ({token, search, type, status, due_date, pa
           });
         
           if (!response.ok) {
-            const result = await response.json();
-            // Throw the actual validation error message
-            throw new Error(JSON.stringify(result));
-        }
+            const result = await response.text();
+            throw new Error(result);
+          }
         
             const result = await response.json();
             return result;
@@ -139,10 +138,9 @@ export const fetchSubmission = async ({token, search, type, status, due_date, pa
           });
         
           if (!response.ok) {
-            const result = await response.json();
-            // Throw the actual validation error message
-            throw new Error(JSON.stringify(result));
-        }
+            const result = await response.text();
+            throw new Error(result);
+          }
       
           const result = await response.json();
           return result;
