@@ -37,10 +37,9 @@ export default function StoreSwitcher({ className, items = [] }){
                     className={cn("w-[200px] justify-between", className)}
                 >
                     <Avatar className="w-4 h-4 rounded-full mr-2">
-                        <AvatarImage src="./signin.png" alt="@shadcn" />
-                        <AvatarFallback>Nad</AvatarFallback>
+                        <AvatarImage src={session?.user?.path} alt="@shadcn" />
+                        <AvatarFallback>{session?.user?.name || 'Guest'}</AvatarFallback>
                     </Avatar>
-                    {/* <img src={profileImage} alt="Profile Image" className="w-4 h-4 rounded-full mr-2" /> */}
                     {session?.user?.name || 'Guest'}
                     {/* <p>Nadiyah Atikah Juliyanti</p> */}
                     <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />

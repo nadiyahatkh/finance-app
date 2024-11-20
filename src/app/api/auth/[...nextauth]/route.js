@@ -55,7 +55,7 @@ const authOptions = {
       if (account?.provider === "credentials") {
         token.id = user.data.id;
         token.email = user.data.email;
-        token.foto = user.data.foto;
+        token.path = user.data.path;
         token.name = user.data.name;
         token.role = user.data.role_id; // Set the role from the user object
         token.token = user.token;
@@ -66,7 +66,7 @@ const authOptions = {
     async session({ session, token }) {
       session.user.id = token.id;
       session.user.email = token.email;
-      session.user.foto = token.foto;
+      session.user.path = token.path;
       session.user.name = token.name;
       session.user.role = token.role; // Ensure role is set here
       session.user.token = token.token;

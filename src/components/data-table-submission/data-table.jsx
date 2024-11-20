@@ -133,7 +133,10 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={() => {
+              setStatusFilter([]);
+              setTypeFilter([]);
+            }}
             className="h-8 px-2 lg:px-3"
           >
             Reset

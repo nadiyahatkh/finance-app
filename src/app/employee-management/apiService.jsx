@@ -83,6 +83,9 @@ export const fetchEmployee = async ({token, page, per_page}) => {
         formData.append(`bank[${index}][bank_id]`, item.bank_id);
         formData.append(`bank[${index}][account_name]`, item.account_name);
         formData.append(`bank[${index}][account_number]`, item.account_number);
+        if (item.id) {
+          formData.append(`bank[${index}][id]`, item.id); // Tambahkan hanya jika id tidak undefined
+        }
       });
       formData.append('manager_id', data.manager_id);
       if (data.password) {

@@ -54,6 +54,7 @@ export default function UpdateEmployee() {
         manager_id: z.string().optional(),
         bank: z.array(
             z.object({
+              id: z.preprocess((val) => Number((val)), z.number().optional()),
               bank_id: z.preprocess((val) => Number((val)), z.number().optional()),
               account_name: z.string().optional(),
               account_number:  z.preprocess((val) => Number((val)), z.number().optional()),
@@ -139,6 +140,7 @@ export default function UpdateEmployee() {
             
             response.data.bank_accounts.forEach(item => {
               append({
+                id: item.id || "",
                 bank_id: item.bank_id,
                 account_name: item.account_name,
                 account_number: item.account_number,
@@ -286,6 +288,21 @@ export default function UpdateEmployee() {
                                         {fields.map((item, index) => (
                                         <div key={item.id} className="mb-4">
                                             <div className="mb-4">
+                                            <FormField
+                                                control={form.control}
+                                                name={`bank.${index}.id`}
+                                                render={({ field }) => (
+                                                    <Input 
+                                                        onValueChange={(value) => {
+                                                            console.log('ID yang diubah:', value); // Log perubahan ID
+                                                            field.onChange(value);
+                                                        }}
+                                                        {...field}
+                                                        type="hidden" 
+                                                        value={field.value ?? ""} 
+                                                    />
+                                                )}
+                                            />
                                             <Label className="block text-sm mb-2">Bank</Label>
                                             <FormField
                                                 control={form.control}
@@ -350,7 +367,7 @@ export default function UpdateEmployee() {
                                             type="button"
                                             variant="ghost"
                                             className="text-blue-600 text-xs"
-                                            onClick={() => append({ bank_id: "", account_name: "", account_number: "" })} // Menambah item baru
+                                            onClick={() => append({ bank_id: "", account_name: "", account_number: "", id: "" })} // Menambah item baru
                                         >
                                             <Plus className="w-4 h-4 mr-1" /> Tambah item
                                         </Button>
