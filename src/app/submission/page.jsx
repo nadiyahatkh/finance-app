@@ -32,7 +32,7 @@ export default function SubmissionAdmin(){
     const [isLoadingTolak, setIsLoadingTolak] = useState(false);
     const [notes, setNotes] = useState('')
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-  
+    const [isApprovedAllDialogOpen, setIsApprovedAllDialogOpen] = useState(false)
     const [date, setDate] = useState();
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
@@ -109,6 +109,7 @@ export default function SubmissionAdmin(){
     try {
       await approvedAllSubmission({ token });
       submissionData()
+      setIsApprovedAllDialogOpen(false)
       setOpenSuccess(true)
     } catch (error) {
       let message = '';
@@ -119,7 +120,7 @@ export default function SubmissionAdmin(){
           message = error.message || "An unexpected error occurred.";
           setErrorMessages([message]);
       }
-
+      setIsApprovedAllDialogOpen(false)
       setOpenError(true);
       console.error('Error creating asset:', error);
     } finally {
@@ -166,45 +167,45 @@ export default function SubmissionAdmin(){
           </div>
           {/* Right section */}
           <div className="flex items-center space-x-4">
-          <Popover>
-  <PopoverTrigger asChild>
-    <Button
-      id="date"
-      variant={"outline"}
-      className={cn(
-        "w-[300px] justify-start text-left font-normal",
-        !date && "text-muted-foreground"
-      )}
-    >
-      <CalendarIcon className="mr-2 h-4 w-4" />
-      {date?.from ? (
-        date.to ? (
-          <>
-            {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
-          </>
-        ) : (
-          format(date.from, "LLL dd, y")
-        )
-      ) : (
-        <span>Pick a date</span>
-      )}
-    </Button>
-  </PopoverTrigger>
-  <PopoverContent className="w-auto p-0" align="start">
-    <Calendar
-      initialFocus
-      mode="range"
-      defaultMonth={date?.from || new Date().setMonth(0)} // Start of the year
-      selected={date}
-      onSelect={(selectedDate) => {
-        setDate(selectedDate);
-        // Trigger fetching data when date is selected
-        submissionData();
-      }}
-      numberOfMonths={2}
-    />
-  </PopoverContent>
-</Popover>
+            <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "w-[300px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from || new Date().setMonth(0)} // Start of the year
+                selected={date}
+                onSelect={(selectedDate) => {
+                  setDate(selectedDate);
+                  // Trigger fetching data when date is selected
+                  submissionData();
+                }}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
 
 
               {/* {!isDateDefault() && (
@@ -250,6 +251,8 @@ export default function SubmissionAdmin(){
               totalPage={totalPage} 
               perPage={perPage} 
               setPerPage={setPerPage}
+              setIsApprovedAllDialogOpen={setIsApprovedAllDialogOpen}
+              isApprovedAllDialogOpen={isApprovedAllDialogOpen}
           />
           </div>
         </CardContent>

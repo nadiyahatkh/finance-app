@@ -50,12 +50,13 @@ import { incomeType, statuses } from './data';
 
 
 
-export function DataTable({ columns, data, search, setSearch, openSuccess, setOpenSuccess, handleApproveAll, handleDeniedAll, notes, setNotes, errorMessages , openError,setOpenError, isDialogOpen, setIsDialogOpen, isLoadingTolak, setIsLoadingTolak, statusFilter , setStatusFilter, totalPage, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading, typeFilter, setTypeFilter}) {
+export function DataTable({ columns, data, search, setSearch, openSuccess, setOpenSuccess, handleApproveAll, handleDeniedAll,setIsApprovedAllDialogOpen,isApprovedAllDialogOpen, notes, setNotes, errorMessages , openError,setOpenError, isDialogOpen, setIsDialogOpen, isLoadingTolak, statusFilter , setStatusFilter, totalPage, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading, typeFilter, setTypeFilter}) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [isSelectDeleteOpen, setIsSelectDeleteOpen] = useState(false);
   const [pendingSearch, setPendingSearch] = useState(search);
+  
 
   const table = useReactTable({
     data,
@@ -199,18 +200,34 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
                           </form>
                         </DialogContent>
                       </Dialog>
-        <Button className="" disabled={isLoading} onClick={handleApproveAll} style={{ background: "#F9B421" }}>
-        {isLoading ? (
-            <ThreeDots
-              height="15"
-              width="15"
-              color="#ffffff"
-              ariaLabel="hearts-loading"
-            />
-          ) : (
-            'Setujui Semua'
-          )}
-        </Button>
+              <Button className="" onClick={() => setIsApprovedAllDialogOpen(true)} style={{ background: "#F9B421" }}>
+                  Setujui Semua
+              </Button>
+              <AlertDialog open={isApprovedAllDialogOpen} onClose={() => setIsApprovedAllDialogOpen(false)}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Ingin Mensetujui semua pengajuan ini?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setIsApprovedAllDialogOpen(false)}>Batal</AlertDialogCancel>
+                  <AlertDialogAction disabled={isLoading} onClick={handleApproveAll} className="bg-[#F9B421]">
+                  {isLoading ? (
+                                  <ThreeDots
+                                  height="20"
+                                  width="20"
+                                  color="#ffffff"
+                                  ariaLabel="loading"
+                                  />
+                                ) : (
+                                  'Ya'
+                                )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
         {/* Success Dialog */}
         <AlertDialog open={openSuccess} onOpenChange={setOpenSuccess}>
