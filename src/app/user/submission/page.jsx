@@ -158,6 +158,21 @@ export default function SubmissionUser() {
         return numberFormat.format(numberValue).replace('Rp', 'Rp ');
       };
 
+      useEffect(() => {
+        const calculateTotal = () => {
+            const totalAmount = fields.reduce((acc, item) => {
+                const quantity = Number(item.quantity) || 0; // Pastikan quantity adalah angka
+                const price = Number(String(item.price).replace(/[^0-9]/g, '')) || 0; // Pastikan price adalah angka
+                return acc + quantity * price; // Tambahkan total per item
+            }, 0);
+            setTotal(totalAmount); // Update state total
+        };
+    
+        calculateTotal();
+    }, [fields]); // Memantau perubahan pada fields
+    
+    
+
     return(
         <div className="py-4">
             <div className="w-full max-w-7xl mx-auto">
@@ -372,12 +387,24 @@ export default function SubmissionUser() {
                                         </Button>
                                         </div>
                                         <div className="mt-4">
-                                        <div className="flex justify-end font-bold text-lg">
-                                            Total: Rp. {/* Bisa tambahkan logika untuk menghitung total */}
+                                            <div className="flex justify-end font-bold text-lg">
+                                                Total: {new Intl.NumberFormat('id-ID', {
+                                                    style: 'currency',
+                                                    currency: 'IDR',
+                                                    minimumFractionDigits: 0,
+                                                }).format(total)}
+                                            </div>
                                         </div>
-                                        </div>
+
                                     </CardContent>
                                     </Card>
+                                </div>
+                                <div className="mb-4">
+                                    <span className="text-muted-foreground text-sm">Jumlah keseluruhan: {new Intl.NumberFormat('id-ID', {
+                                        style: 'currency',
+                                        currency: 'IDR',
+                                        minimumFractionDigits: 0,
+                                    }).format(total)}</span>
                                 </div>
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2 font-semibold">Bukti Pembayaran/Pengeluaran</Label>

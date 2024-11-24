@@ -252,7 +252,7 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
                 <AlertDialogDescription className="">Anda telah berhasil mensetujui semua pengajuan ini.</AlertDialogDescription>
                 <AlertDialogAction
                     onClick={() => setOpenSuccess(false)}
-                    style={{ background: "#4F46E5" }}
+                    style={{ background: "#F9B421" }}
                     className="w-full"
                 >
                     Kembali

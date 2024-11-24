@@ -47,6 +47,7 @@ export default function UpdateProfile() {
     const [banks, setBanks] = useState()
     const [bankId, setBankId] = useState()
     const [id, setId] = useState()
+    const [total, setTotal] = useState(0)
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -147,6 +148,19 @@ export default function UpdateProfile() {
             form.setValue('path', e.target.files);
         }
     };
+
+    useEffect(() => {
+        const calculateTotal = () => {
+            const totalAmount = fields.reduce((acc, item) => {
+                const quantity = Number(item.quantity) || 0;
+                const price = Number(String(item.price).replace(/[^0-9]/g, '')) || 0;
+                return acc + quantity * price;
+            }, 0);
+            setTotal(totalAmount);
+        };
+    
+        calculateTotal();
+    }, [fields]);
 
     return(
         <>
@@ -330,8 +344,24 @@ export default function UpdateProfile() {
                                             <Plus className="w-4 h-4 mr-1" /> Tambah item
                                         </Button>
                                         </div>
+                                        <div className="mt-4">
+                                            <div className="flex justify-end font-bold text-lg">
+                                                Total: {new Intl.NumberFormat('id-ID', {
+                                                    style: 'currency',
+                                                    currency: 'IDR',
+                                                    minimumFractionDigits: 0,
+                                                }).format(total)}
+                                            </div>
+                                        </div>
                                     </CardContent>
                                     </Card>
+                                </div>
+                                <div className="mb-4">
+                                    <span className="text-muted-foreground text-sm">Jumlah keseluruhan: {new Intl.NumberFormat('id-ID', {
+                                        style: 'currency',
+                                        currency: 'IDR',
+                                        minimumFractionDigits: 0,
+                                    }).format(total)}</span>
                                 </div>
                                 <div className="flex justify-end">
                                     <Button type="submit" onClick={() => console.log(form)} disabled={isLoading} className="px-4 py-2 font-semibold rounded-lg" style={{ background: "#F9B421" }}>
