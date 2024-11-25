@@ -17,13 +17,13 @@ export const statuses = [
 
 export const incomeType = [
   {
-    label: "Reimburesment",
-    value: "Reimburesent",
+    label: "Reimbursement",
+    value: "Reimburesment",
     icon: ArrowUpIcon
   },
   {
     label: "Payment Request",
-    value: "Payment Process",
+    value: "Payment Request",
     icon: ArrowDownIcon
   }
 ];

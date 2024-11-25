@@ -70,7 +70,7 @@ export const columns = [
     header: 'Type',
     cell: ({ row }) => {
       const type = row.original.type;
-      const bgColor = type === "Payment Process" ? "bg-blue-500" : "bg-green-500";
+      const bgColor = type === "Payment Request" ? "bg-blue-500" : "bg-green-500";
 
       return (
         <span className={`px-2 rounded text-white text-sm ${bgColor}`}>

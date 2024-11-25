@@ -64,8 +64,8 @@ export default function Dashboard(){
         const dashboardData = await fetchDashboard({ token, month: selectedMonth });
         const formattedChartData = dashboardData.data.chart.map((item) => ({
           month: item.month,
-          Reimburesent: item.types.Reimburesent,
-          PaymentProcess: item.types["Payment Process"],
+          Reimbursement: item.types.Reimbursement,
+          PaymentRequest: item.types["Payment Request"],
         }));
         setChartData(formattedChartData);
       } catch (error) {
@@ -152,16 +152,16 @@ export default function Dashboard(){
                   cursor={false}
                   content={<ChartTooltipContent indicator="dashed" />}
                 />
-                <Bar dataKey="Reimburesent" fill="#28A745" radius={4} barSize={30} />
-                <Bar dataKey="PaymentProcess" fill="#2563EB" radius={4} barSize={30} />
+                <Bar dataKey="Reimbursement" fill="#28A745" radius={4} barSize={30} />
+                <Bar dataKey="PaymentRequest" fill="#2563EB" radius={4} barSize={30} />
               </BarChart>
             </ChartContainer>
             <div className="flex justify-center items-center space-x-4">
               <p className="flex items-center font-semibold text-sm">
-                <Circle className="h-4 w-4 mr-2 fill-green-600" style={{ color: "#28A745" }} /> Reimburesent
+                <Circle className="h-4 w-4 mr-2 fill-green-600" style={{ color: "#28A745" }} /> Reimbursement
               </p>
               <p className="flex items-center font-semibold text-sm">
-                <Circle className="h-4 w-4 mr-2 fill-blue-600" style={{ color: "#2563EB" }} /> Payment Process
+                <Circle className="h-4 w-4 mr-2 fill-blue-600" style={{ color: "#2563EB" }} /> Payment Request
               </p>
             </div>
           </CardContent>

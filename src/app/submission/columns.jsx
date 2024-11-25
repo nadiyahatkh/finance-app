@@ -1,7 +1,7 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { TrendingUp, TrendingDown, MoreHorizontal, Trash2, PencilLine, CheckCheckIcon, XCircle, RefreshCw, RotateCw, Info } from "lucide-react";
+import { TrendingUp, TrendingDown, MoreHorizontal, Trash2, PencilLine, CheckCheckIcon, XCircle, RefreshCw, RotateCw, Info, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -106,7 +106,7 @@ export const columns = [
     header: 'Type',
     cell: ({ row }) => {
       const type = row.original.type;
-      const bgColor = type === "Payment Process" ? "bg-blue-500" : "bg-green-500";
+      const bgColor = type === "Payment Request" ? "bg-blue-500" : "bg-green-500";
 
       return (
         <span className={`px-2 rounded text-white text-sm ${bgColor}`}>
@@ -162,25 +162,11 @@ export const columns = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>
             <Link href={`./submission/detail-submission/${id}`} className="flex items-center">
-                <PencilLine className="mr-2 h-4 w-4" />
+                <Eye className="mr-2 h-4 w-4" />
                 Detail
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
-          {/* <AlertDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Tindakan ini tidak dapat dibatalkan. Ini akan menghapus data secara permanen dari server.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Batal</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog> */}
         </DropdownMenu>
       );
     }

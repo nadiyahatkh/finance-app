@@ -148,8 +148,8 @@ export default function DetailSubmission() {
                     <div className="text-muted-foreground">Tipe</div>
                     <div
                       className={`font-semibold w-[90px] rounded text-white px-1 ${
-                        detail?.type === 'Reimburesent' ? 'bg-green-500' : 
-                        detail?.type === 'Payment Process' ? 'bg-blue-500' : ''
+                        detail?.type === 'Reimbursement' ? 'bg-green-500' : 
+                        detail?.type === 'Payment Request' ? 'bg-blue-500' : ''
                       }`}
                     >
                       {detail?.type}

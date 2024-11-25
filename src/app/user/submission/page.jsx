@@ -274,7 +274,6 @@ export default function SubmissionUser() {
                                             className=""
                                             placeholder="Masukan Nama Rekening..."
                                             type="text"
-                                            readOnly
                                             />
                                         </div>
                                         <div className="w-full ml-2">
@@ -317,7 +316,6 @@ export default function SubmissionUser() {
                                         className=""
                                         placeholder="Masukan Nomor Rekening..."
                                         type="text"
-                                        readOnly
                                     />
                                 </div>
                                 <hr className="mb-4" />
@@ -376,15 +374,7 @@ export default function SubmissionUser() {
                                             <Plus className="w-4 h-4 mr-1" /> Tambah item
                                         </Button>
                                         </div>
-                                        <div className="mt-4">
-                                            <div className="flex justify-end font-bold text-lg">
-                                                Total: {new Intl.NumberFormat('id-ID', {
-                                                    style: 'currency',
-                                                    currency: 'IDR',
-                                                    minimumFractionDigits: 0,
-                                                }).format(total)}
-                                            </div>
-                                        </div>
+                                    
 
                                     </CardContent>
                                     </Card>
