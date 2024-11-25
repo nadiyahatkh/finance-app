@@ -116,8 +116,6 @@ export const columns = [
   cell: ({ row }) => {
     const submission = row.original;
     const id = submission.id;
-
-    // Cek apakah salah satu admin_approvals memiliki status "denied" atau "approved"
     const isEditable = !submission.admin_approvals.some(
       (approval) => approval.status === 'denied' || approval.status === 'approved'
     );
