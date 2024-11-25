@@ -45,6 +45,7 @@ export default function UpdateSubmission(){
     const [pdfFiles, setPdfFiles] = useState([]);
     const [deletedImages, setDeletedImages] = useState([]);
     const router = useRouter()
+    const [total, setTotal] = useState(0)
 
     const FormSchema = z.object({
         due_date: z.date().optional(),
@@ -227,6 +228,19 @@ const formatPrice = (value) => {
     return numberFormat.format(numberValue).replace('Rp', 'Rp ');
   };
 
+  useEffect(() => {
+    const calculateTotal = () => {
+        const totalAmount = fields.reduce((acc, item) => {
+            const quantity = Number(item.quantity) || 0; // Pastikan quantity adalah angka
+            const price = Number(String(item.price).replace(/[^0-9]/g, '')) || 0; // Pastikan price adalah angka
+            return acc + quantity * price; // Tambahkan total per item
+        }, 0);
+        setTotal(totalAmount); // Update state total
+    };
+
+    calculateTotal();
+}, [fields]); // Memantau perubahan pada fields
+
     return(
         <div className="py-4">
             <div className="w-full max-w-7xl mx-auto">
@@ -261,8 +275,8 @@ const formatPrice = (value) => {
                                         render={({ field }) => (
                                             <RadioGroup
                                             onValueChange={(value) => {
-                                                field.onChange(value); // Mengupdate nilai form
-                                                setTransactionType(value); // Menyimpan nilai pada state lokal
+                                                field.onChange(value);
+                                                setTransactionType(value);
                                               }}
                                               value={field.value?.toString() || ""}
                                             >
@@ -301,8 +315,6 @@ const formatPrice = (value) => {
                                     />
                                 </div>
                                 <div className="mb-4">
-                                    <div className="flex justify-between items-center">
-                                        <div className="w-full mr-2">
                                             <Label className="block text-sm mb-2">Jangka Waktu</Label>
                                             <FormField
                                             control={form.control}
@@ -325,12 +337,6 @@ const formatPrice = (value) => {
                                             </Popover>
                                             )}
                                         />
-                                        </div>
-                                        <div className="w-full ml-2">
-                                            <Label className="block text-sm mb-2">Jumlah (RP)</Label>
-                                            <Input type="" placeholder="Rp." />
-                                        </div>
-                                    </div>
                                 </div>
                                 <div className="mb-4">
                                     <div className="flex justify-between items-center">
@@ -398,7 +404,7 @@ const formatPrice = (value) => {
                                             <Label className="block text-sm mb-2">Deskripsi</Label>
                                             <FormField
                                                 control={form.control}
-                                                name={`submission_item.${index}.description`} // Nama yang unik untuk setiap field deskripsi
+                                                name={`submission_item.${index}.description`}
                                                 render={({ field }) => (
                                                 <Input {...field} placeholder="Contoh: Pembelian Laptop untuk karyawan" />
                                                 )}
@@ -409,7 +415,7 @@ const formatPrice = (value) => {
                                                 <Label className="block text-sm mb-2">Kuantitas</Label>
                                                 <FormField
                                                 control={form.control}
-                                                name={`submission_item.${index}.quantity`} // Nama yang unik untuk setiap field kuantitas
+                                                name={`submission_item.${index}.quantity`}
                                                 render={({ field }) => (
                                                     <Input {...field} placeholder="Masukan jumlah..." type="number" />
                                                 )}
@@ -419,7 +425,7 @@ const formatPrice = (value) => {
                                                 <Label className="block text-sm mb-2">Jumlah (Rp)</Label>
                                                 <FormField
                                                 control={form.control}
-                                                name={`submission_item.${index}.price`} // Nama yang unik untuk setiap field jumlah
+                                                name={`submission_item.${index}.price`}
                                                 render={({ field }) => (
                                                     <Input {...field} placeholder="Masukan harga..." type="text"  onChange={(e) => field.onChange(formatPrice(e.target.value))} />
                                                 )}
@@ -438,18 +444,29 @@ const formatPrice = (value) => {
                                             type="button"
                                             variant="ghost"
                                             className="text-blue-600 text-xs"
-                                            onClick={() => append({ description: "", quantity: "", price: "" })} // Menambah item baru
+                                            onClick={() => append({ description: "", quantity: "", price: "" })} 
                                         >
                                             <Plus className="w-4 h-4 mr-1" /> Tambah item
                                         </Button>
                                         </div>
                                         <div className="mt-4">
-                                        <div className="flex justify-end font-bold text-lg">
-                                            Total: Rp. {/* Bisa tambahkan logika untuk menghitung total */}
-                                        </div>
+                                            <div className="flex justify-end font-bold text-lg">
+                                                Total: {new Intl.NumberFormat('id-ID', {
+                                                    style: 'currency',
+                                                    currency: 'IDR',
+                                                    minimumFractionDigits: 0,
+                                                }).format(total)}
+                                            </div>
                                         </div>
                                     </CardContent>
                                     </Card>
+                                </div>
+                                <div className="mb-4">
+                                    <span className="text-muted-foreground text-sm">Jumlah keseluruhan: {new Intl.NumberFormat('id-ID', {
+                                        style: 'currency',
+                                        currency: 'IDR',
+                                        minimumFractionDigits: 0,
+                                    }).format(total)}</span>
                                 </div>
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2 font-semibold">Bukti Pembayaran/Pengeluaran</Label>

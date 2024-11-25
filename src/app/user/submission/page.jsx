@@ -161,15 +161,15 @@ export default function SubmissionUser() {
       useEffect(() => {
         const calculateTotal = () => {
             const totalAmount = fields.reduce((acc, item) => {
-                const quantity = Number(item.quantity) || 0; // Pastikan quantity adalah angka
-                const price = Number(String(item.price).replace(/[^0-9]/g, '')) || 0; // Pastikan price adalah angka
-                return acc + quantity * price; // Tambahkan total per item
+                const quantity = Number(item.quantity) || 0;
+                const price = Number(String(item.price).replace(/[^0-9]/g, '')) || 0;
+                return acc + quantity * price;
             }, 0);
-            setTotal(totalAmount); // Update state total
+            setTotal(totalAmount);
         };
     
         calculateTotal();
-    }, [fields]); // Memantau perubahan pada fields
+    }, [fields]);
     
     
 
@@ -246,34 +246,26 @@ export default function SubmissionUser() {
                                     />
                                 </div>
                                 <div className="mb-4">
-                                    <div className="flex justify-between items-center">
-                                        <div className="w-full mr-2">
-                                            <Label className="block text-sm mb-2">Jangka Waktu</Label>
-                                            <FormField
-                                            control={form.control}
-                                            name="due_date"
-                                            render={({ field }) => (
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button variant="outline" className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                                    {field.value ? format(field.value, 'PPP') : <span>Pilih tanggal pengajuan</span>}
-                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date().setHours(0, 0, 0, 0)} initialFocus />
-                                                </PopoverContent>
-                                            </Popover>
-                                            )}
-                                        />
-                                        </div>
-                                        <div className="w-full ml-2">
-                                            <Label className="block text-sm mb-2">Jumlah (RP)</Label>
-                                            <Input type="" placeholder="Rp." />
-                                        </div>
-                                    </div>
+                                    <Label className="block text-sm mb-2">Jangka Waktu</Label>
+                                    <FormField
+                                    control={form.control}
+                                    name="due_date"
+                                    render={({ field }) => (
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button variant="outline" className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                            {field.value ? format(field.value, 'PPP') : <span>Pilih tanggal pengajuan</span>}
+                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date().setHours(0, 0, 0, 0)} initialFocus />
+                                        </PopoverContent>
+                                    </Popover>
+                                    )}
+                                    />
                                 </div>
                                 <div className="mb-4">
                                     <div className="flex justify-between items-center">
@@ -297,7 +289,7 @@ export default function SubmissionUser() {
                                                     <Select
                                                     value={field.value ? field.value.toString() : ""}
                                                     onValueChange={(value) => {
-                                                        field.onChange(value); // Update react-hook-form state
+                                                        field.onChange(value);
                                                         setBankId(value);
                                                     }}
                                                     {...field}
@@ -341,7 +333,7 @@ export default function SubmissionUser() {
                                             <Label className="block text-sm mb-2">Deskripsi</Label>
                                             <FormField
                                                 control={form.control}
-                                                name={`submission_item.${index}.description`} // Nama yang unik untuk setiap field deskripsi
+                                                name={`submission_item.${index}.description`}
                                                 render={({ field }) => (
                                                 <Input {...field} placeholder="Contoh: Pembelian Laptop untuk karyawan" />
                                                 )}
@@ -352,7 +344,7 @@ export default function SubmissionUser() {
                                                 <Label className="block text-sm mb-2">Kuantitas</Label>
                                                 <FormField
                                                 control={form.control}
-                                                name={`submission_item.${index}.quantity`} // Nama yang unik untuk setiap field kuantitas
+                                                name={`submission_item.${index}.quantity`}
                                                 render={({ field }) => (
                                                     <Input {...field} placeholder="Masukan jumlah..." type="number" />
                                                 )}
@@ -362,7 +354,7 @@ export default function SubmissionUser() {
                                                 <Label className="block text-sm mb-2">Jumlah (Rp)</Label>
                                                 <FormField
                                                 control={form.control}
-                                                name={`submission_item.${index}.price`} // Nama yang unik untuk setiap field jumlah
+                                                name={`submission_item.${index}.price`}
                                                 render={({ field }) => (
                                                     <Input {...field} placeholder="Masukan harga..." type="text" onChange={(e) => field.onChange(formatPrice(e.target.value))} />
                                                 )}
@@ -381,7 +373,7 @@ export default function SubmissionUser() {
                                             type="button"
                                             variant="ghost"
                                             className="text-blue-600 text-xs"
-                                            onClick={() => append({ description: "", quantity: "", price: "" })} // Menambah item baru
+                                            onClick={() => append({ description: "", quantity: "", price: "" })} 
                                         >
                                             <Plus className="w-4 h-4 mr-1" /> Tambah item
                                         </Button>
