@@ -56,14 +56,14 @@ export function DataTable({ columns, data, search, setSearch,typeFilter, setType
   const table = useReactTable({
     data,
     columns,
-    pageCount: totalPage, // Tambahkan totalPage
-    manualPagination: true, // Gunakan paginasi manual
+    pageCount: totalPage,
+    manualPagination: true,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       pagination: {
-        pageIndex: currentPage - 1, // halaman dalam index-based
+        pageIndex: currentPage - 1,
         pageSize: perPage,
       },
     },
@@ -71,7 +71,7 @@ export function DataTable({ columns, data, search, setSearch,typeFilter, setType
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: (updater) => {
       const pageIndex = typeof updater === "function" ? updater(table.getState().pagination).pageIndex : updater.pageIndex;
-      setPage(pageIndex + 1); // perbarui halaman ke state
+      setPage(pageIndex + 1);
     },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
@@ -80,15 +80,8 @@ export function DataTable({ columns, data, search, setSearch,typeFilter, setType
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-//   const handleDelete = () => {
-//     const deleteRows = table.getSelectedRowModel().rows.map(row => row.original.id);
-//     onDelete(deleteRows);
-//     setIsSelectDeleteOpen(false);
-//   };
-
 
 const isFiltered = statusFilter.length > 0 || typeFilter.length > 0;
-//   const isFiltered = statusFilter.length > 0;
 
   const handleSearchKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -146,26 +139,6 @@ const isFiltered = statusFilter.length > 0 || typeFilter.length > 0;
             <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
         )}
-        {/* {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-          <Button variant="outline" size="sm" onClick={() => setIsSelectDeleteOpen(true)} className="ml-4">
-            <TrashIcon className="mr-2 size-4" aria-hidden="true" />
-            Delete ({table.getFilteredSelectedRowModel().rows.length})
-          </Button>
-        ) : null}
-        <AlertDialog open={isSelectDeleteOpen} onClose={() => setIsSelectDeleteOpen(false)}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Tindakan ini tidak dapat dibatalkan. Ini akan menghapus Rows secara permanen dari server.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setIsSelectDeleteOpen(false)}>Batal</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog> */}
         </div>
         
 

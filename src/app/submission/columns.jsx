@@ -1,12 +1,13 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { TrendingUp, TrendingDown, MoreHorizontal, Trash2, PencilLine, CheckCheckIcon, XCircle, RefreshCw, RotateCw } from "lucide-react";
+import { TrendingUp, TrendingDown, MoreHorizontal, Trash2, PencilLine, CheckCheckIcon, XCircle, RefreshCw, RotateCw, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { formatCurrency } from "../utils/formatCurrency";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 export const columns = [
   {
@@ -61,11 +62,38 @@ export const columns = [
     header: 'Tanggal Pembayaran',
     cell: ({ row }) => {
       const dueDate = new Date(row.original.due_date);
-      return dueDate.toLocaleDateString("id-ID", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      }).replace(/\//g, '-');
+      const today = new Date();
+      const diffTime = Math.abs(dueDate - today);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const isNearDue = diffDays <= 7;
+  
+      return (
+        <div className="flex items-center space-x-2">
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <div
+                className={`flex items-center ${
+                  isNearDue ? "text-red-500" : ""
+                }`}
+              >
+                {dueDate.toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }).replace(/\//g, '-')}
+                {isNearDue && (
+                  <Info className="ml-2 h-4 w-4 text-red-500" />
+                )}
+              </div>
+            </HoverCardTrigger>
+            {isNearDue && (
+              <HoverCardContent>
+                Waktu pembayaran mendekati waktu tempo. Harap segera melakukan tindakan.
+              </HoverCardContent>
+            )}
+          </HoverCard>
+        </div>
+      );
     },
   },
   {

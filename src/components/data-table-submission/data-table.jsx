@@ -61,14 +61,14 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
   const table = useReactTable({
     data,
     columns,
-    pageCount: totalPage, // Tambahkan totalPage
-    manualPagination: true, // Gunakan paginasi manual
+    pageCount: totalPage,
+    manualPagination: true,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       pagination: {
-        pageIndex: currentPage - 1, // halaman dalam index-based
+        pageIndex: currentPage - 1,
         pageSize: perPage,
       },
     },
@@ -76,7 +76,7 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: (updater) => {
       const pageIndex = typeof updater === "function" ? updater(table.getState().pagination).pageIndex : updater.pageIndex;
-      setPage(pageIndex + 1); // perbarui halaman ke state
+      setPage(pageIndex + 1);
     },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
