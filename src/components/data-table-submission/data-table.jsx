@@ -107,7 +107,7 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
       <div className='flex flex-wrap items-center justify-between'>
         <div className='flex items-center py-4'>
         <Input
-          placeholder="Filter labels..."
+          placeholder="Filter pengajuan..."
           value={pendingSearch}
             onChange={(e) => handleOnChangeSearch(e)}
             onKeyDown={handleSearchKeyDown}

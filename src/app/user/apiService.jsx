@@ -118,8 +118,6 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
           });
         }
 
-        console.log(data.delete_images)
-
         if (data.delete_images && data.delete_images.length > 0) {
           data.delete_images.forEach((file) => {
           formData.append('delete_files[]', file);

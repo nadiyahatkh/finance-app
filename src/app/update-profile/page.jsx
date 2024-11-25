@@ -57,8 +57,6 @@ export default function UpdateProfilAdmin() {
             }
     
             filteredData.path = data.path ? data.path[0] : null;
-
-            console.log('Filtered Data:', filteredData);
     
             const result = await updateProfileAdmin({ data: filteredData, token });
             setOpenSuccess(true);
@@ -85,7 +83,6 @@ export default function UpdateProfilAdmin() {
         const fetchData = async () => {
             if(token) {
                 const response = await fetchProfileAdminId({ token });
-                console.log(fetchProfileAdminId)
                 form.setValue('name', response.user.name, {shouldValidate: true})
                 form.setValue('username', response.user.username, {shouldValidate: true})
                 form.setValue('email', response.user.email, {shouldValidate: true})

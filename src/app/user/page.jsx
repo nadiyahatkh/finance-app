@@ -30,21 +30,9 @@ export default function HomeUser() {
   const [perPage, setPerPage] = useState(10)
   const [totalPage, setTotalPage] = useState(0);
 
-  
-  // const { data: dataSubmissionUser, error, isLoading } = useQuery({
-  //   queryKey: ['usersubmissions', search, typeFilter, statusFilter, page, perPage],
-  //   refetchOnWindowFocus: false,
-  //   queryFn: () => fetchSubmissionUser({token, search, page, per_page: perPage, type: typeFilter, finish_status: statusFilter}),
-  // });
-
-  // console.log(dataSubmissionUser)
-
-  // const submissionData = dataSubmissionUser?.data.data || [];
-  // const totalPage = dataSubmissionUser?.data.last_page || 1; 
   const submissionData = async () => {
     try {
         const pengajuan = await fetchSubmissionUser({ token, search, page, per_page: perPage,  finish_status: statusFilter, type: typeFilter});
-        console.log(pengajuan)
         setData(pengajuan.data.data);
         setTotalPage(pengajuan.data.last_page)
       } catch (error) {
@@ -62,7 +50,6 @@ export default function HomeUser() {
     const loadData = async () => {
       try {
         const data = await fetchAmount({ token });
-        console.log(data)
         setCardData([
           {
             label: "Permintaan Tertunda",

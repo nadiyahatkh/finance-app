@@ -109,7 +109,7 @@ const isFiltered = statusFilter.length > 0 || typeFilter.length > 0;
       <div className='flex items-center justify-between'>
         <div className='flex items-center py-4'>
         <Input
-          placeholder="Filter labels..."
+          placeholder="Filter pengajuan..."
           value={pendingSearch}
             onChange={(e) => handleOnChangeSearch(e)}
             onKeyDown={handleSearchKeyDown}

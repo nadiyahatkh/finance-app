@@ -159,11 +159,9 @@ export default function UpdateEmployee() {
             delete filteredData.password;
         }
         setIsLoading(true)
-        console.log("Token:", token);
         try {
         const result = await updateUsers({ data: filteredData, token, id });
         setOpenSuccess(true)
-        console.log(result)
         } catch (error) {
             let message = '';
         try {
@@ -294,7 +292,6 @@ export default function UpdateEmployee() {
                                                 render={({ field }) => (
                                                     <Input 
                                                         onValueChange={(value) => {
-                                                            console.log('ID yang diubah:', value); // Log perubahan ID
                                                             field.onChange(value);
                                                         }}
                                                         {...field}
@@ -463,7 +460,6 @@ export default function UpdateEmployee() {
                             <div className="flex justify-end">
                             <Button
                             type="submit"
-                            onClick={() => console.log(form)}
                             disabled={isLoading}
                             className="px-4 py-2 text-sm font-semibold rounded-lg"
                             style={{ background: "#F9B421" }}

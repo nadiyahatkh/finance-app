@@ -62,7 +62,6 @@ export default function SubmissionUser() {
         const loadData = async () => {
           try {
             const response = await fetchSubmissionUser({ token, type: transactionType });
-            console.log(response)
             setData(response);
           } catch (error) {
             console.error('Failed to fetch data:', error);
@@ -92,7 +91,6 @@ export default function SubmissionUser() {
         const fetchData = async () => {
             if (token && bankId) {
                 const response = await fetchBankDetail({ token, id: bankId });
-                console.log(response);
                 setAccountId(response.account_id);
                 setAccountName(response.account_name);
                 setAccountNumber(response.account_number);
@@ -419,7 +417,7 @@ export default function SubmissionUser() {
                                             {selectedFiles.map(file => (
                                                 <Card key={file.name} className="flex justify-between items-center">
                                                     <span className="text-sm text-muted-foreground p-2">{file.file.name}</span>
-                                                    <Button type="button" variant="danger" onClick={() => handleRemoveFile(file.name)}>
+                                                    <Button type="button" variant="danger" onClick={() => handleRemoveFile(file.file.name)}>
                                                         <CircleX className="h-4 w-4"/>
                                                     </Button>
                                                 </Card>
@@ -431,7 +429,6 @@ export default function SubmissionUser() {
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    onClick={() => console.log(form)}
                                     className="px-4 py-2 text-sm font-semibold rounded-lg text-black"
                                     style={{ background: "#F9B421" }}
                                     >

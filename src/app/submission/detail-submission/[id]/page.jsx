@@ -35,7 +35,6 @@ export default function DetailSubmission() {
     const loadDetail = async () => {
       if (token && submissionId) {
         const response = await fetchSubmissionDetail({ token, id: submissionId });
-        console.log(response);
         setDetail(response?.submission);
         const adminApproval = response?.submission?.admin_approvals?.find(
           (approval) => approval.user_id === currentAdminId

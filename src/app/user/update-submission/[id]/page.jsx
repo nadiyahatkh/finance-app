@@ -75,7 +75,6 @@ export default function UpdateSubmission(){
         const fetchData = async () => {
           if (token && id) {
             const response = await submissionDetailId({ token, id });
-            console.log(response);
       
             form.setValue('bank_account_id', response.data.bank_account_id, { shouldValidate: true });
             form.setValue('purpose', response.data.purpose, { shouldValidate: true });
@@ -116,19 +115,19 @@ export default function UpdateSubmission(){
         }
     }, [token, transactionType]);
 
-    useEffect(() => {
-        const fetchSubmissions = async () => {
-            if (transactionType === "Reimburesent" ) {
-                const response = await fetchSubmissionUser({ token, type: transactionType });
-                console.log(response)
-                setData(response);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchSubmissions = async () => {
+    //         if (transactionType === "Reimburesent" ) {
+    //             const response = await fetchSubmissionUser({ token, type: transactionType });
+    //             console.log(response)
+    //             setData(response);
+    //         }
+    //     };
 
-        if (token && transactionType) {
-            fetchSubmissions();
-        }
-    }, [transactionType, token]);
+    //     if (token && transactionType) {
+    //         fetchSubmissions();
+    //     }
+    // }, [transactionType, token]);
 
       useEffect(() => {
         const loadDataBanks = async () => {
@@ -149,7 +148,6 @@ export default function UpdateSubmission(){
         const fetchData = async () => {
             if (token && bankId) {
                 const response = await fetchBankDetail({ token, id: bankId });
-                console.log(response);
                 setAccountId(response.account_id);
                 setAccountName(response.account_name);
                 setAccountNumber(response.account_number);
@@ -217,29 +215,29 @@ export default function UpdateSubmission(){
             setDeletedImages((prevDeletedPdf) => [...prevDeletedPdf, pdfPath]);
         };
 
-const formatPrice = (value) => {
-    if (!value) return "";
-    const numberValue = Number(value.replace(/[^0-9]/g, ""));
-    const numberFormat = new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    });
-    return numberFormat.format(numberValue).replace('Rp', 'Rp ');
-  };
+        const formatPrice = (value) => {
+            if (!value) return "";
+            const numberValue = Number(value.replace(/[^0-9]/g, ""));
+            const numberFormat = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            });
+            return numberFormat.format(numberValue).replace('Rp', 'Rp ');
+        };
 
-  useEffect(() => {
-    const calculateTotal = () => {
-        const totalAmount = fields.reduce((acc, item) => {
-            const quantity = Number(item.quantity) || 0; // Pastikan quantity adalah angka
-            const price = Number(String(item.price).replace(/[^0-9]/g, '')) || 0; // Pastikan price adalah angka
-            return acc + quantity * price; // Tambahkan total per item
-        }, 0);
-        setTotal(totalAmount); // Update state total
-    };
+        useEffect(() => {
+            const calculateTotal = () => {
+                const totalAmount = fields.reduce((acc, item) => {
+                    const quantity = Number(item.quantity) || 0; // Pastikan quantity adalah angka
+                    const price = Number(String(item.price).replace(/[^0-9]/g, '')) || 0; // Pastikan price adalah angka
+                    return acc + quantity * price; // Tambahkan total per item
+                }, 0);
+                setTotal(totalAmount); // Update state total
+            };
 
-    calculateTotal();
-}, [fields]); // Memantau perubahan pada fields
+            calculateTotal();
+        }, [fields]); // Memantau perubahan pada fields
 
     return(
         <div className="py-4">
@@ -528,7 +526,6 @@ const formatPrice = (value) => {
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    onClick={() => console.log(form)}
                                     className="px-4 py-2 text-sm font-semibold rounded-lg text-black"
                                     style={{ background: "#F9B421" }}
                                     >

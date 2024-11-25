@@ -101,9 +101,7 @@ export default function UpdateProfile() {
         const loadDataBanks = async () => {
             try {
               const bankData = await fetchBankAll({ token });
-              console.log(bankData)
               setBanks(bankData.data);
-              console.log(setBanks)
             } catch (error) {
               console.error('Failed to fetch positions:', error);
             }
@@ -118,7 +116,6 @@ export default function UpdateProfile() {
         const fetchData = async () => {
             if(token) {
                 const response = await fetchProfileUserId({ token });
-                console.log(response)
                 form.setValue('name', response.user.name, {shouldValidate: true})
                 form.setValue('username', response.user.username, {shouldValidate: true})
                 form.setValue('email', response.user.email, {shouldValidate: true})
@@ -252,7 +249,6 @@ export default function UpdateProfile() {
                                                 render={({ field }) => (
                                                     <Input 
                                                         onValueChange={(value) => {
-                                                            console.log('ID yang diubah:', value); // Log perubahan ID
                                                             field.onChange(value);
                                                         }}
                                                         {...field}
@@ -334,7 +330,7 @@ export default function UpdateProfile() {
                                     </Card>
                                 </div>
                                 <div className="flex justify-end">
-                                    <Button type="submit" onClick={() => console.log(form)} disabled={isLoading} className="px-4 py-2 font-semibold rounded-lg" style={{ background: "#F9B421" }}>
+                                    <Button type="submit" disabled={isLoading} className="px-4 py-2 font-semibold rounded-lg" style={{ background: "#F9B421" }}>
                                     {isLoading ? (
                                         <TailSpin
                                         height="20"

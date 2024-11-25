@@ -46,7 +46,6 @@ export default function SubmissionAdmin(){
     try {
       const due_date = date?.from ? format(date.from, "yyyy-MM-dd") : "";
         const pengajuan = await fetchSubmission({ token, search, due_date,page, per_page: perPage,  status: statusFilter, type: typeFilter});
-        console.log(pengajuan )
         setData(pengajuan.submissions.data);
         setTotalPage(pengajuan.submissions.last_page)
       } catch (error) {
@@ -67,7 +66,6 @@ export default function SubmissionAdmin(){
     const loadData = async () => {
       try {
         const data = await fetchAmount({ token });
-        console.log(data)
         setCardData([
           {
             label: "Permintaan Tertunda",
