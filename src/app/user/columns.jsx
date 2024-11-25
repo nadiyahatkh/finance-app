@@ -113,9 +113,14 @@ export const columns = [
   },
   {
     id: 'aksi',
-    cell: ({ row, data }) => {
-      
-      const id = row.original.id;
+  cell: ({ row }) => {
+    const submission = row.original;
+    const id = submission.id;
+
+    // Cek apakah salah satu admin_approvals memiliki status "denied" atau "approved"
+    const isEditable = !submission.admin_approvals.some(
+      (approval) => approval.status === 'denied' || approval.status === 'approved'
+    );
 
       return (
         <DropdownMenu>
@@ -134,12 +139,14 @@ export const columns = [
                 Detail
               </Link>
             </DropdownMenuItem>
+            {isEditable && (
             <DropdownMenuItem>
-            <Link href={`./user/update-submission/${id}`} className="flex items-center">
+              <Link href={`./user/update-submission/${id}`} className="flex items-center">
                 <PencilLine className="mr-2 h-4 w-4" />
                 Update
               </Link>
             </DropdownMenuItem>
+          )}
           </DropdownMenuContent>
         </DropdownMenu>
       );
