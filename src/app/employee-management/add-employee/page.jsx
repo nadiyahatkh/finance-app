@@ -20,7 +20,6 @@ import { createEmployee, fetchDepartments, fetchManagers, fetchPositions } from 
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { fetchBankAll } from "@/app/apiService";
 import { ThreeDots } from "react-loader-spinner";
 import { useRouter } from "next/navigation";
 
@@ -35,8 +34,6 @@ export default function AddEmployee() {
     const [positionId, setPositionId] = useState();
     const [managers, setManagers] = useState()
     const [managerId, setManagerId] = useState()
-    const [banks, setBanks] = useState()
-    const [bankId, setBankId] = useState()
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState("");
     const [openSuccess, setOpenSuccess] = useState(false);
@@ -53,23 +50,12 @@ export default function AddEmployee() {
         department_id: z.string().min(1, { message: "Department wajib diisi." }),
         position_id: z.string().min(1, { message: "Posisi wajib diisi." }),
         manager_id: z.string().min(1, { message: "Manager wajib diisi." }),
-        bank: z.array(
-            z.object({
-              bank_id: z.preprocess((val) => Number((val)), z.number().min(1, { message: "Bank is Required" })),
-              account_name: z.string().min(1, { message: "Nama Rekening is required." }),
-              account_number:  z.preprocess((val) => Number((val)), z.number().min(1, { message: "Nomer Rekening is Required" })),
-            })
-          ).min(1, { message: "At least one submission item is required." }),
         path: z.any().optional()
       });
 
     const form = useForm({
         resolver: zodResolver(FormSchema),
     });
-    const { fields, append, remove } = useFieldArray({
-        control: form.control,
-        name: "bank",
-      });
 
     useEffect(() => {
         const loadDataDepartments = async () => {
@@ -88,14 +74,6 @@ export default function AddEmployee() {
             console.error('Failed to fetch positions:', error);
           }
         };
-        const loadDataBanks = async () => {
-          try {
-            const bankData = await fetchBankAll({ token });
-            setBanks(bankData.data);
-          } catch (error) {
-            console.error('Failed to fetch positions:', error);
-          }
-        };
         const loadDataMangers = async () => {
           try {
             const managerData = await fetchManagers({ token });
@@ -109,7 +87,6 @@ export default function AddEmployee() {
             loadDataMangers();
             loadDataDepartments();
             loadDataPositions();
-            loadDataBanks();
         }
     }, [token])
 
@@ -127,7 +104,6 @@ export default function AddEmployee() {
         data.manager_id = managerId;
         data.departement_id = departmentId;
         data.position_id = positionId;
-        data.bank_id = bankId;
         setIsLoading(true)
         try {
         const result = await createEmployee({ data, token , file: selectedFile });
@@ -264,85 +240,6 @@ export default function AddEmployee() {
                                 )}
                                 />
                             </div>
-                            <div className="mb-4">
-                                    <Label className="block text-sm mb-2">Bank</Label>
-                                    <Card className="">
-                                    <CardContent className="p-4">
-                                        {fields.map((item, index) => (
-                                        <div key={item.id} className="mb-4">
-                                            <div className="mb-4">
-                                            <Label className="block text-sm mb-2">Bank</Label>
-                                            <FormField
-                                                control={form.control}
-                                                name={`bank.${index}.bank_id`}
-                                                render={({ field }) => (
-                                                    <>
-                                                    <Select
-                                                    value={field.value ? field.value.toString() : ""}
-                                                    onValueChange={(value) => {
-                                                        field.onChange(value);
-                                                        setBankId(value);
-                                                    }}
-                                                    {...field}
-                                                    >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Pilih bank untuk ditampilkan" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {banks?.map((bank) => (
-                                                        <SelectItem key={bank.id} value={bank.id.toString()}>{bank.name}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                    </Select>
-                                                    {form.formState.errors.bank_id && (
-                                                        <FormMessage type="error" className="italic">{form.formState.errors.bank_id.message}</FormMessage>
-                                                    )}
-                                                </>
-                                                )}
-                                            />
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                            <div className="w-full mr-2">
-                                                <Label className="block text-sm mb-2">Nama Rekening</Label>
-                                                <FormField
-                                                control={form.control}
-                                                name={`bank.${index}.account_name`}
-                                                render={({ field }) => (
-                                                    <Input {...field} placeholder="Masukan Nama Rekening..." type="text" />
-                                                )}
-                                                />
-                                            </div>
-                                            <div className="w-full ml-2">
-                                                <Label className="block text-sm mb-2">Nomer Rekening</Label>
-                                                <FormField
-                                                control={form.control}
-                                                name={`bank.${index}.account_number`}
-                                                render={({ field }) => (
-                                                    <Input {...field} placeholder="Masukan Nomer Rekening..." type="number" />
-                                                )}
-                                                />
-                                            </div>
-                                            </div>
-                                            <div className="flex justify-end mt-2">
-                                            <Button variant="ghost" className="text-red-600 text-xs" onClick={() => remove(index)}>
-                                                <Trash2 className="w-4 h-4 mr-1" /> Hapus item
-                                            </Button>
-                                            </div>
-                                        </div>
-                                        ))}
-                                        <div className="flex justify-end">
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            className="text-blue-600 text-xs"
-                                            onClick={() => append({ bank_id: "", account_name: "", account_number: "" })}
-                                        >
-                                            <Plus className="w-4 h-4 mr-1" /> Tambah item
-                                        </Button>
-                                        </div>
-                                    </CardContent>
-                                    </Card>
-                                </div>
                             <div className="mb-4">
                                 <Label className="block text-sm mb-2">Manager</Label>
                                 <FormField

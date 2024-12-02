@@ -17,12 +17,14 @@ export default function DetailSubmission() {
   const token = session?.user?.token;
   const {id} = useParams()
   const [detail, setDetail] = useState()
+  const [file, setFile] = useState()
   
   useEffect(() => {
     const loadDetail = async () => {
       if (token && id) {
         const response = await fetchSubmissionUserDetail({ token, id });
         setDetail(response?.data);
+        setFile(response?.proofs)
       }
     };
 
@@ -64,6 +66,8 @@ if (userPositionName === "GA") {
   
 
   const images = detail?.files?.map(file => file.image_urls)?.flat() || [];
+  const pdfs = detail?.files?.map(file => file.pdf_urls)?.flat() || [];
+  const files = file?.map(file => file.url)?.flat() || [];
 
   const items = detail?.items || [];
   const totalAmount = items.reduce((acc, item) => acc + (item.quantity * item.price), 0)
@@ -103,65 +107,116 @@ if (userPositionName === "GA") {
                     {detail?.type}
                   </div>
                 </div>
-                  <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Bukti</div>
-                    <div className="font-semibold">
-
-                    <Dialog>
-                      <DialogTrigger>
-                        <span className='h-4 w-4 p-0 cursor-pointer'>
-                          Lihat
-                        </span>
-                      </DialogTrigger>
-                      <DialogContent className="flex items-center justify-center">
-                        <div className="w-full max-w-xs">
-                          <Carousel
-                            plugins={[Autoplay({ delay: 2000 })]}
-                            className="w-full"
-                          >
-                            <CarouselContent>
-                            {images.map((image, index) => (
-                              <CarouselItem key={index}>
-                                <div className="p-1">
-                                  <Card>
-                                    <CardContent className="flex aspect-square items-center justify-center p-0">
-                                      <img src={image} alt={`${index}`} width={500} height={500} className="w-full h-full object-cover rounded" />
-                                    </CardContent>
-                                  </Card>
-                                </div>
-                              </CarouselItem>
-                            ))}
-                            </CarouselContent>
-                            <CarouselPrevious />
-                            <CarouselNext />
-                          </Carousel>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                    </div>
+                <div className="text-xs mb-2 grid grid-cols-2">
+                  <div className="text-muted-foreground">Bukti</div>
+                  <div className="font-semibold">
+                    {images.length > 0 ? (
+                      images.map((image, index) => (
+                        <Dialog key={index}>
+                          <DialogTrigger>
+                            <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
+                          </DialogTrigger>
+                          <DialogContent className="flex items-center justify-center">
+                            <div className="w-full max-w-xs">
+                              <Carousel
+                                plugins={[Autoplay({ delay: 2000 })]}
+                                className="w-full"
+                              >
+                                <CarouselContent>
+                                  <CarouselItem key={index}>
+                                    <div className="p-1">
+                                      <Card>
+                                        <CardContent className="flex aspect-square items-center justify-center p-0">
+                                          <img
+                                            src={image}
+                                            alt={`${index}`}
+                                            width={500}
+                                            height={500}
+                                            className="w-full h-full object-cover rounded"
+                                          />
+                                        </CardContent>
+                                      </Card>
+                                    </div>
+                                  </CarouselItem>
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                              </Carousel>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      ))
+                    ) : (
+                      ""
+                    )}
                   </div>
+                </div>
+                <div className="text-xs mb-2 grid grid-cols-2">
+                  <div className="text-muted-foreground">Bukti Transfer</div>
+                  <div className="font-semibold">
+                    {files.length > 0 ? (
+                      <Dialog>
+                          <DialogTrigger>
+                            <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
+                          </DialogTrigger>
+                          <DialogContent className="flex items-center justify-center">
+                            <div className="w-full max-w-xs">
+                              <Carousel
+                                plugins={[Autoplay({ delay: 2000 })]}
+                                className="w-full"
+                                >
+                                <CarouselContent>
+                                {files.map((image, index) => (
+                                  <CarouselItem key={index}>
+                                    <div className="p-1">
+                                      <Card>
+                                        <CardContent className="flex aspect-square items-center justify-center p-0">
+                                          <img
+                                            src={image}
+                                            alt={`${index}`}
+                                            width={500}
+                                            height={500}
+                                            className="w-full h-full object-cover rounded"
+                                          />
+                                        </CardContent>
+                                      </Card>
+                                    </div>
+                                  </CarouselItem>
+                                  ))}
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                              </Carousel>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                    ) : (
+                      "Belum di setujui"
+                    )}
+                  </div>
+                </div>
                 </div>
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nama Bank</div>
-                    <div className="font-semibold">{detail?.bank_account.bank.name}</div>
+                    <div className="font-semibold">{detail?.bank_name}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nama Pemilik Rekening</div>
-                    <div className="font-semibold">{detail?.bank_account.account_name}</div>
+                    <div className="font-semibold">{detail?.account_name}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nomor Rekening</div>
-                    <div className="font-semibold">{detail?.bank_account.account_number}</div>
+                    <div className="font-semibold">{detail?.account_number}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
                     <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Instal Pdf</div>
+                    <div className="text-muted-foreground">Bukti Pdf</div>
                     <div className="font-semibold">
-                    {detail?.files?.[0]?.pdf_urls?.map((pdfUrl, index) => (
+                    {pdfs.map((pdfUrl, index) => (
                         <a
                           key={index}
                           href={pdfUrl}
@@ -179,86 +234,86 @@ if (userPositionName === "GA") {
               </div>
 
               <ul className="relative flex flex-col md:flex-row gap-2">
-    {filteredSteps.map((step, index) => {
-      const approval = detail?.admin_approvals?.find(
-        (approval) => approval.user?.role_id === step.role_id
-      );
+                {filteredSteps.map((step, index) => {
+                  const approval = detail?.admin_approvals?.find(
+                    (approval) => approval.user?.role_id === step.role_id
+                  );
 
-      const isFirstStep = index === 0;
-      const isApproved = approval?.status === "approved" || isFirstStep;
-      const isDenied = approval?.status === "denied";
+                  const isFirstStep = index === 0;
+                  const isApproved = approval?.status === "approved" || isFirstStep;
+                  const isDenied = approval?.status === "denied";
 
-      const borderColor = isDenied
-        ? "border-red-400"
-        : isApproved
-        ? "border-green-400"
-        : "border-gray-200";
-      const iconColor = isDenied
-        ? "text-red-400"
-        : isApproved
-        ? "text-green-400"
-        : "text-gray-200";
-      const bgColor = isDenied
-        ? "bg-red-400"
-        : isApproved
-        ? "bg-green-400"
-        : "bg-gray-200";
+                  const borderColor = isDenied
+                    ? "border-red-400"
+                    : isApproved
+                    ? "border-green-400"
+                    : "border-gray-200";
+                  const iconColor = isDenied
+                    ? "text-red-400"
+                    : isApproved
+                    ? "text-green-400"
+                    : "text-gray-200";
+                  const bgColor = isDenied
+                    ? "bg-red-400"
+                    : isApproved
+                    ? "bg-green-400"
+                    : "bg-gray-200";
 
-      const displayDate =
-        isFirstStep && detail?.created_at
-          ? new Date(detail.created_at).toLocaleString("id-ID", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          : "";
+                  const displayDate =
+                    isFirstStep && detail?.created_at
+                      ? new Date(detail.created_at).toLocaleString("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "";
 
-      return (
-        <li
-          key={index}
-          className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block"
-        >
-          <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
-            <span
-              className={`size-7 flex justify-center items-center shrink-0 border ${borderColor} rounded-full w-[45px] h-[45px]`}
-            >
-              {isFirstStep ? (
-                <Receipt className={`h-5 w-5 ${iconColor}`} />
-              ) : (
-                <CircleUserRound className={`h-5 w-5 ${iconColor}`} />
-              )}
-            </span>
-            <div
-              className={`mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 ${bgColor} group-last:hidden dark:bg-neutral-700`}
-            ></div>
-          </div>
-          <div className="grow md:grow-0 md:mt-3 pb-5 flex flex-col">
-            {isFirstStep ? (
-              <>
-                <span className="block text-xs font-medium text-gray-800 dark:text-white">
-                  Pengajuan dibuat
-                </span>
-                <p className="text-xs text-gray-500 dark:text-neutral-500">
-                  {displayDate}
-                </p>
-              </>
-            ) : (
-              <>
-                <span className="block text-xs font-medium text-gray-800 dark:text-white">
-                  {isDenied ? "Denied" : isApproved ? "Approved" : "Menunggu"}
-                </span>
-                <p className="text-xs text-gray-500 dark:text-neutral-500">
-                  {step.role}
-                </p>
-              </>
-            )}
-          </div>
-        </li>
-      );
-    })}
-  </ul>
+                  return (
+                    <li
+                      key={index}
+                      className="md:shrink md:basis-0 flex-1 group flex gap-x-2 md:block"
+                    >
+                      <div className="min-w-7 min-h-7 flex flex-col items-center md:w-full md:inline-flex md:flex-wrap md:flex-row text-xs align-middle">
+                        <span
+                          className={`size-7 flex justify-center items-center shrink-0 border ${borderColor} rounded-full w-[45px] h-[45px]`}
+                        >
+                          {isFirstStep ? (
+                            <Receipt className={`h-5 w-5 ${iconColor}`} />
+                          ) : (
+                            <CircleUserRound className={`h-5 w-5 ${iconColor}`} />
+                          )}
+                        </span>
+                        <div
+                          className={`mt-2 w-px h-full md:mt-0 md:ms-2 md:w-full md:h-px md:flex-1 ${bgColor} group-last:hidden dark:bg-neutral-700`}
+                        ></div>
+                      </div>
+                      <div className="grow md:grow-0 md:mt-3 pb-5 flex flex-col">
+                        {isFirstStep ? (
+                          <>
+                            <span className="block text-xs font-medium text-gray-800 dark:text-white">
+                              Pengajuan dibuat
+                            </span>
+                            <p className="text-xs text-gray-500 dark:text-neutral-500">
+                              {displayDate}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <span className="block text-xs font-medium text-gray-800 dark:text-white">
+                              {isDenied ? "Denied" : isApproved ? "Approved" : "Menunggu"}
+                            </span>
+                            <p className="text-xs text-gray-500 dark:text-neutral-500">
+                              {step.role}
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
 
               <div className="flex justify-center items-center mb-4">
                 {detail?.admin_approvals?.map((approval) => (

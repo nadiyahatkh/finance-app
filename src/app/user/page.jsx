@@ -33,8 +33,35 @@ export default function HomeUser() {
   const submissionData = async () => {
     try {
         const pengajuan = await fetchSubmissionUser({ token, search, page, per_page: perPage,  finish_status: statusFilter, type: typeFilter});
-        setData(pengajuan.data.data);
-        setTotalPage(pengajuan.data.last_page)
+        console.log(pengajuan)
+        setData(pengajuan.data.submissions.data);
+        setTotalPage(pengajuan.data.submissions.last_page)
+        setCardData([
+          {
+            label: "Permintaan Tertunda",
+            amount: pengajuan.data.amounts.process,
+            image: "./Vector.png",
+            color: colorStyles[0]
+          },
+          {
+            label: "Permintaan yang Disetujui",
+            amount: pengajuan.data.amounts.approval,
+            image: "./CekCircle.png",
+            color: colorStyles[1],
+          },
+          {
+            label: "Permintaan yang Ditolak",
+            amount: pengajuan.data.amounts.denied,
+            image: "./VectorX.png",
+            color: colorStyles[2]
+          },
+          {
+            label: "Jumlah (Rp)",
+            amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(pengajuan.data.amounts.amount),
+            image: "./Rp.png",
+            color: colorStyles[3]
+          }
+        ]);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -45,45 +72,6 @@ export default function HomeUser() {
       submissionData();
     }
   }, [token, search, statusFilter, typeFilter, page, perPage]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchAmount({ token });
-        setCardData([
-          {
-            label: "Permintaan Tertunda",
-            amount: data.data.process,
-            image: "./Vector.png",
-            color: colorStyles[0]
-          },
-          {
-            label: "Permintaan yang Disetujui",
-            amount: data.data.approval,
-            image: "./CekCircle.png",
-            color: colorStyles[1],
-          },
-          {
-            label: "Permintaan yang Ditolak",
-            amount: data.data.denied,
-            image: "./VectorX.png",
-            color: colorStyles[2]
-          },
-          {
-            label: "Jumlah (Rp)",
-            amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.data.amount),
-            image: "./Rp.png",
-            color: colorStyles[3]
-          }
-        ]);
-      } catch (error) {
-        console.error('Gagal mengambil data:', error);
-      }
-    };
-    if (token) {
-      loadData();
-    }
-  }, [token]);
 
     return(
         <div className="py-4">

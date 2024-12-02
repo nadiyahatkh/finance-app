@@ -50,7 +50,38 @@ import { incomeType, statuses } from './data';
 
 
 
-export function DataTable({ columns, data, search, setSearch, openSuccess, setOpenSuccess, handleApproveAll, handleDeniedAll,setIsApprovedAllDialogOpen,isApprovedAllDialogOpen, notes, setNotes, errorMessages , openError,setOpenError, isDialogOpen, setIsDialogOpen, isLoadingTolak, statusFilter , setStatusFilter, totalPage, currentPage, setPage, perPage, setPerPage, onDelete, isLoading, setIsLoading, typeFilter, setTypeFilter}) {
+export function DataTable({ 
+    columns,
+    data, 
+    search, 
+    setSearch, 
+    openSuccess, 
+    setOpenSuccess, 
+    handleApproveAll, 
+    handleDeniedAll,
+    setIsApprovedAllDialogOpen,
+    isApprovedAllDialogOpen, 
+    notes, 
+    setNotes, 
+    errorMessages , 
+    openError,
+    setOpenError, 
+    isDialogOpen, 
+    setIsDialogOpen, 
+    isLoadingTolak, 
+    statusFilter , 
+    setStatusFilter, 
+    totalPage, 
+    currentPage, 
+    setPage, 
+    perPage, 
+    setPerPage, 
+    onDelete, 
+    isLoading, 
+    setIsLoading, 
+    typeFilter, 
+    setTypeFilter
+  }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -101,6 +132,22 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
     setPendingSearch(e.target.value)
   }
 
+  const handleSelectApproveAll = () => {
+    const approveRows = table.getSelectedRowModel().rows.map(row => row.original.id);
+    handleApproveAll(approveRows);
+  };
+
+  const handleSelectDeniedAll = (event) => {
+    event.preventDefault();
+    const deniedRows = table.getSelectedRowModel().rows.map(row => row.original.id);
+    if (deniedRows.length === 0) {
+      alert("Please select at least one row to deny.");
+      return;
+    }
+    handleDeniedAll(deniedRows);
+  };
+  
+
   return (
     <>
       {/* Filters */}
@@ -145,8 +192,10 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
           </Button>
         )}
         </div>
+
         
       <div className='flex items-center space-x-2'>
+      {table.getFilteredSelectedRowModel().rows.length > 0 ? (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
                           <Button 
@@ -160,7 +209,7 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
                           <DialogHeader>
                             <DialogTitle>Alasan Penolakan</DialogTitle>
                           </DialogHeader>
-                          <form onSubmit={handleDeniedAll}>
+                          <form onSubmit={handleSelectDeniedAll}>
                             <div className="grid w-full gap-1.5">
                               <Textarea
                                 id="notes"
@@ -200,9 +249,12 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
                           </form>
                         </DialogContent>
                       </Dialog>
+                      ) : null}
+                   {table.getFilteredSelectedRowModel().rows.length > 0 ? (   
               <Button className="" onClick={() => setIsApprovedAllDialogOpen(true)} style={{ background: "#F9B421" }}>
                   Setujui Semua
               </Button>
+            ) : null}
               <AlertDialog open={isApprovedAllDialogOpen} onClose={() => setIsApprovedAllDialogOpen(false)}>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -213,7 +265,7 @@ export function DataTable({ columns, data, search, setSearch, openSuccess, setOp
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel onClick={() => setIsApprovedAllDialogOpen(false)}>Batal</AlertDialogCancel>
-                  <AlertDialogAction disabled={isLoading} onClick={handleApproveAll} className="bg-[#F9B421]">
+                  <AlertDialogAction disabled={isLoading} onClick={handleSelectApproveAll} className="bg-[#F9B421]">
                   {isLoading ? (
                                   <ThreeDots
                                   height="20"

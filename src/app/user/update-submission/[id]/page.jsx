@@ -29,14 +29,9 @@ export default function UpdateSubmission(){
     const {id} = useParams()
     const { data: session } = useSession();
     const token = session?.user?.token;
-    const [banks, setBanks] = useState([])
-    const [bankId, setBankId] = useState()
-    const [accountId, setAccountId] = useState()
     const [transactionType, setTransactionType] = useState()
     const [data, setData] = useState()
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const [accountName, setAccountName] = useState("");
-    const [accountNumber, setAccountNumber] = useState("");
     const [openSuccess, setOpenSuccess] = useState(false);
     const [openError, setOpenError] = useState(false);
     const [errorMessages, setErrorMessages] = useState([]);
@@ -51,7 +46,9 @@ export default function UpdateSubmission(){
         due_date: z.date().optional(),
         type: z.string().optional(),
         purpose: z.string().optional(),
-        bank_account_id: z.preprocess((val) => Number((val)), z.number().optional()),
+        bank_name: z.string().min(1, { message: "Bank is required." }),
+        account_name: z.string().min(1, { message: "Account Name is required." }),
+        account_number: z.preprocess((val) => Number((val)), z.number().min(1, { message: "Account number must be at least 1" })),
         
         submission_item: z.array(
           z.object({
@@ -76,7 +73,9 @@ export default function UpdateSubmission(){
           if (token && id) {
             const response = await submissionDetailId({ token, id });
       
-            form.setValue('bank_account_id', response.data.bank_account_id, { shouldValidate: true });
+            form.setValue('bank_name', response.data.bank_name, { shouldValidate: true });
+            form.setValue('account_name', response.data.account_name, { shouldValidate: true });
+            form.setValue('account_number', response.data.account_number, { shouldValidate: true });
             form.setValue('purpose', response.data.purpose, { shouldValidate: true });
             form.setValue('due_date', new Date(response.data.due_date), { shouldValidate: true });
             form.setValue('type', response.data.type, { shouldValidate: true });
@@ -92,15 +91,12 @@ export default function UpdateSubmission(){
             setImage(response.data.files?.map(file => file.image)?.flat() || []);
             setPdfFiles(response.data.files?.map(file => file.pdf)?.flat() || []);
             setTransactionType(response.data.type);
-            setBankId(response.data.bank_account.bank_id);
           }
         };
       
         fetchData();
-      }, [token, id, append, remove, form, setTransactionType, setBankId, setImage]);
-      
-
-
+      }, [token, id, append, remove, form, setTransactionType, setImage]);
+    
       useEffect(() => {
         const loadData = async () => {
           try {
@@ -129,39 +125,10 @@ export default function UpdateSubmission(){
     //     }
     // }, [transactionType, token]);
 
-      useEffect(() => {
-        const loadDataBanks = async () => {
-            try {
-              const bankData = await fetchBanks({ token });
-              setBanks(bankData);
-            } catch (error) {
-              console.error('Failed to fetch positions:', error);
-            }
-          };
-
-          if(token){
-            loadDataBanks()
-          }
-    })
-
-      useEffect(() => {
-        const fetchData = async () => {
-            if (token && bankId) {
-                const response = await fetchBankDetail({ token, id: bankId });
-                setAccountId(response.account_id);
-                setAccountName(response.account_name);
-                setAccountNumber(response.account_number);
-            }
-        };
-    
-        fetchData();
-    }, [token, bankId]);
-
     const onSubmit = async (data) => {
     
         const payload = {
             ...data,
-            bank_account_id: accountId,
             file: selectedFiles.map(file => file.file),
             delete_images: deletedImages
         };
@@ -191,8 +158,6 @@ export default function UpdateSubmission(){
         }
     };
     
-
-    
         const handleFileChange = (event) => {
             const files = Array.from(event.target.files);
             const newFiles = files.map(file => ({ file: file }));
@@ -207,8 +172,6 @@ export default function UpdateSubmission(){
             setImage(prevImage => prevImage.filter(file => file !== filePath));
             setDeletedImages(prevDeletedImages => [...prevDeletedImages, filePath]);
         };
-        
-    
 
         const handleRemovePdf = (pdfPath) => {
             setPdfFiles(prevPdfFiles => prevPdfFiles.filter(file => file !== pdfPath));
@@ -280,14 +243,14 @@ export default function UpdateSubmission(){
                                             >
                                                     <div className="border-none rounded-lg p-4 bg-gray-50">
                                                         <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem name="type" value="Reimburesent" id="r1" style={{ color: "#F9B421" }} disabled={transactionType === "Payment Process"} />
+                                                            <RadioGroupItem name="type" value="Reimbursement" id="r1" style={{ color: "#F9B421" }} disabled={transactionType === "Payment Request"} />
                                                             <Label htmlFor="r1">Pengembalian <span className="italic">(Reimbursement)</span></Label>
                                                         </div>
                                                         <p className="title text-muted-foreground text-xs ml-6">Proses penggantian biaya yang dikeluarkan karyawan untuk keperluan bisnis.</p>
                                                     </div>
                                                     <div className="border-none rounded-lg p-4 bg-gray-50">
                                                         <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem name="type" value="Payment Process" id="r2" style={{ color: "#F9B421" }} disabled={transactionType === "Reimburesent"} />
+                                                            <RadioGroupItem name="type" value="Payment Request" id="r2" style={{ color: "#F9B421" }} disabled={transactionType === "Reimbursement"} />
                                                             <Label htmlFor="r2">Permintaan Pembayaran <span className="italic">(Payment Request)</span></Label>
                                                         </div>
                                                         <p className="title text-muted-foreground text-xs ml-6">Pengajuan pembayaran kepada pihak ketiga untuk barang atau jasa yang diterima.</p>
@@ -340,40 +303,29 @@ export default function UpdateSubmission(){
                                     <div className="flex justify-between items-center">
                                         <div className="w-full mr-2">
                                             <Label className="block text-sm mb-2">Nama Rekening</Label>
-                                            <Input
-                                            value={accountName}
-                                            className=""
-                                            placeholder="Masukan Nama Rekening..."
-                                            type="text"
-                                            readOnly
-                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="account_name"
+                                                render={({ field }) => (
+                                                <>
+                                                    <Input {...field} className="" placeholder="Masukkan nama rekening..." type="text" />
+                                                    {form.formState.errors.account_name && (
+                                                        <FormMessage type="error" className="italic">{form.formState.errors.account_name.message}</FormMessage>
+                                                    )}
+                                                </>
+                                                )}
+                                                />
                                         </div>
                                         <div className="w-full ml-2">
                                             <Label className="block text-sm mb-2">Bank</Label>
                                             <FormField
                                                 control={form.control}
-                                                name="bank_account_id"
+                                                name="bank_name"
                                                 render={({ field }) => (
                                                 <>
-                                                    <Select
-                                                    value={field.value ? field.value.toString() : ""}
-                                                    onValueChange={(value) => {
-                                                        field.onChange(value);
-                                                        setBankId(value);
-                                                    }}
-                                                    {...field}
-                                                    >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Pilih bank..." />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                    {Array.isArray(banks) && banks.map((bank) => (
-                                                        <SelectItem key={bank.id} value={bank.id.toString()}>{bank.name}</SelectItem>
-                                                    ))}
-                                                    </SelectContent>
-                                                    </Select>
-                                                    {form.formState.errors.bank_id && (
-                                                        <FormMessage type="error" className="italic">{form.formState.errors.bank_id.message}</FormMessage>
+                                                    <Input {...field} className="" placeholder="Masukkan tujuan..." type="text" />
+                                                    {form.formState.errors.bank_name && (
+                                                        <FormMessage type="error" className="italic">{form.formState.errors.bank_name.message}</FormMessage>
                                                     )}
                                                 </>
                                                 )}
@@ -383,12 +335,17 @@ export default function UpdateSubmission(){
                                 </div>
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2">Nomor Rekening</Label>
-                                    <Input
-                                        value={accountNumber}
-                                        className=""
-                                        placeholder="Masukan Nomor Rekening..."
-                                        type="text"
-                                        readOnly
+                                    <FormField
+                                    control={form.control}
+                                    name="account_number"
+                                    render={({ field }) => (
+                                    <>
+                                        <Input {...field} className="" placeholder="Masukkan nama rekening..." type="number" />
+                                        {form.formState.errors.account_number && (
+                                            <FormMessage type="error" className="italic">{form.formState.errors.account_number.message}</FormMessage>
+                                        )}
+                                    </>
+                                    )}
                                     />
                                 </div>
                                 <hr className="mb-4" />
@@ -447,20 +404,11 @@ export default function UpdateSubmission(){
                                             <Plus className="w-4 h-4 mr-1" /> Tambah item
                                         </Button>
                                         </div>
-                                        <div className="mt-4">
-                                            <div className="flex justify-end font-bold text-lg">
-                                                Total: {new Intl.NumberFormat('id-ID', {
-                                                    style: 'currency',
-                                                    currency: 'IDR',
-                                                    minimumFractionDigits: 0,
-                                                }).format(total)}
-                                            </div>
-                                        </div>
                                     </CardContent>
                                     </Card>
                                 </div>
                                 <div className="mb-4">
-                                    <span className="text-muted-foreground text-sm">Jumlah keseluruhan: {new Intl.NumberFormat('id-ID', {
+                                    <span className="flex justify-end font-bold text-sm">Jumlah keseluruhan: {new Intl.NumberFormat('id-ID', {
                                         style: 'currency',
                                         currency: 'IDR',
                                         minimumFractionDigits: 0,
@@ -469,7 +417,7 @@ export default function UpdateSubmission(){
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2 font-semibold">Bukti Pembayaran/Pengeluaran</Label>
                                     <div className="border-dashed border-2 rounded-lg flex flex-col items-center justify-center p-4 mb-1">
-                                        <img src="../upload.png" className="mb-4" alt="" />
+                                        <img src=".././upload.png" className="mb-4" alt="" />
                                         <div className="font-semibold text-xs mb-5">Drag your file to start uploading format PDF</div>
 
                                         <input

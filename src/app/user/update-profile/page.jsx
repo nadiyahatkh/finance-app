@@ -23,14 +23,6 @@ const FormSchema = z.object({
     email: z.string().min(1, { message: "Email is required." }),
     password: z.string().optional(),
     path: z.any().optional(),
-    bank: z.array(
-        z.object({
-          id: z.preprocess((val) => Number((val)), z.number().optional()),
-          bank_id: z.preprocess((val) => Number((val)), z.number().optional()),
-          account_name: z.string().optional(),
-          account_number:  z.preprocess((val) => Number((val)), z.number().optional()),
-        })
-      ).optional(),
   });
 
 export default function UpdateProfile() {
@@ -44,8 +36,6 @@ export default function UpdateProfile() {
     const [openError, setOpenError] = useState(false);
     const [errorMessages, setErrorMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [banks, setBanks] = useState()
-    const [bankId, setBankId] = useState()
     const [id, setId] = useState()
 
     const togglePasswordVisibility = () => {
@@ -58,11 +48,6 @@ export default function UpdateProfile() {
             path: null
         }
     });
-
-    const { fields, append, remove } = useFieldArray({
-        control: form.control,
-        name: "bank",
-      });
 
 
     const onSubmit = async (data) => {
@@ -96,19 +81,6 @@ export default function UpdateProfile() {
             setIsLoading(false);
         }
     };
-
-    useEffect(() => {
-        const loadDataBanks = async () => {
-            try {
-              const bankData = await fetchBankAll({ token });
-              setBanks(bankData.data);
-            } catch (error) {
-              console.error('Failed to fetch positions:', error);
-            }
-          };
-
-          loadDataBanks()
-    }, [token])
     
 
 
@@ -121,17 +93,6 @@ export default function UpdateProfile() {
                 form.setValue('email', response.user.email, {shouldValidate: true})
                 form.setValue('password', response.user.password, {shouldValidate: true})
                 setProfileImage(response.profile_image_url);
-
-                remove();
-            
-                response.user.bank_accounts.forEach(item => {
-                append({
-                    id: item.id || "",
-                    bank_id: item.bank_id,
-                    account_name: item.account_name,
-                    account_number: item.account_number,
-                });
-                });
             }
         };
         fetchData()
@@ -235,99 +196,6 @@ export default function UpdateProfile() {
                                                 )}
                                             </button>
                                     </div>
-                                </div>
-                                <div className="mb-4">
-                                    <Label className="block text-sm mb-2">Item</Label>
-                                    <Card className="">
-                                    <CardContent className="p-4">
-                                        {fields.map((item, index) => (
-                                        <div key={item.id} className="mb-4">
-                                            <div className="mb-4">
-                                            <FormField
-                                                control={form.control}
-                                                name={`bank.${index}.id`}
-                                                render={({ field }) => (
-                                                    <Input 
-                                                        onValueChange={(value) => {
-                                                            field.onChange(value);
-                                                        }}
-                                                        {...field}
-                                                        type="hidden" 
-                                                        value={field.value ?? ""} 
-                                                    />
-                                                )}
-                                            />
-                                            <Label className="block text-sm mb-2">Bank</Label>
-                                            <FormField
-                                                control={form.control}
-                                                name={`bank.${index}.bank_id`}
-                                                render={({ field }) => (
-                                                    <>
-                                                    <Select
-                                                    value={field.value ?? ""}
-                                                    onValueChange={(value) => {
-                                                        field.onChange(Number(value));
-                                                        setBankId(Number(value));
-                                                    }}
-                                                    {...field}
-                                                    >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Pilih bank untuk ditampilkan" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {banks?.map((bank) => (
-                                                        <SelectItem key={bank.id} value={bank.id}>{bank.name}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                    </Select>
-                                                    {form.formState.errors.bank_id && (
-                                                        <FormMessage type="error" className="italic">{form.formState.errors.bank_id.message}</FormMessage>
-                                                    )}
-                                                </>
-                                                )}
-                                            />
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                            <div className="w-full mr-2">
-                                                <Label className="block text-sm mb-2">Nama Rekening</Label>
-                                                <FormField
-                                                control={form.control}
-                                                name={`bank.${index}.account_name`} // Nama yang unik untuk setiap field kuantitas
-                                                render={({ field }) => (
-                                                    <Input {...field} placeholder="Masukan Nama Rekening..." type="text" />
-                                                )}
-                                                />
-                                            </div>
-                                            <div className="w-full ml-2">
-                                                <Label className="block text-sm mb-2">Nomer Rekening</Label>
-                                                <FormField
-                                                control={form.control}
-                                                name={`bank.${index}.account_number`} // Nama yang unik untuk setiap field jumlah
-                                                render={({ field }) => (
-                                                    <Input {...field} placeholder="Masukan Nomer Rekening..." type="number" />
-                                                )}
-                                                />
-                                            </div>
-                                            </div>
-                                            <div className="flex justify-end mt-2">
-                                            <Button variant="ghost" className="text-red-600 text-xs" onClick={() => remove(index)}>
-                                                <Trash2 className="w-4 h-4 mr-1" /> Hapus item
-                                            </Button>
-                                            </div>
-                                        </div>
-                                        ))}
-                                        <div className="flex justify-end">
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            className="text-blue-600 text-xs"
-                                            onClick={() => append({ bank_id: "", account_name: "", account_number: "", id:"" })} // Menambah item baru
-                                        >
-                                            <Plus className="w-4 h-4 mr-1" /> Tambah item
-                                        </Button>
-                                        </div>
-                                    </CardContent>
-                                    </Card>
                                 </div>
                                 <div className="flex justify-end">
                                     <Button type="submit" disabled={isLoading} className="px-4 py-2 font-semibold rounded-lg" style={{ background: "#F9B421" }}>

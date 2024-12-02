@@ -60,7 +60,9 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
         formData.append('due_date', format(data.due_date, 'yyyy-MM-dd'));
         formData.append('type', data.type);
         formData.append('purpose', data.purpose);
-        formData.append('bank_account_id', data.bank_account_id);
+        formData.append('bank_name', data.bank_name);
+        formData.append('account_name', data.account_name);
+        formData.append('account_number', data.account_number);
 
         data.submission_item.forEach((item, index) => {
           formData.append(`submission_item[${index}][description]`, item.description);
@@ -72,7 +74,7 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
           file.forEach((file) => {
           formData.append('file[]', file);
         });
-      }
+        }
     
         const response = await fetch(`${BASE_URL}/api/submission/submissions`, {
           method: 'POST',
@@ -199,14 +201,6 @@ export const fetchSubmissionUserDetail = async ({token, id}) => {
           formData.append('name', data.name);
           formData.append('username', data.username);
           formData.append('email', data.email);
-          data.bank.forEach((item, index) => {
-            formData.append(`bank[${index}][bank_id]`, item.bank_id);
-            formData.append(`bank[${index}][account_name]`, item.account_name);
-            formData.append(`bank[${index}][account_number]`, item.account_number);
-            if (item.id) {
-              formData.append(`bank[${index}][id]`, item.id);
-            }
-          });
           if (data.password) {
               formData.append('password', data.password);
           }

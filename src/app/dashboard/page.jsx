@@ -15,17 +15,17 @@ const colorStyles = ["#335CFF", "#1DAF61", "#FB3748", "#09090B"];
 export default function Dashboard(){
   const { data: session } = useSession();
   const token = session?.user?.token;
-  const [cardData, setCardData] = useState();
+  const [cardData, setCardData] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   
   const chartConfig = {
-    Reimburesent: {
-      label: "Reimburesent",
+    Reimbursement: {
+      label: "Reimbursement",
       color: "hsl(var(--chart-1))",
     },
-    PaymentProcess: {
-      label: "Payment Process",
+    PaymentRequest: {
+      label: "Payment Request",
       color: "hsl(var(--chart-2))",
     },
   };
@@ -33,36 +33,34 @@ export default function Dashboard(){
   useEffect(() => {
     const loadData = async () => {
       try {
-        const amountData = await fetchAmount({ token });
+        const dashboardData = await fetchDashboard({ token, month: selectedMonth });
         setCardData([
           {
             label: "Permintaan Tertunda",
-            amount: amountData.data.process,
+            amount: dashboardData.data.amountSummary.process,
             image: "./Vector.png",
             color: colorStyles[0],
           },
           {
             label: "Permintaan yang Disetujui",
-            amount: amountData.data.approval,
+            amount: dashboardData.data.amountSummary.approval,
             image: "./CekCircle.png",
             color: colorStyles[1],
           },
           {
             label: "Permintaan yang Ditolak",
-            amount: amountData.data.denied,
+            amount: dashboardData.data.amountSummary.denied,
             image: "./VectorX.png",
             color: colorStyles[2],
           },
           {
             label: "Jumlah (Rp)",
-            amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amountData.data.amount),
+            amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(dashboardData.data.amountSummary.amount),
             image: "./Rp.png",
             color: colorStyles[3],
           },
         ]);
-
-        const dashboardData = await fetchDashboard({ token, month: selectedMonth });
-        const formattedChartData = dashboardData.data.chart.map((item) => ({
+        const formattedChartData = dashboardData.data.dashboardChart.map((item) => ({
           month: item.month,
           Reimbursement: item.types.Reimbursement,
           PaymentRequest: item.types["Payment Request"],

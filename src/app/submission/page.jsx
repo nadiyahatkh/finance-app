@@ -20,7 +20,7 @@ const colorStyles = ["#335CFF", "#1DAF61", "#FB3748", "#09090B"];
 export default function SubmissionAdmin(){
   const { data: session } = useSession();
   const token = session?.user?.token;
-  const [cardData, setCardData] = useState()
+  const [cardData, setCardData] = useState([])
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState([]);
   const [statusFilter, setStatusFilter] = useState([]);
@@ -48,6 +48,32 @@ export default function SubmissionAdmin(){
         const pengajuan = await fetchSubmission({ token, search, due_date,page, per_page: perPage,  status: statusFilter, type: typeFilter});
         setData(pengajuan.submissions.data);
         setTotalPage(pengajuan.submissions.last_page)
+        setCardData([
+          {
+            label: "Permintaan Tertunda",
+            amount: pengajuan.data.process,
+            image: "./Vector.png",
+            color: colorStyles[0]
+          },
+          {
+            label: "Permintaan yang Disetujui",
+            amount: pengajuan.data.approval,
+            image: "./CekCircle.png",
+            color: colorStyles[1],
+          },
+          {
+            label: "Permintaan yang Ditolak",
+            amount: pengajuan.data.denied,
+            image: "./VectorX.png",
+            color: colorStyles[2]
+          },
+          {
+            label: "Jumlah (Rp)",
+            amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(pengajuan.data.amount),
+            image: "./Rp.png",
+            color: colorStyles[3]
+          }
+        ]);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       }
@@ -62,50 +88,13 @@ export default function SubmissionAdmin(){
  
 
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchAmount({ token });
-        setCardData([
-          {
-            label: "Permintaan Tertunda",
-            amount: data.data.process,
-            image: "./Vector.png",
-            color: colorStyles[0]
-          },
-          {
-            label: "Permintaan yang Disetujui",
-            amount: data.data.approval,
-            image: "./CekCircle.png",
-            color: colorStyles[1],
-          },
-          {
-            label: "Permintaan yang Ditolak",
-            amount: data.data.denied,
-            image: "./VectorX.png",
-            color: colorStyles[2]
-          },
-          {
-            label: "Jumlah (Rp)",
-            amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.data.amount),
-            image: "./Rp.png",
-            color: colorStyles[3]
-          }
-        ]);
-      } catch (error) {
-        console.error('Gagal mengambil data:', error);
-      }
-    };
-    if (token) {
-      loadData();
-    }
-  }, [token]);
+ 
 
 
-  const handleApproveAll = async () => {
+  const handleApproveAll = async (selected_ids) => {
     setIsLoading(true)
     try {
-      await approvedAllSubmission({ token });
+      await approvedAllSubmission({ selected_ids, token });
       submissionData()
       setIsApprovedAllDialogOpen(false)
       setOpenSuccess(true)
@@ -126,12 +115,11 @@ export default function SubmissionAdmin(){
     }
   };
 
-  const handleDeniedAll = async (event) => {
-    event.preventDefault();
+  const handleDeniedAll = async (selected_ids) => {
     if (!notes) return; 
     setIsLoadingTolak(true)
     try {
-      await deniedAllSubmission({ token, notes });
+      await deniedAllSubmission({ selected_ids, token, notes });
       submissionData()
       setNotes('');
       setIsDialogOpen(false);

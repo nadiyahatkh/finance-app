@@ -1,18 +1,19 @@
 'use client'
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, ChevronRight, CircleUserRound, Receipt } from "lucide-react";
+import { Check, ChevronRight, CircleUserRound, CircleX, Receipt } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatCurrency } from "@/app/utils/formatCurrency";
-import { approvedSubmission, deniedSubmission, fetchSubmissionDetail } from "../../apiService";
+import { approvedSubmission, checkBoxFinance, deniedSubmission, fetchSubmissionDetail, proofImage } from "../../apiService";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Hearts, ThreeDots } from "react-loader-spinner";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay"
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function DetailSubmission() {
   const { data: session } = useSession();
@@ -30,39 +31,58 @@ export default function DetailSubmission() {
   const [detail, setDetail] = useState()
   const router = useRouter();
   const [showActions, setShowActions] = useState(true);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  // const [files, setFiles] = useState([]);
+  const role = session?.user?.role
+  const [isDialogOpenUpload, setIsDialogOpenUpload] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [loadingUpload, setLoadingUpload] = useState(false)
+  const [openSuccesUpload, setOpenSuccesUpload ] = useState(false)
+  const [isChecked, setIsChecked] = useState(false); // State untuk checkbox
+  const [loading, setLoading] = useState(false); // State untuk loading
+  const [file, setFile] = useState()
   
-  useEffect(() => {
-    const loadDetail = async () => {
-      if (token && submissionId) {
-        const response = await fetchSubmissionDetail({ token, id: submissionId });
-        setDetail(response?.submission);
+  const loadDetail = async () => {
+    if (token && submissionId) {
+      const response = await fetchSubmissionDetail({ token, id: submissionId });
+      setDetail(response?.submission);
+        setFile(response?.proofs)
         const adminApproval = response?.submission?.admin_approvals?.find(
           (approval) => approval.user_id === currentAdminId
         );
         if (adminApproval && (adminApproval.status === 'approved' || adminApproval.status === 'denied')) {
           setShowActions(false);
         }
+
+        if (adminApproval) {
+          setIsChecked(adminApproval.is_checked === true); // Set checkbox berdasarkan API
+        }
       }
     };
 
-    loadDetail();
+    useEffect(() => {
+    if(token) {
+
+      loadDetail();
+    }
   }, [token, submissionId, currentAdminId]);
 
   const items = detail?.items || [];
   const totalAmount = items.reduce((acc, item) => acc + (item.quantity * item.price), 0)
 
-  const handleAccept = async () => {
-    setIsLoading(true)
+  const handleAccept = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
     try {
       await approvedSubmission({ id: submissionId, token });
-      setOpenSuccess(true)
+      setOpenSuccess(true);
     } catch (error) {
       const message = JSON.parse(error.message);
-          setErrorMessages(Object.values(message).flat());
-          setOpenError(true);
-          console.error('Error updating profile:', error);
+      setErrorMessages(Object.values(message).flat());
+      setOpenError(true);
+      console.error('Error updating profile:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   };
 
@@ -118,7 +138,67 @@ export default function DetailSubmission() {
     filteredSteps = steps; 
   }
 
-  const images = detail?.files?.map(file => file.file_urls)?.flat() || [];
+  const images = detail?.files?.map(file => file.image_urls)?.flat() || [];
+  const pdfs = detail?.files?.map(file => file.pdf_urls)?.flat() || [];
+  const files = file?.map(file => file.url)?.flat() || [];
+
+  
+
+  const handleCheckboxChange = async (event) => {
+    const checked = event.target.checked;
+    setIsChecked(checked);
+
+    if (checked) {
+      setLoading(true);
+      try {
+        const result = await checkBoxFinance({ token, id: submissionId });
+        console.log("API Response:", result);
+      } catch (error) {
+        console.error("Error calling API:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const uploadFile = async(event) => {
+    event.preventDefault();
+    setLoadingUpload(true)
+  console.log("Upload button clicked");
+
+  if (!selectedFiles || selectedFiles.length === 0) {
+    console.error("No files selected");
+    setErrorMessages(["Please select a file before uploading"]);
+    setOpenError(true);
+    return;
+  }
+    try{
+      await proofImage({id: submissionId, token, file: selectedFiles.map(file => file.file)})
+      loadDetail()
+      setOpenSuccesUpload(true)
+    } catch (error) {
+      let message = '';
+  try {
+      const errorDetail = JSON.parse(error.message);
+      setErrorMessages(Object.values(errorDetail.errors).flat());
+  } catch (e) {
+      message = error.message || "An unexpected error occurred.";
+      setErrorMessages([message]);
+  }
+
+  setOpenError(true);
+  console.error('Error creating asset:', error);
+  } finally {
+    setLoadingUpload(false)
+  }
+  }
+  
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    const newFiles = files.map(file => ({ file: file }));
+    console.log("New Files: ", newFiles); // Debug file yang dipilih
+    setSelectedFiles([...selectedFiles, ...newFiles]);
+  };
 
   return (
     <div className="py-4">
@@ -156,54 +236,79 @@ export default function DetailSubmission() {
                     </div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Bukti</div>
-                    <div className="font-semibold">
-                    <Dialog>
-                      <DialogTrigger>
-                        <span className='h-4 w-4 p-0 cursor-pointer'>
-                          Lihat
-                        </span>
-                      </DialogTrigger>
-                      <DialogContent className="flex items-center justify-center">
-                        <div className="w-full max-w-xs">
-                          <Carousel
-                            plugins={[Autoplay({ delay: 2000 })]}
-                            className="w-full"
-                          >
-                            <CarouselContent>
-                            {images.map((image, index) => (
-                              <CarouselItem key={index}>
-                                <div className="p-1">
-                                  <Card>
-                                    <CardContent className="flex aspect-square items-center justify-center p-0">
-                                      <img src={image} alt={`${index}`} width={500} height={500} className="w-full h-full object-cover rounded" />
-                                    </CardContent>
-                                  </Card>
-                                </div>
-                              </CarouselItem>
-                            ))}
-                            </CarouselContent>
-                            <CarouselPrevious />
-                            <CarouselNext />
-                          </Carousel>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                    </div>
+                  <div className="text-muted-foreground">Bukti</div>
+                  <div className="font-semibold">
+                    {images.length > 0 ? (
+                      <Dialog >
+                          <DialogTrigger>
+                            <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
+                          </DialogTrigger>
+                          <DialogContent className="flex items-center justify-center">
+                            <div className="w-full max-w-xs">
+                              <Carousel
+                                plugins={[Autoplay({ delay: 2000 })]}
+                                className="w-full"
+                                >
+                                <CarouselContent>
+                                {images.map((image, index) => (
+                                  <CarouselItem key={index}>
+                                    <div className="p-1">
+                                      <Card>
+                                        <CardContent className="flex aspect-square items-center justify-center p-0">
+                                          <img
+                                            src={image}
+                                            alt={`${index}`}
+                                            width={500}
+                                            height={500}
+                                            className="w-full h-full object-cover rounded"
+                                          />
+                                        </CardContent>
+                                      </Card>
+                                    </div>
+                                  </CarouselItem>
+                                ))}
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                              </Carousel>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                    ) : (
+                      "-"
+                    )}
                   </div>
+                </div>
+                {role === 4 && (
+
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                      <div className="text-muted-foreground">Bukti HardCopy</div>
+                      <div className="">
+                        <div className="items-top flex space-x-2">
+                        <input 
+                            type="checkbox" 
+                            id="terms1"
+                            checked={isChecked} 
+                            onChange={handleCheckboxChange} 
+                          />
+                        {/* {loading && <span>Loading...</span>} */}
+                        </div>
+                      </div>
+                    </div>
+                )}
                 </div>
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nama Bank</div>
-                    <div className="font-semibold">{detail?.bank_account.bank.name}</div>
+                    <div className="font-semibold">{detail?.bank_name}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nama Pemilik Rekening</div>
-                    <div className="font-semibold">{detail?.bank_account.account_name}</div>
+                    <div className="font-semibold">{detail?.account_name}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Nomor Rekening</div>
-                    <div className="font-semibold">{detail?.bank_account.account_number}</div>
+                    <div className="font-semibold">{detail?.account_number}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
@@ -212,7 +317,7 @@ export default function DetailSubmission() {
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Bukti Pdf</div>
                     <div className="font-semibold">
-                    {detail?.files?.[0]?.pdf_urls?.map((pdfUrl, index) => (
+                    {pdfs.map((pdfUrl, index) => (
                         <a
                           key={index}
                           href={pdfUrl}
@@ -226,7 +331,128 @@ export default function DetailSubmission() {
                       ))}
                     </div>
                   </div>
+                  {role === 4 && detail?.admin_approvals?.some(
+                      (approval) => approval.user?.role_id === 4 && approval.status === 'approved'
+                    ) && (!file || file.length === 0) && (
+                    <div className="text-xs mb-2 grid grid-cols-2">
+                      <div className="text-muted-foreground">Upload bukti Tf</div>
+                      <div className="font-semibold">
+                      <Dialog open={isDialogOpenUpload} onOpenChange={setIsDialogOpenUpload}>
+                          <DialogTrigger asChild>
+                            <span 
+                              className="text-[#F9B421] cursor-pointer"
+                            >
+                              Upload
+                            </span>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Upload Bukti TF disini</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={uploadFile}>
+                              <div className="grid w-full gap-1.5">
+                              <input
+                                    name="file"
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    className=""
+                                    id="fileInput"
+                                    onChange={handleFileChange}
+                                />
+                              </div>
+                              {selectedFiles.length > 0 && (
+                                        <div className="mt-4 space-y-2">
+                                            {selectedFiles.map(file => (
+                                                <Card key={file.name} className="flex justify-between items-center">
+                                                    <span className="text-sm text-muted-foreground p-2">{file.file.name}</span>
+                                                    <Button type="button" variant="danger" onClick={() => handleRemoveFile(file.file.name)}>
+                                                        <CircleX className="h-4 w-4"/>
+                                                    </Button>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    )}
+                              <DialogFooter>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setIsDialogOpenUpload(false)}
+                                  type="button"
+                                  className="mr-2 shadow-md h-8 w-[20%] text-[#F9B421]"
+                                >
+                                  Kembali
+                                </Button>
+                                <Button 
+                                  type="submit"
+                                  // onClick={() => console.log(form)}
+                                  className="text-white h-8 w-[20%] bg-[#F9B421]"
+                                  // disabled={loadingStatus[currentApplicantId]}
+                                >
+                                  {loadingUpload ? (
+                                        <ThreeDots
+                                        height="20"
+                                        width="20"
+                                        color="#ffffff"
+                                        ariaLabel="loading"
+                                        />
+                                    ) : (
+                                        "Upload"
+                                    )}
+                                </Button>
+                              </DialogFooter>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {files.length > 0 ? (
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                  <div className="text-muted-foreground">Bukti Transfer</div>
+                  <div className="font-semibold">
+                      <Dialog>
+                          <DialogTrigger>
+                            <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
+                          </DialogTrigger>
+                          <DialogContent className="flex items-center justify-center">
+                            <div className="w-full max-w-xs">
+                              <Carousel
+                                plugins={[Autoplay({ delay: 2000 })]}
+                                className="w-full"
+                                >
+                                <CarouselContent>
+                                {files.map((image, index) => (
+                                  <CarouselItem key={index}>
+                                    <div className="p-1">
+                                      <Card>
+                                        <CardContent className="flex aspect-square items-center justify-center p-0">
+                                          <img
+                                            src={image}
+                                            alt={`${index}`}
+                                            width={500}
+                                            height={500}
+                                            className="w-full h-full object-cover rounded"
+                                          />
+                                        </CardContent>
+                                      </Card>
+                                    </div>
+                                  </CarouselItem>
+                                  ))}
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                              </Carousel>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                  </div>
+                  </div>
+                    ) : (
+                      ""
+                    )}
+
                 </div>
+
                 <div className="flex justify-end">
                   {showActions && (
                     <>
@@ -284,6 +510,7 @@ export default function DetailSubmission() {
                           </form>
                         </DialogContent>
                       </Dialog>
+
                       <Button
                         onClick={handleAccept}
                         className="ml-2 bg-[#F9B421] hover:bg-[#E5A50F] transition-colors"
@@ -424,114 +651,6 @@ export default function DetailSubmission() {
                   <h6 className="text-sm font-bold w-1/6 text-center">Rp. {totalAmount.toLocaleString('id-ID')}</h6>
                 </div>
               </div>
-              {/* <div className="flex justify-center items-center">
-
-                <div className="grid grid-cols-9 justify-center items-center">
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-            
-                      </div>
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <div className="border border-green-400 W-[55px]"></div>
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>
-                </div>
-              </div>
-              <div className="flex justify-center items-center">
-                <div className="grid grid-cols-9 justify-center items-center">
-                      <div className="text-center w-[80px] break-words">
-                        <span>apalah</span>
-                      </div>
-                      <div>
-                        
-                      </div>
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <hr className="border-green-400" />
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>  
-                      <div className="border border-green-400 W-[55px]"></div>
-                      <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                          <CircleUserRound className="h-5 w-5 text-green-400" />
-                      </div>
-                </div>
-              </div> */}
-
-
-
-              {/* <div className="flex justify-center items-center mb-4">
-
-                <div className="flex items-center">
-                  <div className="flex flex-col">
-                    <div className="flex items-center">
-
-                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                        <Receipt className="h-5 w-5 text-green-400" />
-                    </div>
-                    <div className="border border-green-400 w-[100px]"></div>
-                    </div>
-                  <span style={{ marginLeft:-10 }}>testjjkjjkjk</span>
-
-                  </div>
-
-                </div>
-                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
-                    </div>  
-                    <div className="border border-green-400 w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border-2 border-green-400 w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-green-400" />
-                    </div>
-                    <div className="border border-red-400 w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border-2 border-red-400 w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-muted-foreground text-red-400" />
-                    </div>
-                    <div className="border w-[100px]"></div>
-                    <div className="rounded-full flex justify-center items-center border-2 w-[45px] h-[45px]">
-                        <CircleUserRound className="h-5 w-5 text-muted-foreground" />
-                    </div>
-              </div> */}
-              {/* <div className="grid grid-cols-5 gap-4 justify-content-center">
-                    <div className="">
-                        <span>Test</span>
-                        
-                    </div>
-                    <div>
-                        <span>Test</span>
-                        
-                    </div>
-                    <div>
-                        <span>Test</span>
-                        
-                    </div>
-                    <div>
-                        <span>Test</span>
-                        
-                    </div>
-                    <div>
-                        <span>Test</span>
-                        
-                    </div>
-              </div> */}
-              {/* Success Dialog */}
               <AlertDialog open={openSuccess} onOpenChange={setOpenSuccess}>
                         <AlertDialogContent className="flex flex-col items-center justify-center text-center">
                             <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#DCFCE7" }}>
@@ -554,6 +673,35 @@ export default function DetailSubmission() {
                             <AlertDialogDescription className="">Anda telah berhasil menyetujui pengajuan pembayaran</AlertDialogDescription>
                             <AlertDialogAction
                                 onClick={() => router.push('/submission')}
+                                className="w-full bg-[#F9B421]"
+                            >
+                                Kembali
+                            </AlertDialogAction>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    {/* openSuccesUpload */}
+              <AlertDialog open={openSuccesUpload} onOpenChange={setOpenSuccesUpload}>
+                        <AlertDialogContent className="flex flex-col items-center justify-center text-center">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#DCFCE7" }}>
+                                <svg
+                                    className="w-6 h-6 text-green-600"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M5 13l4 4L19 7"
+                                    ></path>
+                                </svg>
+                            </div>
+                            <AlertDialogTitle className="">Yeay! Sukses</AlertDialogTitle>
+                            <AlertDialogDescription className="">Anda telah berhasil mengirim bukti transfer</AlertDialogDescription>
+                            <AlertDialogAction
+                                onClick={() => setOpenSuccesUpload(false)}
                                 className="w-full bg-[#F9B421]"
                             >
                                 Kembali

@@ -28,14 +28,9 @@ import { useRouter } from "next/navigation";
 export default function SubmissionUser() {
     const { data: session } = useSession();
     const token = session?.user?.token;
-    const [banks, setBanks] = useState([])
-    const [bankId, setBankId] = useState()
-    const [accountId, setAccountId] = useState()
     const [transactionType, setTransactionType] = useState()
     const [data, setData] = useState()
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const [accountName, setAccountName] = useState("");
-    const [accountNumber, setAccountNumber] = useState("");
     const [openSuccess, setOpenSuccess] = useState(false);
     const [openError, setOpenError] = useState(false);
     const [errorMessages, setErrorMessages] = useState([]);
@@ -47,7 +42,10 @@ export default function SubmissionUser() {
         due_date: z.date({ message: "Due date cannot be in the past." }),
         type: z.string().min(1, { message: "Type is required." }),
         purpose: z.string().min(1, { message: "Purpose is required." }),
-        bank_account_id: z.preprocess((val) => Number(val), z.number().min(1, { message: "Bank account is required." })),
+        bank_name: z.string().min(1, { message: "Bank is required." }),
+        account_name: z.string().min(1, { message: "Account Name is required." }),
+        account_number: z.preprocess((val) => Number((val)), z.number().min(1, { message: "Account number must be at least 1" })),
+
         
         submission_item: z.array(
           z.object({
@@ -72,36 +70,6 @@ export default function SubmissionUser() {
         }
     }, [token, transactionType]);
 
-    useEffect(() => {
-        const loadDataBanks = async () => {
-            try {
-              const bankData = await fetchBanks({ token });
-              setBanks(bankData);
-            } catch (error) {
-              console.error('Failed to fetch positions:', error);
-            }
-          };
-
-          if(token){
-            loadDataBanks()
-          }
-    })
-     
-    useEffect(() => {
-        const fetchData = async () => {
-            if (token && bankId) {
-                const response = await fetchBankDetail({ token, id: bankId });
-                setAccountId(response.account_id);
-                setAccountName(response.account_name);
-                setAccountNumber(response.account_number);
-            }
-        };
-    
-        fetchData();
-    }, [token, bankId]);
-    
-      
-
     const form = useForm({
         resolver: zodResolver(FormSchema),
     });
@@ -112,7 +80,6 @@ export default function SubmissionUser() {
       
 
       const onSubmit= async (data) => {
-        data.bank_account_id = accountId;
         setIsLoading(true)
         try{
             const result = await createSubmissionUser({data, token, file: selectedFiles.map(file => file.file) });
@@ -211,14 +178,14 @@ export default function SubmissionUser() {
                                             >
                                                     <div className="border-none rounded-lg p-4 bg-gray-50">
                                                         <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem name="type" value="1" id="r1" style={{ color: "#F9B421" }} />
+                                                            <RadioGroupItem name="type" value="Reimbursement" id="r1" style={{ color: "#F9B421" }} />
                                                             <Label htmlFor="r1">Pengembalian <span className="italic">(Reimbursement)</span></Label>
                                                         </div>
                                                         <p className="title text-muted-foreground text-xs ml-6">Proses penggantian biaya yang dikeluarkan karyawan untuk keperluan bisnis.</p>
                                                     </div>
                                                     <div className="border-none rounded-lg p-4 bg-gray-50">
                                                         <div className="flex items-center space-x-2">
-                                                            <RadioGroupItem name="type" value="2" id="r2" style={{ color: "#F9B421" }} />
+                                                            <RadioGroupItem name="type" value="Payment Request" id="r2" style={{ color: "#F9B421" }} />
                                                             <Label htmlFor="r2">Permintaan Pembayaran <span className="italic">(Payment Request)</span></Label>
                                                         </div>
                                                         <p className="title text-muted-foreground text-xs ml-6">Pengajuan pembayaran kepada pihak ketiga untuk barang atau jasa yang diterima.</p>
@@ -269,39 +236,29 @@ export default function SubmissionUser() {
                                     <div className="flex justify-between items-center">
                                         <div className="w-full mr-2">
                                             <Label className="block text-sm mb-2">Nama Rekening</Label>
-                                            <Input
-                                            value={accountName}
-                                            className=""
-                                            placeholder="Masukan Nama Rekening..."
-                                            type="text"
-                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="account_name"
+                                                render={({ field }) => (
+                                                <>
+                                                    <Input {...field} className="" placeholder="Masukkan nama rekening..." type="text" />
+                                                    {form.formState.errors.account_name && (
+                                                        <FormMessage type="error" className="italic">{form.formState.errors.account_name.message}</FormMessage>
+                                                    )}
+                                                </>
+                                                )}
+                                                />
                                         </div>
                                         <div className="w-full ml-2">
                                             <Label className="block text-sm mb-2">Bank</Label>
                                             <FormField
                                                 control={form.control}
-                                                name="bank_account_id"
+                                                name="bank_name"
                                                 render={({ field }) => (
                                                 <>
-                                                    <Select
-                                                    value={field.value ? field.value.toString() : ""}
-                                                    onValueChange={(value) => {
-                                                        field.onChange(value);
-                                                        setBankId(value);
-                                                    }}
-                                                    {...field}
-                                                    >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Pilih bank..." />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                    {Array.isArray(banks) && banks.map((bank) => (
-                                                        <SelectItem key={bank.id} value={bank.id.toString()}>{bank.name}</SelectItem>
-                                                    ))}
-                                                    </SelectContent>
-                                                    </Select>
-                                                    {form.formState.errors.bank_id && (
-                                                        <FormMessage type="error" className="italic">{form.formState.errors.bank_id.message}</FormMessage>
+                                                    <Input {...field} className="" placeholder="Masukkan tujuan..." type="text" />
+                                                    {form.formState.errors.bank_name && (
+                                                        <FormMessage type="error" className="italic">{form.formState.errors.bank_name.message}</FormMessage>
                                                     )}
                                                 </>
                                                 )}
@@ -311,12 +268,18 @@ export default function SubmissionUser() {
                                 </div>
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2">Nomor Rekening</Label>
-                                    <Input
-                                        value={accountNumber}
-                                        className=""
-                                        placeholder="Masukan Nomor Rekening..."
-                                        type="text"
-                                    />
+                                    <FormField
+                                                control={form.control}
+                                                name="account_number"
+                                                render={({ field }) => (
+                                                <>
+                                                    <Input {...field} className="" placeholder="Masukkan nama rekening..." type="number" />
+                                                    {form.formState.errors.account_number && (
+                                                        <FormMessage type="error" className="italic">{form.formState.errors.account_number.message}</FormMessage>
+                                                    )}
+                                                </>
+                                                )}
+                                                />
                                 </div>
                                 <hr className="mb-4" />
                                 <div className="mb-4">
@@ -374,13 +337,11 @@ export default function SubmissionUser() {
                                             <Plus className="w-4 h-4 mr-1" /> Tambah item
                                         </Button>
                                         </div>
-                                    
-
                                     </CardContent>
                                     </Card>
                                 </div>
                                 <div className="mb-4">
-                                    <span className="text-muted-foreground text-sm">Jumlah keseluruhan: {new Intl.NumberFormat('id-ID', {
+                                    <span className="flex justify-end font-bold text-sm">Jumlah keseluruhan: {new Intl.NumberFormat('id-ID', {
                                         style: 'currency',
                                         currency: 'IDR',
                                         minimumFractionDigits: 0,
