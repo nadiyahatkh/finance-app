@@ -3,13 +3,14 @@ import { getSession } from "next-auth/react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
-export const fetchSubmissionUser = async ({token, search, type, finish_status, page, per_page}) => {
+export const fetchSubmissionUser = async ({token, search, type, finish_status, page, per_page, due_date}) => {
     const session = await getSession()
     const statusParams = finish_status?.map(s => `finish_status[]=${s}`).join('&');
     const typeParams = type?.map(t => `type[]=${t}`).join('&');
+    const dateParam = due_date ? `due_date=${due_date}` : '';
 
       try {
-        const response = await fetch(`${BASE_URL}/api/submission/index?search=${search}&${typeParams}&${statusParams}&page=${page}&per_page=${per_page}`, {
+        const response = await fetch(`${BASE_URL}/api/submission/index?search=${search}&${dateParam}&${typeParams}&${statusParams}&page=${page}&per_page=${per_page}`, {
           headers: {
             "ngrok-skip-browser-warning": true,
             'Authorization': `Bearer ${session.user.token}`,

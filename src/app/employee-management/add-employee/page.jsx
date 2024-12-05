@@ -46,7 +46,6 @@ export default function AddEmployee() {
         username: z.string().min(1, { message: "UserName karyawan is required." }),
         email: z.string().min(1, { message: "Email is required." }),
         password: z.string().min(1, { message: "Password wajib diisi." }),
-        nip: z.string().min(1, { message: "Nip wajib diisi." }),
         department_id: z.string().min(1, { message: "Department wajib diisi." }),
         position_id: z.string().min(1, { message: "Posisi wajib diisi." }),
         manager_id: z.string().min(1, { message: "Manager wajib diisi." }),
@@ -205,21 +204,6 @@ export default function AddEmployee() {
                                 <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="****" type="password" />
                                 {form.formState.errors.password && (
                                     <FormMessage type="error" className="italic">{form.formState.errors.password.message}</FormMessage>
-                                    )}
-                                </>
-                                )}
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <Label className="block text-sm mb-2">NIP</Label>
-                                <FormField
-                                control={form.control}
-                                name="nip"
-                                render={({ field }) => (
-                                <>
-                                    <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="121300" type="text" />
-                                    {form.formState.errors.nip && (
-                                    <FormMessage type="error" className="italic">{form.formState.errors.nip.message}</FormMessage>
                                     )}
                                 </>
                                 )}

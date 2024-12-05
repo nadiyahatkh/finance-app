@@ -54,7 +54,7 @@ export default function Dashboard(){
             color: colorStyles[2],
           },
           {
-            label: "Jumlah (Rp)",
+            label: "Pending Balance",
             amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(dashboardData.data.amountSummary.amount),
             image: "./Rp.png",
             color: colorStyles[3],

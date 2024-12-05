@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export function Card({ label, amount, description, image, color }) {
-  const isPrice = label === "Jumlah (Rp)";
+  const isPrice = label === "Pending Balance";
   return (
     <CardContent className="hover:bg-gray-50">
       <section className="flex justify-between">

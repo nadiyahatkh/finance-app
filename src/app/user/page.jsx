@@ -29,10 +29,12 @@ export default function HomeUser() {
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [totalPage, setTotalPage] = useState(0);
+  const [date, setDate] = useState();
 
   const submissionData = async () => {
     try {
-        const pengajuan = await fetchSubmissionUser({ token, search, page, per_page: perPage,  finish_status: statusFilter, type: typeFilter});
+        const due_date = date ? format(date, "yyyy-MM-dd") : "";
+        const pengajuan = await fetchSubmissionUser({ token, search, page,due_date, per_page: perPage,  finish_status: statusFilter, type: typeFilter});
         console.log(pengajuan)
         setData(pengajuan.data.submissions.data);
         setTotalPage(pengajuan.data.submissions.last_page)
@@ -56,7 +58,7 @@ export default function HomeUser() {
             color: colorStyles[2]
           },
           {
-            label: "Jumlah (Rp)",
+            label: "Pending Balance",
             amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(pengajuan.data.amounts.amount),
             image: "./Rp.png",
             color: colorStyles[3]
@@ -71,7 +73,14 @@ export default function HomeUser() {
     if (token) {
       submissionData();
     }
-  }, [token, search, statusFilter, typeFilter, page, perPage]);
+  }, [token, search, statusFilter, typeFilter, date, page, perPage]);
+
+  const resetDateFilter = () => {
+    setDate();
+    submissionData();
+  };
+
+  const isDateDefault = () => !date; 
 
     return(
         <div className="py-4">
@@ -122,12 +131,38 @@ export default function HomeUser() {
                     />
                   </PopoverContent>
               </Popover> */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(selectedDate) => {
+                      console.log("Selected date:", selectedDate); // Debug date value
+                      setDate(selectedDate);
+                      submissionData(); // Memanggil ulang data setelah memilih tanggal
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
 
-              {/* {!isDateDefault() && (
+              {!isDateDefault() && (
               <Button variant="outline" className="text-red-500" style={{ color: '#F9B421', border: 'none' }} onClick={resetDateFilter}>
                 Reset Date
               </Button>
-            )} */}
+            )}
             {/* Add Asset Button */}
             <Button variant="solid" className="" style={{ background: "#F9B421" }}>
                 <Link href="./user/submission">

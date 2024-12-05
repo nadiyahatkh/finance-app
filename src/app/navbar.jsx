@@ -9,11 +9,16 @@ const disabledNavbar = ["/sign-in"];
 
 
 export default function Navbar() {
-    const pathname = usePathname();
+  const pathname = usePathname();
 
-  if (disabledNavbar.includes(pathname)) {
+  const isDisabled = 
+    disabledNavbar.includes(pathname) || 
+    pathname.startsWith("/submission/print/");
+
+  if (isDisabled) {
     return <div></div>;
   }
+  
     return (
         <div className="border-b">
             <div className="flex h-16 items-center px-4">

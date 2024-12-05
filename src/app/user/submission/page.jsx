@@ -45,8 +45,6 @@ export default function SubmissionUser() {
         bank_name: z.string().min(1, { message: "Bank is required." }),
         account_name: z.string().min(1, { message: "Account Name is required." }),
         account_number: z.preprocess((val) => Number((val)), z.number().min(1, { message: "Account number must be at least 1" })),
-
-        
         submission_item: z.array(
           z.object({
             description: z.string().min(1, { message: "Description is required." }),
@@ -293,8 +291,11 @@ export default function SubmissionUser() {
                                             <FormField
                                                 control={form.control}
                                                 name={`submission_item.${index}.description`}
-                                                render={({ field }) => (
-                                                <Input {...field} placeholder="Contoh: Pembelian Laptop untuk karyawan" />
+                                                render={({ field , fieldState}) => (
+                                                    <>
+                                                        <Input {...field} placeholder="Contoh: Pembelian Laptop untuk karyawan" />
+                                                        {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                                                    </>
                                                 )}
                                             />
                                             </div>
@@ -304,8 +305,11 @@ export default function SubmissionUser() {
                                                 <FormField
                                                 control={form.control}
                                                 name={`submission_item.${index}.quantity`}
-                                                render={({ field }) => (
+                                                render={({ field, fieldState }) => (
+                                                    <>
                                                     <Input {...field} placeholder="Masukan jumlah..." type="number" />
+                                                    {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                                                    </>
                                                 )}
                                                 />
                                             </div>
@@ -314,8 +318,11 @@ export default function SubmissionUser() {
                                                 <FormField
                                                 control={form.control}
                                                 name={`submission_item.${index}.price`}
-                                                render={({ field }) => (
+                                                render={({ field, fieldState }) => (
+                                                    <>
                                                     <Input {...field} placeholder="Masukan harga..." type="text" onChange={(e) => field.onChange(formatPrice(e.target.value))} />
+                                                    {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                                                    </>
                                                 )}
                                                 />
                                             </div>

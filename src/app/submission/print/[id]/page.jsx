@@ -15,8 +15,9 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from "embla-carousel-autoplay"
 import { Checkbox } from "@/components/ui/checkbox";
 
-export default function DetailSubmission() {
-  const { data: session } = useSession();
+
+export default function PrintDetailSubmission() {
+    const { data: session } = useSession();
   const token = session?.user?.token;
   const {id: submissionId} = useParams()
   const currentAdminId = session?.user?.id;
@@ -26,7 +27,6 @@ export default function DetailSubmission() {
   const [loadingStatus, setLoadingStatus] = useState({});
   const [isLoading, setIsLoading] = useState(false)
   const [openSuccess, setOpenSuccess] = useState(false);
-  const [openSuccessDenied, setOpenSuccessDenied] = useState(false)
   const [openError, setOpenError] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
   const [detail, setDetail] = useState()
@@ -41,9 +41,11 @@ export default function DetailSubmission() {
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false); 
   const [file, setFile] = useState()
+  const [detailLoading, setDetailLoading] = useState(true)
   
   const loadDetail = async () => {
     if (token && submissionId) {
+        setDetailLoading(true)
       const response = await fetchSubmissionDetail({ token, id: submissionId });
       setDetail(response?.submission);
         setFile(response?.submission.proofs)
@@ -57,11 +59,14 @@ export default function DetailSubmission() {
         if (adminApproval) {
           setIsChecked(adminApproval.is_checked === true);
         }
+        
       }
+      setDetailLoading(false)
     };
 
     useEffect(() => {
     if(token) {
+        
 
       loadDetail();
     }
@@ -76,7 +81,6 @@ export default function DetailSubmission() {
     try {
       await approvedSubmission({ id: submissionId, token });
       setOpenSuccess(true);
-      loadDetail()
     } catch (error) {
       const message = JSON.parse(error.message);
       setErrorMessages(Object.values(message).flat());
@@ -95,7 +99,9 @@ export default function DetailSubmission() {
     setLoadingStatus((prevState) => ({ ...prevState, [currentApplicantId]: true }));
     try {
       await deniedSubmission({ id: currentApplicantId, token, notes });
-      setOpenSuccessDenied(true)
+      router.push('/submission');
+        
+      
     } catch (error) {
       console.error('Error denying applicant:', error);
     } finally {
@@ -196,7 +202,6 @@ export default function DetailSubmission() {
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
     const newFiles = files.map(file => ({ file: file }));
-    console.log("New Files: ", newFiles); // Debug file yang dipilih
     setSelectedFiles([...selectedFiles, ...newFiles]);
   };
 
@@ -204,21 +209,24 @@ export default function DetailSubmission() {
     setSelectedFiles(selectedFiles.filter(file => file.file.name !== fileName));
   };
 
-  return (
-    <div className="py-4">
-      <div className="max-w-7xl w-full mx-auto">
-        <p className="title font-manrope font-bold text-2xl leading-10">
-          Pengajuan Pembayaran/Reimbursement
-        </p>
-        <p className="title text-muted-foreground text-sm mb-5">Pengajuan Detail</p>
-        <div className="mt-4">
-          <Card className="lg:w-5/6 p-4">
+  useEffect(() => {
+    if (typeof window !== "undefined" && detailLoading === false)  {
+      window.print();
+    }
+  }, [
+    detailLoading
+  ]);
+
+    return(
+        <div className="py-4">
+            <div className="max-w-7xl w-full mx-auto">
+            <Card className="lg:w-5/6 p-4">
             <CardContent className="w-full">
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal</div>
-                    <div className="font-semibold">{detail?.submission_date ? new Date(detail.submission_date).toLocaleDateString() : ""}</div>
+                    <div className="font-semibold">{new Date(detail?.submission_date).toLocaleDateString()}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tujuan Pembayaran/Pengeluaran</div>
@@ -226,7 +234,7 @@ export default function DetailSubmission() {
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal Pembayaran</div>
-                    <div className="font-semibold">{detail?.due_date ? new Date(detail.due_date).toLocaleDateString() : ""}</div>
+                    <div className="font-semibold">{new Date(detail?.due_date).toLocaleDateString()}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tipe</div>
@@ -297,7 +305,7 @@ export default function DetailSubmission() {
                             onChange={handleCheckboxChange} 
                             disabled={isChecked} 
                           />
-                        {loading && <span>Loading...</span>}
+                        {/* {loading && <span>Loading...</span>} */}
                         </div>
                       </div>
                     </div>
@@ -318,7 +326,7 @@ export default function DetailSubmission() {
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
-                    <div className="font-semibold">{detail?.amount ? formatCurrency(detail.amount) : ""}</div>
+                    <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
                   </div>
                   {pdfs.length > 0 ? (
 
@@ -342,78 +350,75 @@ export default function DetailSubmission() {
                   ) : (
                     ""
                   )}
+                  {pdfsProofs.length > 0 ? (
 
-                  {role === 4 && (
-                    <>
-                    {pdfsProofs.length > 0 ? (
-                    <div className="text-xs mb-2 grid grid-cols-2">
-                      <div className="text-muted-foreground">Bukti Tf pdf</div>
-                      <div className="font-semibold">
-                      {pdfsProofs.map((pdfUrl, index) => (
-                          <a
-                            key={index}
-                            href={pdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 underline"
-                            download
-                          >
-                            Download PDF
-                          </a>
-                        ))}
-                      </div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Bukti Tf pdf</div>
+                    <div className="font-semibold">
+                    {pdfsProofs.map((pdfUrl, index) => (
+                        <a
+                          key={index}
+                          href={pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 underline"
+                          download
+                        >
+                          Download PDF
+                        </a>
+                      ))}
                     </div>
+                  </div>
+                  ) : (
+                    ""
+                  )}
+
+                  
+                  
+                  {imagesProofs.length > 0 ? (
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                  <div className="text-muted-foreground">Bukti Transfer</div>
+                  <div className="font-semibold">
+                      <Dialog>
+                          <DialogTrigger>
+                            <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
+                          </DialogTrigger>
+                          <DialogContent className="flex items-center justify-center">
+                            <div className="w-full max-w-xs">
+                              <Carousel
+                                plugins={[Autoplay({ delay: 2000 })]}
+                                className="w-full"
+                                >
+                                <CarouselContent>
+                                {imagesProofs.map((image, index) => (
+                                  <CarouselItem key={index}>
+                                    <div className="p-1">
+                                      <Card>
+                                        <CardContent className="flex aspect-square items-center justify-center p-0">
+                                          <img
+                                            src={image}
+                                            alt={`${index}`}
+                                            width={500}
+                                            height={500}
+                                            className="w-full h-full object-cover rounded"
+                                          />
+                                        </CardContent>
+                                      </Card>
+                                    </div>
+                                  </CarouselItem>
+                                  ))}
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                              </Carousel>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                  </div>
+                  </div>
                     ) : (
                       ""
                     )}
-                    
-                    {imagesProofs.length > 0 ? (
-                    <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Bukti Transfer</div>
-                    <div className="font-semibold">
-                        <Dialog>
-                            <DialogTrigger>
-                              <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
-                            </DialogTrigger>
-                            <DialogContent className="flex items-center justify-center">
-                              <div className="w-full max-w-xs">
-                                <Carousel
-                                  plugins={[Autoplay({ delay: 2000 })]}
-                                  className="w-full"
-                                  >
-                                  <CarouselContent>
-                                  {imagesProofs.map((image, index) => (
-                                    <CarouselItem key={index}>
-                                      <div className="p-1">
-                                        <Card>
-                                          <CardContent className="flex aspect-square items-center justify-center p-0">
-                                            <img
-                                              src={image}
-                                              alt={`${index}`}
-                                              width={500}
-                                              height={500}
-                                              className="w-full h-full object-cover rounded"
-                                            />
-                                          </CardContent>
-                                        </Card>
-                                      </div>
-                                    </CarouselItem>
-                                    ))}
-                                  </CarouselContent>
-                                  <CarouselPrevious />
-                                  <CarouselNext />
-                                </Carousel>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                    </div>
-                    </div>
-                      ) : (
-                        ""
-                      )}
-                    
-                    </>
-                  )}
 
                 </div>
 
@@ -492,25 +497,6 @@ export default function DetailSubmission() {
                       </div>
                     </div>
                   )}
-
-                  {role === 4 && 
-                  detail?.admin_approvals?.some(
-                    (approval) => approval.user?.role_id === 4 && approval.status === 'approved'
-                  ) && 
-                  detail?.proofs?.length > 0 && (
-                    <div className="text-xs mb-2 grid grid-cols-2">
-                      <div className="text-muted-foreground">Print Detail</div>
-                      <div className="font-semibold">
-                        <button
-                          onClick={() => router.push(`/submission/print/${submissionId}`)}
-                          className="bg-blue-500 text-white px-4 py-2 rounded"
-                        >
-                          Print
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
                 <div className="flex justify-end">
                   {showActions && (
                     <>
@@ -730,7 +716,7 @@ export default function DetailSubmission() {
                             <AlertDialogTitle className="">Yeay! Sukses</AlertDialogTitle>
                             <AlertDialogDescription className="">Anda telah berhasil menyetujui pengajuan pembayaran</AlertDialogDescription>
                             <AlertDialogAction
-                                onClick={() =>setOpenSuccess(false)}
+                                onClick={() => router.push('/submission')}
                                 className="w-full bg-[#F9B421]"
                             >
                                 Kembali
@@ -738,7 +724,7 @@ export default function DetailSubmission() {
                         </AlertDialogContent>
                     </AlertDialog>
                     {/* openSuccesUpload */}
-                     <AlertDialog open={openSuccesUpload} onOpenChange={setOpenSuccesUpload}>
+              <AlertDialog open={openSuccesUpload} onOpenChange={setOpenSuccesUpload}>
                         <AlertDialogContent className="flex flex-col items-center justify-center text-center">
                             <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#DCFCE7" }}>
                                 <svg
@@ -760,35 +746,6 @@ export default function DetailSubmission() {
                             <AlertDialogDescription className="">Anda telah berhasil mengirim bukti transfer</AlertDialogDescription>
                             <AlertDialogAction
                                 onClick={() => setOpenSuccesUpload(false)}
-                                className="w-full bg-[#F9B421]"
-                            >
-                                Kembali
-                            </AlertDialogAction>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                    {/* openSuccesUDenied */}
-                     <AlertDialog open={openSuccessDenied} onOpenChange={setOpenSuccessDenied}>
-                        <AlertDialogContent className="flex flex-col items-center justify-center text-center">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-full" style={{ background: "#DCFCE7" }}>
-                                <svg
-                                    className="w-6 h-6 text-green-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M5 13l4 4L19 7"
-                                    ></path>
-                                </svg>
-                            </div>
-                            <AlertDialogTitle className="">Yeay! Sukses</AlertDialogTitle>
-                            <AlertDialogDescription className="">Anda telah berhasil menolak pengajuan ini</AlertDialogDescription>
-                            <AlertDialogAction
-                                onClick={() => router.push('/submission')}
                                 className="w-full bg-[#F9B421]"
                             >
                                 Kembali
@@ -829,8 +786,7 @@ export default function DetailSubmission() {
 
             </CardContent>
           </Card>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    )
 }

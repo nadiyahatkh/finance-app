@@ -26,6 +26,7 @@ export default function SubmissionAdmin(){
   const [statusFilter, setStatusFilter] = useState([]);
   const [data, setData] = useState([])
   const [openSuccess, setOpenSuccess] = useState(false);
+  const [openSuccessDenied, setOpenSuccessDenied] = useState(false)
     const [openError, setOpenError] = useState(false);
     const [errorMessages, setErrorMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +45,7 @@ export default function SubmissionAdmin(){
 
   const submissionData = async () => {
     try {
-      const due_date = date?.from ? format(date.from, "yyyy-MM-dd") : "";
+      const due_date = date ? format(date, "yyyy-MM-dd") : "";
         const pengajuan = await fetchSubmission({ token, search, due_date,page, per_page: perPage,  status: statusFilter, type: typeFilter});
         setData(pengajuan.submissions.data);
         setTotalPage(pengajuan.submissions.last_page)
@@ -68,7 +69,7 @@ export default function SubmissionAdmin(){
             color: colorStyles[2]
           },
           {
-            label: "Jumlah (Rp)",
+            label: "Pending Balance",
             amount: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(pengajuan.data.amount),
             image: "./Rp.png",
             color: colorStyles[3]
@@ -123,6 +124,7 @@ export default function SubmissionAdmin(){
       submissionData()
       setNotes('');
       setIsDialogOpen(false);
+      setOpenSuccessDenied(true)
     } catch (error) {
       let message = '';
       try {
@@ -140,6 +142,13 @@ export default function SubmissionAdmin(){
     }
   };
 
+  const resetDateFilter = () => {
+    setDate();
+    submissionData();
+  };
+
+  const isDateDefault = () => !date; 
+
     return(
     <div className="py-4">
       <div className="w-full max-w-7xl mx-auto">
@@ -153,7 +162,7 @@ export default function SubmissionAdmin(){
           </div>
           {/* Right section */}
           <div className="flex items-center space-x-4">
-            <Popover>
+            {/* <Popover>
             <PopoverTrigger asChild>
               <Button
                 id="date"
@@ -191,14 +200,40 @@ export default function SubmissionAdmin(){
                 numberOfMonths={2}
               />
             </PopoverContent>
-          </Popover>
+          </Popover> */}
+          <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-[280px] justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(selectedDate) => {
+                    console.log("Selected date:", selectedDate); // Debug date value
+                    setDate(selectedDate);
+                    submissionData(); // Memanggil ulang data setelah memilih tanggal
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
 
 
-              {/* {!isDateDefault() && (
+              {!isDateDefault() && (
               <Button variant="outline" className="text-red-500" style={{ color: '#F9B421', border: 'none' }} onClick={resetDateFilter}>
                 Reset Date
               </Button>
-            )} */}
+            )}
           </div>
         </div>
             <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4 mb-4">
@@ -225,6 +260,8 @@ export default function SubmissionAdmin(){
             errorMessages={errorMessages}
             openSuccess={openSuccess}
             setOpenSuccess={setOpenSuccess}
+            openSuccessDenied={openSuccessDenied}
+            setOpenSuccessDenied={setOpenSuccessDenied}
             setIsDialogOpen={setIsDialogOpen}
             isDialogOpen={isDialogOpen}
             isLoadingTolak={isLoadingTolak}

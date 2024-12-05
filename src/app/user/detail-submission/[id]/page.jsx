@@ -107,12 +107,11 @@ if (userPositionName === "GA") {
                     {detail?.type}
                   </div>
                 </div>
+                    {images.length > 0 ? (
                 <div className="text-xs mb-2 grid grid-cols-2">
                   <div className="text-muted-foreground">Bukti</div>
                   <div className="font-semibold">
-                    {images.length > 0 ? (
-                      images.map((image, index) => (
-                        <Dialog key={index}>
+                      <Dialog >
                           <DialogTrigger>
                             <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
                           </DialogTrigger>
@@ -121,8 +120,9 @@ if (userPositionName === "GA") {
                               <Carousel
                                 plugins={[Autoplay({ delay: 2000 })]}
                                 className="w-full"
-                              >
+                                >
                                 <CarouselContent>
+                                {images.map((image, index) => (
                                   <CarouselItem key={index}>
                                     <div className="p-1">
                                       <Card>
@@ -138,6 +138,7 @@ if (userPositionName === "GA") {
                                       </Card>
                                     </div>
                                   </CarouselItem>
+                                ))}
                                 </CarouselContent>
                                 <CarouselPrevious />
                                 <CarouselNext />
@@ -145,12 +146,11 @@ if (userPositionName === "GA") {
                             </div>
                           </DialogContent>
                         </Dialog>
-                      ))
+                  </div>
+                  </div>
                     ) : (
                       ""
                     )}
-                  </div>
-                </div>
                 <div className="text-xs mb-2 grid grid-cols-2">
                   <div className="text-muted-foreground">Bukti Transfer</div>
                   <div className="font-semibold">
@@ -213,23 +213,27 @@ if (userPositionName === "GA") {
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
                     <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
                   </div>
-                  <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Bukti Pdf</div>
-                    <div className="font-semibold">
-                    {pdfs.map((pdfUrl, index) => (
-                        <a
-                          key={index}
-                          href={pdfUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 underline"
-                          download
-                        >
-                          Download PDF
-                        </a>
-                      ))}
+                  {pdfs.length > 0 ? (
+                    <div className="text-xs mb-2 grid grid-cols-2">
+                      <div className="text-muted-foreground">Bukti Pdf</div>
+                      <div className="font-semibold">
+                      {pdfs.map((pdfUrl, index) => (
+                          <a
+                            key={index}
+                            href={pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                            download
+                          >
+                            Download PDF
+                          </a>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    ""
+                  )}
                 </div>
               </div>
 
