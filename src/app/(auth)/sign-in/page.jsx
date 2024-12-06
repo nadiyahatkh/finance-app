@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getSession, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TailSpin, ThreeDots } from "react-loader-spinner";
 export default function SignIn(){
 
@@ -59,6 +59,16 @@ export default function SignIn(){
         setIsSubmitting(false);
       }
     };
+
+    useEffect(() => {
+      if (status === 'authenticated') {
+        if (session?.user?.role === 1, 2, 3, 4) {
+          router.push('/dashboard');
+        } else {
+          router.push('/user');
+        }
+      }
+    }, [status, session, router]);
 
 
     return(

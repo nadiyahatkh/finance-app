@@ -12,21 +12,20 @@ export default withAuth(
 
     const { pathname } = req.nextUrl;
 
-    // Redirect logged-in users away from the /sign-in page
-    // if (pathname === "/sign-in") {
-    //   if ([1, 2, 3, 4].includes(token.role)) {
-    //     return NextResponse.redirect(new URL('/dashboard', req.url));
-    //   } else if (token.role === 5) {
-    //     return NextResponse.redirect(new URL('/user', req.url));
-    //   }
-    // }
+    // Restrict access to root ("/") for all roles
+    if (pathname === "/") {
+      if ([1, 2, 3, 4].includes(token.role)) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+      } else if (token.role === 5) {
+        return NextResponse.redirect(new URL('/user', req.url));
+      }
+    }
 
-    // Prevent roles 1, 2, 3, and 4 from accessing the "/user" page
+
     if ([1, 2, 3, 4].includes(token.role) && pathname === "/user") {
       return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 
-    // Restrict role 5 to only access the "/user" page
     if (token.role === 5 && pathname !== "/user") {
       return NextResponse.redirect(new URL('/user', req.url));
     }
@@ -36,13 +35,14 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token, // Allow access if the user has a token
+      authorized: ({ token }) => !!token,
     },
   }
 );
 
 export const config = {
   matcher: [
+    "/",
     "/user",
     "/dashboard",
     "/submission",
