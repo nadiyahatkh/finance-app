@@ -18,7 +18,7 @@ export const statuses = [
 export const incomeType = [
   {
     label: "Reimbursement",
-    value: "Reimburesment",
+    value: "Reimbursement",
     icon: ArrowUpIcon
   },
   {

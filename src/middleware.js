@@ -5,14 +5,12 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
 
-    // Redirect to /sign-in if no token is present
     if (!token) {
       return NextResponse.redirect(new URL('/sign-in', req.url));
     }
 
     const { pathname } = req.nextUrl;
 
-    // Restrict access to root ("/") for all roles
     if (pathname === "/") {
       if ([1, 2, 3, 4].includes(token.role)) {
         return NextResponse.redirect(new URL('/dashboard', req.url));
