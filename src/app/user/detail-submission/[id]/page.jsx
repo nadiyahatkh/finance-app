@@ -23,8 +23,8 @@ export default function DetailSubmission() {
     const loadDetail = async () => {
       if (token && id) {
         const response = await fetchSubmissionUserDetail({ token, id });
-        setDetail(response?.data);
-        setFile(response?.proofs)
+        setDetail(response?.data.submission);
+        setFile(response?.data.submission.proofs)
       }
     };
 
@@ -41,7 +41,7 @@ export default function DetailSubmission() {
   
   const userPositionName = detail?.user?.position?.name; // Contoh: "Manager"
 
-
+// Filter langkah sesuai posisi
 let filteredSteps;
 
 if (userPositionName === "GA") {
@@ -61,7 +61,7 @@ if (userPositionName === "GA") {
     ["Pengajuan dibuat", "Head of FAT"].includes(step.role)
   );
 } else {
-  filteredSteps = steps;
+  filteredSteps = steps; // Default: Tampilkan semua langkah jika posisi tidak ditentukan
 }
   
 
@@ -86,7 +86,19 @@ if (userPositionName === "GA") {
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal</div>
-                    <div className="font-semibold">{detail?.submission_date ? new Date(detail.submission_date).toLocaleDateString() : ""}</div>
+                    <div className="font-semibold">
+                    {detail?.submission_date
+                      ? `${new Date(detail.submission_date).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }).replace(/\//g, '-')}, ${new Date(detail.submission_date).toLocaleTimeString("id-ID", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        })} WIB`
+                      : ""}
+                  </div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tujuan Pembayaran/Pengeluaran</div>
@@ -94,7 +106,15 @@ if (userPositionName === "GA") {
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal Pembayaran</div>
-                    <div className="font-semibold">{detail?.due_date ? new Date(detail.due_date).toLocaleDateString() : ""}</div>
+                    <div className="font-semibold">
+                      {detail?.due_date ? 
+                        `${new Date(detail.submission_date).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }).replace(/\//g, '-')}` : ""
+                      }
+                    </div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                   <div className="text-muted-foreground">Tipe</div>
@@ -211,7 +231,7 @@ if (userPositionName === "GA") {
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
-                    <div className="font-semibold">{detail.amount ? formatCurrency(detail?.amount) : ""}</div>
+                    <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
                   </div>
                   {pdfs.length > 0 ? (
                     <div className="text-xs mb-2 grid grid-cols-2">

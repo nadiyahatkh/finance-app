@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CalendarIcon, CircleX, CloudDownload, Plus, Trash, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,9 +18,8 @@ import { format } from "date-fns";
 import { useFieldArray } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { fetchBanks } from "@/app/apiService";
-import { createSubmissionUser, fetchBankDetail, fetchSubmissionUser } from "../apiService";
-import { TailSpin, ThreeDots } from "react-loader-spinner";
+import { createSubmissionUser, fetchSubmissionUser } from "../apiService";
+import { ThreeDots } from "react-loader-spinner";
 import { useRouter } from "next/navigation";
 
 
@@ -167,7 +165,7 @@ export default function SubmissionUser() {
                                     <FormField
                                         control={form.control}
                                         name="type"
-                                        render={({ field }) => (
+                                        render={({ field, fieldState }) => (
                                             <>
                                             <RadioGroup
                                             onValueChange={(value) => {
@@ -202,12 +200,10 @@ export default function SubmissionUser() {
                                     <FormField
                                         control={form.control}
                                         name="purpose"
-                                        render={({ field }) => (
+                                        render={({ field, fieldState }) => (
                                             <>
                                             <Input {...field} className="" placeholder="Masukkan tujuan..." type="text" />
-                                            {form.formState.errors.purpose && (
-                                            <FormMessage type="error" className="italic">{form.formState.errors.purpose.message}</FormMessage>
-                                            )}
+                                            {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                             </>
                                         )}
                                     />
@@ -245,12 +241,10 @@ export default function SubmissionUser() {
                                             <FormField
                                                 control={form.control}
                                                 name="account_name"
-                                                render={({ field }) => (
+                                                render={({ field, fieldState }) => (
                                                 <>
                                                     <Input {...field} className="" placeholder="Masukkan nama rekening..." type="text" />
-                                                    {form.formState.errors.account_name && (
-                                                        <FormMessage type="error" className="italic">{form.formState.errors.account_name.message}</FormMessage>
-                                                    )}
+                                                    {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                                 </>
                                                 )}
                                                 />
@@ -260,12 +254,10 @@ export default function SubmissionUser() {
                                             <FormField
                                                 control={form.control}
                                                 name="bank_name"
-                                                render={({ field }) => (
+                                                render={({ field, fieldState }) => (
                                                 <>
                                                     <Input {...field} className="" placeholder="Masukkan tujuan..." type="text" />
-                                                    {form.formState.errors.bank_name && (
-                                                        <FormMessage type="error" className="italic">{form.formState.errors.bank_name.message}</FormMessage>
-                                                    )}
+                                                    {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                                 </>
                                                 )}
                                                 />
@@ -275,17 +267,15 @@ export default function SubmissionUser() {
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2">Nomor Rekening</Label>
                                     <FormField
-                                                control={form.control}
-                                                name="account_number"
-                                                render={({ field }) => (
-                                                <>
-                                                    <Input {...field} className="" placeholder="Masukkan nama rekening..." type="number" />
-                                                    {form.formState.errors.account_number && (
-                                                        <FormMessage type="error" className="italic">{form.formState.errors.account_number.message}</FormMessage>
-                                                    )}
-                                                </>
-                                                )}
-                                                />
+                                        control={form.control}
+                                        name="account_number"
+                                        render={({ field, fieldState }) => (
+                                        <>
+                                            <Input {...field} className="" placeholder="Masukkan nama rekening..." type="text" />
+                                            {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                                        </>
+                                        )}
+                                        />
                                 </div>
                                 <hr className="mb-4" />
                                 <div className="mb-4">

@@ -226,7 +226,19 @@ export default function PrintDetailSubmission() {
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal</div>
-                    <div className="font-semibold">{new Date(detail?.submission_date).toLocaleDateString()}</div>
+                    <div className="font-semibold">
+                    {detail?.submission_date
+                      ? `${new Date(detail.submission_date).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }).replace(/\//g, '-')}, ${new Date(detail.submission_date).toLocaleTimeString("id-ID", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        })} WIB`
+                      : ""}
+                  </div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tujuan Pembayaran/Pengeluaran</div>
@@ -234,7 +246,15 @@ export default function PrintDetailSubmission() {
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tanggal Pembayaran</div>
-                    <div className="font-semibold">{new Date(detail?.due_date).toLocaleDateString()}</div>
+                    <div className="font-semibold">
+                      {detail?.due_date ? 
+                        `${new Date(detail.submission_date).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }).replace(/\//g, '-')}` : ""
+                      }
+                    </div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Tipe</div>
@@ -300,11 +320,18 @@ export default function PrintDetailSubmission() {
                         <div className="items-top flex space-x-2">
                         <input 
                             type="checkbox" 
+                            className="peer hidden"
                             id="terms1"
                             checked={isChecked} 
                             onChange={handleCheckboxChange} 
                             disabled={isChecked} 
                           />
+                          <label
+                            htmlFor="terms1"
+                            className="block w-5 h-5 border border-gray-300 rounded-sm cursor-pointer peer-checked:bg-[#F9B421] peer-checked:border-[#F9B421] peer-checked:text-white flex items-center justify-center peer-disabled:cursor-not-allowed"
+                          >
+                            ✓
+                            </label>
                         {/* {loading && <span>Loading...</span>} */}
                         </div>
                       </div>
