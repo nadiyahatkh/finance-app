@@ -287,7 +287,7 @@ export default function DetailSubmission() {
                 {role === 4 && (
 
                   <div className="text-xs mb-2 grid grid-cols-2">
-                      <div className="text-muted-foreground">Bukti HardCopy</div>
+                      <div className="text-muted-foreground">Bukti Hard Copy</div>
                       <div className="">
                         <div className="items-top flex space-x-2">
                         <input 

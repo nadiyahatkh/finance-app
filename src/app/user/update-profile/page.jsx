@@ -18,8 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 
 const FormSchema = z.object({
-    name: z.string().min(1, { message: "Nama karyawan is required." }),
-    username: z.string().min(1, { message: "Nama karyawan is required." }),
+    name: z.string().min(1, { message: "Name is required." }),
+    username: z.string().min(1, { message: "Username is required." }),
     email: z.string().min(1, { message: "Email is required." }),
     password: z.string().optional(),
     path: z.any().optional(),

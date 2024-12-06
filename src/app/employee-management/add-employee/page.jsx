@@ -169,12 +169,10 @@ export default function AddEmployee() {
                                 <FormField
                                 control={form.control}
                                 name="name"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                     <>
                                     <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Alicia" type="text" />
-                                    {form.formState.errors.name && (
-                                    <FormMessage type="error" className="italic">{form.formState.errors.name.message}</FormMessage>
-                                    )}
+                                    {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                     </>
                                 )}
                                 />
@@ -184,12 +182,10 @@ export default function AddEmployee() {
                                 <FormField
                                 control={form.control}
                                 name="username"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                     <>
                                     <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Alicia" type="text" />
-                                    {form.formState.errors.username && (
-                                    <FormMessage type="error" className="italic">{form.formState.errors.username.message}</FormMessage>
-                                    )}
+                                    {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                     </>
                                 )}
                                 />
@@ -199,12 +195,10 @@ export default function AddEmployee() {
                                 <FormField
                                 control={form.control}
                                 name="password"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                 <>
                                 <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="****" type="password" />
-                                {form.formState.errors.password && (
-                                    <FormMessage type="error" className="italic">{form.formState.errors.password.message}</FormMessage>
-                                    )}
+                                {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                 </>
                                 )}
                                 />
@@ -214,12 +208,10 @@ export default function AddEmployee() {
                                 <FormField
                                 control={form.control}
                                 name="email"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                 <>
                                 <Input {...field} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="name@gmail.com" type="email" />
-                                {form.formState.errors.email && (
-                                    <FormMessage type="error" className="italic">{form.formState.errors.email.message}</FormMessage>
-                                )}
+                                {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                 </>
                                 )}
                                 />
@@ -229,7 +221,7 @@ export default function AddEmployee() {
                                 <FormField
                                 control={form.control}
                                 name="manager_id"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                     <>
                                         <Select
                                         value={field.value ? field.value.toString() : ""}
@@ -248,9 +240,7 @@ export default function AddEmployee() {
                                             ))}
                                         </SelectContent>
                                         </Select>
-                                        {form.formState.errors.manager_id && (
-                                            <FormMessage type="error" className="italic">{form.formState.errors.manager_id.message}</FormMessage>
-                                        )}
+                                        {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                     </>
                                 )}
                                 />
@@ -260,7 +250,7 @@ export default function AddEmployee() {
                                 <FormField
                                     control={form.control}
                                     name="department_id"
-                                    render={({ field }) => (
+                                    render={({ field, fieldState }) => (
                                     <>
                                         <Select
                                         value={field.value ? field.value.toString() : ""}
@@ -279,9 +269,7 @@ export default function AddEmployee() {
                                             ))}
                                         </SelectContent>
                                         </Select>
-                                        {form.formState.errors.department_id && (
-                                            <FormMessage type="error" className="italic">{form.formState.errors.department_id.message}</FormMessage>
-                                        )}
+                                        {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                     </>
                                     )}
                                     />
@@ -291,7 +279,7 @@ export default function AddEmployee() {
                                 <FormField
                                     control={form.control}
                                     name="position_id"
-                                    render={({ field }) => (
+                                    render={({ field, fieldState }) => (
                                     <>
                                     
                                         <Select
@@ -311,9 +299,7 @@ export default function AddEmployee() {
                                             ))}
                                         </SelectContent>
                                         </Select>
-                                        {form.formState.errors.position_id && (
-                                            <FormMessage type="error" className="italic">{form.formState.errors.position_id.message}</FormMessage>
-                                        )}
+                                        {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
                                     </>
                                     )}
                                     />

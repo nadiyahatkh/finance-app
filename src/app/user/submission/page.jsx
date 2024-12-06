@@ -168,6 +168,7 @@ export default function SubmissionUser() {
                                         control={form.control}
                                         name="type"
                                         render={({ field }) => (
+                                            <>
                                             <RadioGroup
                                             onValueChange={(value) => {
                                                 field.onChange(value);
@@ -189,6 +190,9 @@ export default function SubmissionUser() {
                                                         <p className="title text-muted-foreground text-xs ml-6">Pengajuan pembayaran kepada pihak ketiga untuk barang atau jasa yang diterima.</p>
                                                     </div>
                                             </RadioGroup>
+                                            {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                                            
+                                            </>
                                         )}
                                     />
                                     
@@ -213,20 +217,24 @@ export default function SubmissionUser() {
                                     <FormField
                                     control={form.control}
                                     name="due_date"
-                                    render={({ field }) => (
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                        <FormControl>
-                                            <Button variant="outline" className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                            {field.value ? format(field.value, 'PPP') : <span>Pilih tanggal pengajuan</span>}
-                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date().setHours(0, 0, 0, 0)} initialFocus />
-                                        </PopoverContent>
-                                    </Popover>
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button variant="outline" className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                                    {field.value ? format(field.value, 'PPP') : <span>Pilih tanggal pengajuan</span>}
+                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date().setHours(0, 0, 0, 0)} initialFocus />
+                                                </PopoverContent>
+                                            </Popover>
+                                            {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                                        
+                                        </>
                                     )}
                                     />
                                 </div>
