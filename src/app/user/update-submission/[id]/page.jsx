@@ -73,24 +73,24 @@ export default function UpdateSubmission(){
           if (token && id) {
             const response = await submissionDetailId({ token, id });
       
-            form.setValue('bank_name', response.data.bank_name, { shouldValidate: true });
-            form.setValue('account_name', response.data.account_name, { shouldValidate: true });
-            form.setValue('account_number', response.data.account_number, { shouldValidate: true });
-            form.setValue('purpose', response.data.purpose, { shouldValidate: true });
-            form.setValue('due_date', new Date(response.data.due_date), { shouldValidate: true });
-            form.setValue('type', response.data.type, { shouldValidate: true });
+            form.setValue('bank_name', response.data.submission.bank_name, { shouldValidate: true });
+            form.setValue('account_name', response.data.submission.account_name, { shouldValidate: true });
+            form.setValue('account_number', response.data.submission.account_number, { shouldValidate: true });
+            form.setValue('purpose', response.data.submission.purpose, { shouldValidate: true });
+            form.setValue('due_date', new Date(response.data.submission.due_date), { shouldValidate: true });
+            form.setValue('type', response.data.submission.type, { shouldValidate: true });
             remove();
             
-            response.data.items.forEach(item => {
+            response.data.submission.items.forEach(item => {
               append({
                 description: item.description,
                 quantity: item.quantity,
                 price: item.price,
               });
             });
-            setImage(response.data.files?.map(file => file.image)?.flat() || []);
-            setPdfFiles(response.data.files?.map(file => file.pdf)?.flat() || []);
-            setTransactionType(response.data.type);
+            setImage(response.data.submission.files?.map(file => file.image)?.flat() || []);
+            setPdfFiles(response.data.submission.files?.map(file => file.pdf)?.flat() || []);
+            setTransactionType(response.data.submission.type);
           }
         };
       
@@ -340,7 +340,7 @@ export default function UpdateSubmission(){
                                     name="account_number"
                                     render={({ field }) => (
                                     <>
-                                        <Input {...field} className="" placeholder="Masukkan nama rekening..." type="number" />
+                                        <Input {...field} className="" placeholder="Masukkan nama rekening..." type="text" />
                                         {form.formState.errors.account_number && (
                                             <FormMessage type="error" className="italic">{form.formState.errors.account_number.message}</FormMessage>
                                         )}

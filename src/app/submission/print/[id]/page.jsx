@@ -241,7 +241,7 @@ export default function PrintDetailSubmission() {
                   </div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Tujuan Pembayaran/Pengeluaran</div>
+                    <div className="text-muted-foreground">Tujuan Pembayaran/ Pengeluaran</div>
                     <div className="font-semibold">{detail?.purpose}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
@@ -315,7 +315,7 @@ export default function PrintDetailSubmission() {
                 {role === 4 && (
 
                   <div className="text-xs mb-2 grid grid-cols-2">
-                      <div className="text-muted-foreground">Bukti HardCopy</div>
+                      <div className="text-muted-foreground">Bukti Hard Copy</div>
                       <div className="">
                         <div className="items-top flex space-x-2">
                         <input 
@@ -328,7 +328,7 @@ export default function PrintDetailSubmission() {
                           />
                           <label
                             htmlFor="terms1"
-                            className="block w-5 h-5 border border-gray-300 rounded-sm cursor-pointer peer-checked:bg-[#F9B421] peer-checked:border-[#F9B421] peer-checked:text-white flex items-center justify-center peer-disabled:cursor-not-allowed"
+                            className=" w-5 h-5 border border-gray-300 rounded-sm cursor-pointer peer-checked:bg-[#F9B421] peer-checked:border-[#F9B421] peer-checked:text-white flex items-center justify-center peer-disabled:cursor-not-allowed"
                           >
                             ✓
                             </label>
@@ -353,7 +353,7 @@ export default function PrintDetailSubmission() {
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
-                    <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
+                    <div className="font-semibold">{detail?.amount ? formatCurrency(detail?.amount) : ""}</div>
                   </div>
                   {pdfs.length > 0 ? (
 

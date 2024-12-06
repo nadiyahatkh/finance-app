@@ -32,7 +32,6 @@ export default function DetailSubmission() {
   const [detail, setDetail] = useState()
   const router = useRouter();
   const [showActions, setShowActions] = useState(true);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const role = session?.user?.role
   const [isDialogOpenUpload, setIsDialogOpenUpload] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -233,7 +232,7 @@ export default function DetailSubmission() {
                   </div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Tujuan Pembayaran/Pengeluaran</div>
+                    <div className="text-muted-foreground">Tujuan Pembayaran/ Pengeluaran</div>
                     <div className="font-semibold">{detail?.purpose}</div>
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
@@ -320,7 +319,7 @@ export default function DetailSubmission() {
                           />
                           <label
                             htmlFor="terms1"
-                            className="block w-5 h-5 border border-gray-300 rounded-sm cursor-pointer peer-checked:bg-[#F9B421] peer-checked:border-[#F9B421] peer-checked:text-white flex items-center justify-center peer-disabled:cursor-not-allowed"
+                            className="w-5 h-5 border border-gray-300 rounded-sm cursor-pointer peer-checked:bg-[#F9B421] peer-checked:border-[#F9B421] peer-checked:text-white flex items-center justify-center peer-disabled:cursor-not-allowed"
                           >
                             ✓
                             </label>
@@ -475,7 +474,7 @@ export default function DetailSubmission() {
                                  <Button type="button" variant="outline" className="mb-4" onClick={() => document.getElementById('fileInput').click()}>Pilih File</Button>
                               </div>
                               {selectedFiles.length > 0 && (
-                                        <div className="mt-4 space-y-2">
+                                        <div className=" space-y-2">
                                             {selectedFiles.map(file => (
                                                 <Card key={file.name} className="flex justify-between items-center">
                                                     <span className="text-sm text-muted-foreground p-2">{file.file.name}</span>
@@ -486,7 +485,7 @@ export default function DetailSubmission() {
                                             ))}
                                         </div>
                                     )}
-                              <DialogFooter>
+                              <DialogFooter className="mt-4">
                                 <Button
                                   variant="outline"
                                   onClick={() => setIsDialogOpenUpload(false)}
@@ -530,7 +529,7 @@ export default function DetailSubmission() {
                       <div className="font-semibold">
                         <button
                           onClick={() => router.push(`/submission/print/${submissionId}`)}
-                          className="bg-blue-500 text-white px-4 py-2 rounded"
+                          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-black"
                         >
                           Print
                         </button>
