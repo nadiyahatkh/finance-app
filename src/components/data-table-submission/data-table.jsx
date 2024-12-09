@@ -227,13 +227,13 @@ export function DataTable({
                                 variant="outline"
                                 onClick={() => setIsDialogOpen(false)}
                                 type="button"
-                                className="mr-2 shadow-md h-8 w-[20%] text-[#F9B421]"
+                                className="mr-2 shadow-md h-8 w-[20%] text-[#F9B421] hover:bg-black"
                               >
                                 Kembali
                               </Button>
                               <Button 
                                 type="submit"
-                                className="text-white h-8 w-[20%] bg-[#F9B421]"
+                                className="text-white h-8 w-[20%] bg-[#F9B421] hover:bg-black"
                                 disabled={isLoadingTolak}
                               >
                                 {isLoadingTolak ? (
@@ -253,7 +253,7 @@ export function DataTable({
                       </Dialog>
                       ) : null}
                    {table.getFilteredSelectedRowModel().rows.length > 0 ? (   
-              <Button className="" onClick={() => setIsApprovedAllDialogOpen(true)} style={{ background: "#F9B421" }}>
+              <Button className="bg-[#F9B421] hover:bg-black" onClick={() => setIsApprovedAllDialogOpen(true)}>
                   Setujui Semua
               </Button>
             ) : null}

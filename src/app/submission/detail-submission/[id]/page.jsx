@@ -10,7 +10,7 @@ import { approvedSubmission, checkBoxFinance, deniedSubmission, fetchSubmissionD
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Hearts, ThreeDots } from "react-loader-spinner";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay"
 import { Checkbox } from "@/components/ui/checkbox";
@@ -40,6 +40,7 @@ export default function DetailSubmission() {
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false); 
   const [file, setFile] = useState()
+  const [isOpenDialogApprove, setIsOpenDialogApproved] = useState(false)
   
   const loadDetail = async () => {
     if (token && submissionId) {
@@ -74,6 +75,7 @@ export default function DetailSubmission() {
     setIsLoading(true);
     try {
       await approvedSubmission({ id: submissionId, token });
+      setIsOpenDialogApproved(false)
       setOpenSuccess(true);
       loadDetail()
     } catch (error) {
@@ -595,11 +597,25 @@ export default function DetailSubmission() {
                         </DialogContent>
                       </Dialog>
 
+
                       <Button
-                        onClick={handleAccept}
+                        onClick={() => setIsOpenDialogApproved(true)}
                         className="ml-2 bg-[#F9B421] hover:bg-[#E5A50F] transition-colors"
                       >
-                        {isLoading ? (
+                        Setujui
+                      </Button>
+                      <AlertDialog open={isOpenDialogApprove} onClose={() => setIsOpenDialogApproved(false)}>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Apakah Anda sudah yakin?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Ingin Mensetujui pengajuan ini?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setIsOpenDialogApproved(false)}>Batal</AlertDialogCancel>
+                            <AlertDialogAction disabled={isLoading} onClick={handleAccept} className="bg-[#F9B421]">
+                            {isLoading ? (
                               <ThreeDots
                               height="20"
                               width="20"
@@ -609,7 +625,10 @@ export default function DetailSubmission() {
                           ) : (
                               "Setujui"
                           )}
-                      </Button>
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </>
                   )}
                 </div>
