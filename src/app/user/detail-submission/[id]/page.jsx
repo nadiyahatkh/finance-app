@@ -23,8 +23,8 @@ export default function DetailSubmission() {
     const loadDetail = async () => {
       if (token && id) {
         const response = await fetchSubmissionUserDetail({ token, id });
-        setDetail(response?.data.submission);
-        setFile(response?.data.submission.proofs)
+        setDetail(response?.data?.submission);
+        setFile(response?.data?.submission?.proofs)
       }
     };
 
@@ -67,7 +67,8 @@ if (userPositionName === "GA") {
 
   const images = detail?.files?.map(file => file.image_urls)?.flat() || [];
   const pdfs = detail?.files?.map(file => file.pdf_urls)?.flat() || [];
-  const files = file?.map(file => file.url)?.flat() || [];
+  const imagesProofs = detail?.proofs?.map(file => file.image_urls)?.flat() || [];
+  const pdfsProofs = detail?.proofs?.map(file => file.pdf_urls)?.flat() || [];
 
   const items = detail?.items || [];
   const totalAmount = items.reduce((acc, item) => acc + (item.quantity * item.price), 0)
@@ -92,7 +93,7 @@ if (userPositionName === "GA") {
                           day: "2-digit",
                           month: "2-digit",
                           year: "numeric",
-                        }).replace(/\//g, '-')}, ${new Date(detail.submission_date).toLocaleTimeString("id-ID", {
+                        }).replace(/\//g, '-')}, ${new Date(detail.submission_date).toLocaleString("id-ID", {
                           hour: "2-digit",
                           minute: "2-digit",
                           hour12: false,
@@ -171,50 +172,73 @@ if (userPositionName === "GA") {
                     ) : (
                       ""
                     )}
-                <div className="text-xs mb-2 grid grid-cols-2">
-                  <div className="text-muted-foreground">Bukti Transfer</div>
-                  <div className="font-semibold">
-                    {files.length > 0 ? (
-                      <Dialog>
-                          <DialogTrigger>
-                            <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
-                          </DialogTrigger>
-                          <DialogContent className="flex items-center justify-center">
-                            <div className="w-full max-w-xs">
-                              <Carousel
-                                plugins={[Autoplay({ delay: 2000 })]}
-                                className="w-full"
-                                >
-                                <CarouselContent>
-                                {files.map((image, index) => (
-                                  <CarouselItem key={index}>
-                                    <div className="p-1">
-                                      <Card>
-                                        <CardContent className="flex aspect-square items-center justify-center p-0">
-                                          <img
-                                            src={image}
-                                            alt={`${index}`}
-                                            width={500}
-                                            height={500}
-                                            className="w-full h-full object-cover rounded"
-                                          />
-                                        </CardContent>
-                                      </Card>
-                                    </div>
-                                  </CarouselItem>
-                                  ))}
-                                </CarouselContent>
-                                <CarouselPrevious />
-                                <CarouselNext />
-                              </Carousel>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+
+{pdfsProofs.length > 0 ? (
+                    <div className="text-xs mb-2 grid grid-cols-2">
+                      <div className="text-muted-foreground">Bukti Tf pdf</div>
+                      <div className="font-semibold">
+                      {pdfsProofs.map((pdfUrl, index) => (
+                          <a
+                            key={index}
+                            href={pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                            download
+                          >
+                            Download PDF
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                     ) : (
-                      "Belum di setujui"
+                      ""
                     )}
-                  </div>
-                </div>
+
+                      {imagesProofs.length > 0 ? (
+                    <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Bukti Transfer</div>
+                    <div className="font-semibold">
+                        <Dialog>
+                            <DialogTrigger>
+                              <span className="h-4 w-4 p-0 cursor-pointer">Lihat</span>
+                            </DialogTrigger>
+                            <DialogContent className="flex items-center justify-center">
+                              <div className="w-full max-w-xs">
+                                <Carousel
+                                  plugins={[Autoplay({ delay: 2000 })]}
+                                  className="w-full"
+                                  >
+                                  <CarouselContent>
+                                  {imagesProofs.map((image, index) => (
+                                    <CarouselItem key={index}>
+                                      <div className="p-1">
+                                        <Card>
+                                          <CardContent className="flex aspect-square items-center justify-center p-0">
+                                            <img
+                                              src={image}
+                                              alt={`${index}`}
+                                              width={500}
+                                              height={500}
+                                              className="w-full h-full object-cover rounded"
+                                            />
+                                          </CardContent>
+                                        </Card>
+                                      </div>
+                                    </CarouselItem>
+                                    ))}
+                                  </CarouselContent>
+                                  <CarouselPrevious />
+                                  <CarouselNext />
+                                </Carousel>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                    </div>
+                    </div>
+                      ) : (
+                        ""
+                      )}
                 </div>
                 <div className="">
                   <div className="text-xs mb-2 grid grid-cols-2">
@@ -231,7 +255,7 @@ if (userPositionName === "GA") {
                   </div>
                   <div className="text-xs mb-2 grid grid-cols-2">
                     <div className="text-muted-foreground">Jumlah (Rp)</div>
-                    <div className="font-semibold">{formatCurrency(detail?.amount)}</div>
+                    <div className="font-semibold">{detail?.amount ? formatCurrency(detail?.amount) : ""}</div>
                   </div>
                   {pdfs.length > 0 ? (
                     <div className="text-xs mb-2 grid grid-cols-2">
