@@ -101,16 +101,23 @@ export default function SubmissionAdmin(){
       setOpenSuccess(true)
     } catch (error) {
       let message = '';
-      try {
-          const errorDetail = JSON.parse(error.message);
-          setErrorMessages(Object.values(errorDetail.errors).flat());
-      } catch (e) {
-          message = error.message || "An unexpected error occurred.";
-          setErrorMessages([message]);
+    try {
+      // Periksa apakah error.message adalah JSON
+      const errorDetail = JSON.parse(error.message);
+      if (errorDetail.message) {
+        message = errorDetail.message; // Ambil pesan dari respons error
+        setErrorMessages([message]);
+      } else {
+        setErrorMessages(Object.values(errorDetail.errors).flat());
       }
-      setIsApprovedAllDialogOpen(false)
-      setOpenError(true);
-      console.error('Error creating asset:', error);
+    } catch (e) {
+      // Jika JSON parsing gagal, gunakan pesan string bawaan
+      message = error.message || "An unexpected error occurred.";
+      setErrorMessages([message]);
+    }
+    setIsApprovedAllDialogOpen(false)
+    setOpenError(true);
+    console.error('Error deniedall:', error);
     } finally {
       setIsLoading(false);
     }
@@ -127,16 +134,23 @@ export default function SubmissionAdmin(){
       setOpenSuccessDenied(true)
     } catch (error) {
       let message = '';
-      try {
-          const errorDetail = JSON.parse(error.message);
-          setErrorMessages(Object.values(errorDetail.errors).flat());
-      } catch (e) {
-          message = error.message || "An unexpected error occurred.";
-          setErrorMessages([message]);
+    try {
+      // Periksa apakah error.message adalah JSON
+      const errorDetail = JSON.parse(error.message);
+      if (errorDetail.message) {
+        message = errorDetail.message; // Ambil pesan dari respons error
+        setErrorMessages([message]);
+      } else {
+        setErrorMessages(Object.values(errorDetail.errors).flat());
       }
+    } catch (e) {
+      // Jika JSON parsing gagal, gunakan pesan string bawaan
+      message = error.message || "An unexpected error occurred.";
+      setErrorMessages([message]);
+    }
 
-      setOpenError(true);
-      console.error('Error creating asset:', error);
+    setOpenError(true);
+    console.error('Error deniedall:', error);
     } finally {
       setIsLoadingTolak(false);
     }
@@ -252,6 +266,7 @@ export default function SubmissionAdmin(){
             setStatusFilter={setStatusFilter}
             typeFilter={typeFilter} 
             setTypeFilter={setTypeFilter} 
+            handleDeniedAll={handleDeniedAll}
             handleApproveAll={handleApproveAll}
             setIsLoading={setIsLoading}
             isLoading={isLoading}
@@ -266,7 +281,6 @@ export default function SubmissionAdmin(){
             isDialogOpen={isDialogOpen}
             isLoadingTolak={isLoadingTolak}
             setIsLoadingTolak={setIsLoadingTolak}
-            handleDeniedAll={handleDeniedAll}
             notes={notes}
             setNotes={setNotes}
             currentPage={page} 

@@ -130,7 +130,10 @@ export const fetchSubmission = async ({token, search, type, status, due_date, pa
           try{
           const formData = new FormData();
           formData.append('notes', notes);
-          formData.append('selected_ids[]', selected_ids);
+          selected_ids.forEach((id) => {
+            formData.append('selected_ids[]', id); // Tambahkan setiap ID satu per satu
+          });
+      
 
           const response = await fetch(`${BASE_URL}/api/dataApplicant/deniedall`, {
             method: 'POST',
@@ -149,7 +152,7 @@ export const fetchSubmission = async ({token, search, type, status, due_date, pa
           const result = await response.json();
           return result;
         } catch (error) {
-          console.error('Error update users:', error);
+          console.error('Error :', error);
           throw error;
         }
         };

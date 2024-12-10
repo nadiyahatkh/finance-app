@@ -417,7 +417,7 @@ export default function UpdateSubmission(){
                                 <div className="mb-4">
                                     <Label className="block text-sm mb-2 font-semibold">Bukti Pembayaran/Pengeluaran</Label>
                                     <div className="border-dashed border-2 rounded-lg flex flex-col items-center justify-center p-4 mb-1">
-                                        <img src=".././upload.png" className="mb-4" alt="" />
+                                        <img src="/upload.png" className="mb-4" alt="" />
                                         <div className="font-semibold text-xs mb-5">Drag your file to start uploading format PDF</div>
 
                                         <input
