@@ -173,7 +173,47 @@ if (userPositionName === "GA") {
                       ""
                     )}
 
-{pdfsProofs.length > 0 ? (
+                </div>
+                <div className="">
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Nama Bank</div>
+                    <div className="font-semibold">{detail?.bank_name}</div>
+                  </div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Nama Pemilik Rekening</div>
+                    <div className="font-semibold">{detail?.account_name}</div>
+                  </div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Nomor Rekening</div>
+                    <div className="font-semibold">{detail?.account_number}</div>
+                  </div>
+                  <div className="text-xs mb-2 grid grid-cols-2">
+                    <div className="text-muted-foreground">Jumlah (Rp)</div>
+                    <div className="font-semibold">{detail?.amount ? formatCurrency(detail?.amount) : ""}</div>
+                  </div>
+                  {pdfs.length > 0 ? (
+                    <div className="text-xs mb-2 grid grid-cols-2">
+                      <div className="text-muted-foreground">Bukti Pdf</div>
+                      <div className="font-semibold">
+                      {pdfs.map((pdfUrl, index) => (
+                          <a
+                            key={index}
+                            href={pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                            download
+                          >
+                            Download PDF
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+
+                    {pdfsProofs.length > 0 ? (
                     <div className="text-xs mb-2 grid grid-cols-2">
                       <div className="text-muted-foreground">Bukti Tf pdf</div>
                       <div className="font-semibold">
@@ -239,45 +279,7 @@ if (userPositionName === "GA") {
                       ) : (
                         ""
                       )}
-                </div>
-                <div className="">
-                  <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Nama Bank</div>
-                    <div className="font-semibold">{detail?.bank_name}</div>
-                  </div>
-                  <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Nama Pemilik Rekening</div>
-                    <div className="font-semibold">{detail?.account_name}</div>
-                  </div>
-                  <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Nomor Rekening</div>
-                    <div className="font-semibold">{detail?.account_number}</div>
-                  </div>
-                  <div className="text-xs mb-2 grid grid-cols-2">
-                    <div className="text-muted-foreground">Jumlah (Rp)</div>
-                    <div className="font-semibold">{detail?.amount ? formatCurrency(detail?.amount) : ""}</div>
-                  </div>
-                  {pdfs.length > 0 ? (
-                    <div className="text-xs mb-2 grid grid-cols-2">
-                      <div className="text-muted-foreground">Bukti Pdf</div>
-                      <div className="font-semibold">
-                      {pdfs.map((pdfUrl, index) => (
-                          <a
-                            key={index}
-                            href={pdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 underline"
-                            download
-                          >
-                            Download PDF
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    ""
-                  )}
+
                 </div>
               </div>
 

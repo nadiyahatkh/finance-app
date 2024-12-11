@@ -82,12 +82,12 @@ export default function StoreSwitcher({ className, items = [] }){
                     <AlertDialogHeader>
                       <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Anda Ingin Keluar Dari Akun
+                        Anda Ingin Keluar Dari Akun {session?.user?.name}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel onClick={() => setShowDialogLogOut(false)}>Batal</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleSignOut} style={{ background: "#F9B421" }}>
+                      <AlertDialogAction onClick={handleSignOut} className="hover:bg-black" style={{ background: "#F9B421" }}>
                                     {isLoading ? (
                                         <TailSpin
                                             height="20"
