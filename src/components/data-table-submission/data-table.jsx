@@ -227,7 +227,7 @@ export function DataTable({
                                 variant="outline"
                                 onClick={() => setIsDialogOpen(false)}
                                 type="button"
-                                className="mr-2 shadow-md h-8 w-[20%] text-[#F9B421] hover:bg-black"
+                                className="mr-2 shadow-md h-8 w-[20%] text-[#F9B421]"
                               >
                                 Kembali
                               </Button>

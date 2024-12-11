@@ -52,7 +52,7 @@ export default function EmployeeManagement() {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="solid" className="" style={{ background: "#F9B421" }}>
+            <Button variant="solid" className="bg-[#F9B421] hover:bg-black hover:text-white" >
                 <Link href="./employee-management/add-employee">
                     Tambah Karyawan
                 </Link>
