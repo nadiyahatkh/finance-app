@@ -34,9 +34,15 @@ export const fetchEmployee = async ({token, page, per_page}) => {
       formData.append('username', data.username);
       formData.append('email', data.email);
       formData.append('password', data.password);
-      formData.append('department_id', data.department_id);
       formData.append('position_id', data.position_id);
-      formData.append('manager_id', data.manager_id);
+      if (data.department_id) {
+        formData.append('department_id', data.department_id);
+    }
+
+    if (data.manager_id) {
+        formData.append('manager_id', data.manager_id);
+    }
+
       if (file) {
         formData.append('path', file);
       }

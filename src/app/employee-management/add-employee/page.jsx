@@ -47,9 +47,9 @@ export default function AddEmployee() {
         username: z.string().min(1, { message: "UserName karyawan is required." }),
         email: z.string().min(1, { message: "Email is required." }),
         password: z.string().min(1, { message: "Password wajib diisi." }),
-        department_id: z.string().min(1, { message: "Department wajib diisi." }),
+        department_id: z.string().optional(),
         position_id: z.string().min(1, { message: "Posisi wajib diisi." }),
-        manager_id: z.string().min(1, { message: "Manager wajib diisi." }),
+        manager_id: z.string().optional(),
         path: z.any().optional()
       });
 
@@ -101,8 +101,8 @@ export default function AddEmployee() {
 
 
     const onSubmit = async (data) => {
-        data.manager_id = managerId;
-        data.departement_id = departmentId;
+        data.manager_id = managerId || null;
+        data.departement_id = departmentId || null;
         data.position_id = positionId;
         setIsLoading(true)
         try {
@@ -252,7 +252,7 @@ export default function AddEmployee() {
                                         {...field}
                                         >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Pilih departement untuk ditampilkan" />
+                                            <SelectValue placeholder="Pilih manager untuk ditampilkan" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {managers?.map((manager) => (
