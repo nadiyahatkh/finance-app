@@ -457,6 +457,7 @@ export default function DetailSubmission() {
 
                 </div>
 
+                <div className="">
                 {role === 4 && detail?.admin_approvals?.some(
                       (approval) => approval.user?.role_id === 4 && approval.status === 'approved'
                     ) && (!file || file.length === 0) && (
@@ -533,25 +534,7 @@ export default function DetailSubmission() {
                     </div>
                   )}
 
-                  {role === 4 && 
-                  detail?.admin_approvals?.some(
-                    (approval) => approval.user?.role_id === 4 && approval.status === 'approved'
-                  ) && 
-                  detail?.proofs?.length > 0 && (
-                    <div className="text-xs mb-2 grid grid-cols-2">
-                      <div className="text-muted-foreground">Print Detail</div>
-                      <div className="font-semibold">
-                        <button
-                          onClick={() => router.push(`/submission/print/${submissionId}`)}
-                          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-black"
-                        >
-                          Print
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                <div className="flex justify-end">
+<div className="">
                   {showActions && (
                     <>
                       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -644,6 +627,26 @@ export default function DetailSubmission() {
                     </>
                   )}
                 </div>
+
+                  {role === 4 && 
+                  (
+                    <div className="text-xs mb-2 grid grid-cols-2">
+                      <div className="text-muted-foreground">Print Detail</div>
+                      <div className="font-semibold">
+                        <button
+                          onClick={() => router.push(`/submission/print/${submissionId}`)}
+                          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-black"
+                        >
+                          Print
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                
+
+                </div>
+
               </div>
 
               <ul className="relative flex flex-col md:flex-row gap-2">
