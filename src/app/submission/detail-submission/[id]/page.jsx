@@ -534,7 +534,7 @@ export default function DetailSubmission() {
                     </div>
                   )}
 
-<div className="">
+<div className="mb-2">
                   {showActions && (
                     <>
                       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
