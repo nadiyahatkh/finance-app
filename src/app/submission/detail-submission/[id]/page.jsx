@@ -14,6 +14,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay"
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+
+
 
 export default function DetailSubmission() {
   const { data: session } = useSession();
@@ -41,6 +44,7 @@ export default function DetailSubmission() {
   const [loading, setLoading] = useState(false); 
   const [file, setFile] = useState()
   const [isOpenDialogApprove, setIsOpenDialogApproved] = useState(false)
+  const { toast } = useToast()
   
   const loadDetail = async () => {
     if (token && submissionId) {
@@ -153,9 +157,18 @@ export default function DetailSubmission() {
       setLoading(true);
       try {
         const result = await checkBoxFinance({ token, id: submissionId });
-        console.log("API Response:", result);
+        toast({
+          title: "Berhasil!",
+          description: "Berhasil menceklist bukti hard copy.",
+          variant: "default", // Pilihan: success, error, etc.
+        });
       } catch (error) {
         console.error("Error calling API:", error);
+        toast({
+          title: "Gagal!",
+          description: "Terjadi kesalahan saat menceklist.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
@@ -165,7 +178,6 @@ export default function DetailSubmission() {
   const uploadFile = async(event) => {
     event.preventDefault();
     setLoadingUpload(true)
-  console.log("Upload button clicked");
 
   if (!selectedFiles || selectedFiles.length === 0) {
     console.error("No files selected");

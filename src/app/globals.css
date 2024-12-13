@@ -94,6 +94,11 @@ body {
   
 }
 
+.toast-success {
+  background: green;
+  color: white;
+}
+
 /* Sembunyikan scrollbar untuk semua browser */
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */

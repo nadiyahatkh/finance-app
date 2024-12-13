@@ -23,6 +23,7 @@ import { ThreeDots } from "react-loader-spinner";
 import { useParams, useRouter } from "next/navigation";
 import { fetchDepartments, fetchManagers, fetchPositions, updateUsers, userDetailId } from "../../apiService";
 
+const positionsWithoutInputs = ["GA", "Manager", "CEO", "Finance"];
 
 export default function UpdateEmployee() {
     const { data: session } = useSession();
@@ -118,32 +119,48 @@ export default function UpdateEmployee() {
         fetchData();
       }, [token, id]);
 
-    const onSubmit = async (data) => {
+      const onSubmit = async (data) => {
         const filteredData = { ...data };
+    
+        const selectedPosition = positions?.find((position) => position.id.toString() === data.position_id)?.name;
+        const isPositionWithoutInputs = positionsWithoutInputs.includes(selectedPosition);
+    
+        if (isPositionWithoutInputs) {
+            delete filteredData.manager_id;
+            delete filteredData.department_id;
+        }
     
         if (!data.password) {
             delete filteredData.password;
         }
-        setIsLoading(true)
+    
+    
+        setIsLoading(true);
         try {
-        const result = await updateUsers({ data: filteredData, token, id });
-        setOpenSuccess(true)
+            const result = await updateUsers({ data: filteredData, token, id });
+            setOpenSuccess(true);
         } catch (error) {
             let message = '';
-        try {
-            const errorDetail = JSON.parse(error.message);
-            setErrorMessages(Object.values(errorDetail.errors).flat());
-        } catch (e) {
-            message = error.message || "An unexpected error occurred.";
-            setErrorMessages([message]);
-        }
-
-        setOpenError(true);
-        console.error('Error creating asset:', error);
-        }  finally {
+            try {
+                const errorDetail = JSON.parse(error.message);
+                setErrorMessages(Object.values(errorDetail.errors).flat());
+            } catch (e) {
+                message = error.message || "An unexpected error occurred.";
+                setErrorMessages([message]);
+            }
+    
+            setOpenError(true);
+            console.error('Error update karyawan:', error);
+        } finally {
             setIsLoading(false);
-          }
-     };
+        }
+    };
+    
+
+     const shouldHideInputs = positionsWithoutInputs.includes(
+        positions?.find((position) => position.id.toString() === positionId)?.name
+    );
+
     return(
         <div className="py-4">
             <div className="w-full max-w-7xl mx-auto">
@@ -264,62 +281,6 @@ export default function UpdateEmployee() {
                                 )}
                                 />
                             </div>
-                                <div className="mb-4">
-                                <Label className="block text-sm mb-2">Manager</Label>
-                                <FormField
-                                control={form.control}
-                                name="manager_id"
-                                render={({ field }) => (
-                                    <>
-                                        <Select
-                                        value={field.value ? field.value.toString() : ""}
-                                        onValueChange={(value) => {
-                                            field.onChange(value); // Update react-hook-form state
-                                            setManagerId(value);
-                                        }}
-                                        {...field}
-                                        >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Pilih departement untuk ditampilkan" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {managers?.map((manager) => (
-                                            <SelectItem key={manager.id} value={manager.id.toString()}>{manager.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                        </Select>
-                                    </>
-                                )}
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <Label className="block text-sm mb-2" htmlFor="department_id">Departemen</Label>
-                                <FormField
-                                    control={form.control}
-                                    name="department_id"
-                                    render={({ field }) => (
-                                    <>
-                                        <Select
-                                        value={field.value ? field.value.toString() : ""}
-                                        onValueChange={(value) => {
-                                            field.onChange(value); // Update react-hook-form state
-                                            setDepartmentId(value);
-                                        }}
-                                        {...field}
-                                        >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Pilih departement untuk ditampilkan" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {departments?.map((department) => (
-                                            <SelectItem key={department.id} value={department.id.toString()}>{department.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                        </Select>
-                                    </>
-                                    )}
-                                    />
-                            </div>
                             <div className="mb-4">
                                 <Label className="block text-sm mb-2" htmlFor="position_id">Posisi</Label>
                                 <FormField
@@ -349,10 +310,77 @@ export default function UpdateEmployee() {
                                     )}
                                     />
                             </div>
+                             {/* Manager */}
+                            {!shouldHideInputs && (
+                                <div className="mb-4">
+                                    <Label className="block text-sm mb-2">Manager</Label>
+                                    <FormField
+                                        control={form.control}
+                                        name="manager_id"
+                                        render={({ field, fieldState }) => (
+                                            <>
+                                                <Select
+                                                    value={field.value ? field.value.toString() : ""}
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        setManagerId(value);
+                                                    }}
+                                                    {...field}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Pilih manager untuk ditampilkan" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {managers?.map((manager) => (
+                                                            <SelectItem key={manager.id} value={manager.id.toString()}>{manager.name}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                                            </>
+                                        )}
+                                    />
+                                </div>
+                            )}
+                            {/* Departments */}
+                            {!shouldHideInputs && (
+                            <div className="mb-4">
+                                <Label className="block text-sm mb-2" htmlFor="department_id">Departemen</Label>
+                                <FormField
+                                    control={form.control}
+                                    name="department_id"
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                        value={field.value ? field.value.toString() : ""}
+                                        onValueChange={(value) => {
+                                            field.onChange(value); 
+                                            setDepartmentId(value);
+                                        }}
+                                        {...field}
+                                        >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih departement untuk ditampilkan" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {departments?.map((department) => (
+                                            <SelectItem key={department.id} value={department.id.toString()}>{department.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
+                                        {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                                    </>
+                                    )}
+                                    />
+                            </div>
+
+                            )}
+                            
                             <div className="flex justify-end">
                             <Button
                             type="submit"
                             disabled={isLoading}
+                            onClick={() => console.log(form)}
                             className="px-4 py-2 text-sm font-semibold rounded-lg"
                             style={{ background: "#F9B421" }}
                             >

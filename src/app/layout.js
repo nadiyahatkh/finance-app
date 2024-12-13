@@ -7,6 +7,7 @@ import Navbar from "./navbar";
 import NextAuth from "@/lib/next-auth/NextAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Provider from "@/util/Providers";
+import { Toaster } from "@/components/ui/toaster";
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({ children }) {
         <NextAuth>
           <Navbar />
           {children}
+          <Toaster />
         </NextAuth>
 
         </Provider>
